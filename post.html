@@ -4,36 +4,144 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>文章详情 - lucky-xing's Blog</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #fafafa;
+            color: #333;
+            line-height: 1.8;
+        }
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+        header {
+            margin-bottom: 40px;
+        }
+        h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        .nav {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+        .nav a {
+            color: #0066cc;
+            text-decoration: none;
+        }
+        .nav a:hover {
+            text-decoration: underline;
+        }
+        .post-meta {
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .post-content {
+            font-size: 16px;
+        }
+        .post-content h2 {
+            font-size: 22px;
+            margin: 40px 0 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #0066cc;
+        }
+        .post-content h3 {
+            font-size: 18px;
+            margin: 30px 0 12px;
+        }
+        .post-content p {
+            margin-bottom: 16px;
+        }
+        .post-content ul, .post-content ol {
+            margin: 16px 0;
+            padding-left: 24px;
+        }
+        .post-content li {
+            margin-bottom: 8px;
+        }
+        .post-content pre {
+            background: #f5f5f5;
+            padding: 16px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 16px 0;
+        }
+        .post-content code {
+            font-family: 'Fira Code', monospace;
+            font-size: 14px;
+        }
+        .post-content blockquote {
+            border-left: 4px solid #0066cc;
+            padding-left: 16px;
+            margin: 16px 0;
+            color: #666;
+        }
+        .post-tags {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        .post-tags .tag {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #f0f0f0;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #666;
+            margin-right: 8px;
+            text-decoration: none;
+        }
+        .post-tags .tag:hover {
+            background: #e0e0e0;
+        }
+        .back-link {
+            margin-bottom: 30px;
+        }
+        .back-link a {
+            color: #0066cc;
+            text-decoration: none;
+        }
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+        footer {
+            margin-top: 80px;
+            padding-top: 40px;
+            border-top: 1px solid #eee;
+            color: #888;
+            font-size: 14px;
+        }
+    </style>
 </head>
-<body data-page="post">
-    <header class="header">
-        <nav class="nav">
-            <a href="index.html" class="logo">🚀 lucky-xing</a>
-            <div class="nav-links">
+<body>
+    <div class="container">
+        <header>
+            <nav class="nav">
                 <a href="index.html">首页</a>
                 <a href="archives.html">归档</a>
-                <a href="tags.html">标签</a>
                 <a href="about.html">关于</a>
-                <button id="theme-toggle" class="theme-btn" aria-label="切换主题">🌙</button>
-            </div>
-            <button class="mobile-menu-btn" id="mobile-menu-btn">☰</button>
-        </nav>
-    </header>
-    <div class="mobile-menu" id="mobile-menu">
-        <a href="index.html">首页</a>
-        <a href="archives.html">归档</a>
-        <a href="tags.html">标签</a>
-        <a href="about.html">关于</a>
+                <a href="https://github.com/lucky-xing" target="_blank">GitHub</a>
+            </nav>
+        </header>
+        
+        <div class="back-link">
+            <a href="index.html">← 返回首页</a>
+        </div>
+
+        <main id="content"></main>
+
+        <footer>
+            <p>© 2026 lucky-xing. Built with ❤️</p>
+        </footer>
     </div>
-    <main class="main">
-        <section class="content" id="content">
-            <!-- 文章内容由 JS 渲染 -->
-        </section>
-    </main>
-    <footer class="footer">
-        <p>© 2026 lucky-xing. Built with ❤️</p>
-    </footer>
     <script>
 const posts = [
     {
@@ -42,24 +150,8 @@ const posts = [
         date: '2026-03-14',
         category: '技术',
         tags: ['AI', '通信', '深度学习', '信道估计', '信号均衡', '接收机'],
-        excerpt: '调研报告：深度学习在通信接收机设计中的应用，包括信道估计、信号均衡、一体化接收机等核心技术的最新研究进展...',
-        content: `<h1>AI驱动的通信接收机设计综述</h1>
-<p><strong>摘要：</strong>随着5G向6G演进，AI与通信的深度融合已成为未来无线通信系统的重要研究方向。本文综述了近年来深度学习在通信接收机设计中的研究进展，重点关注信道估计、信号均衡和一体化接收机等核心问题。</p>
-<h2>一、引言</h2>
-<p>传统的通信接收机通常采用模块化的设计思路，将信道估计、均衡、解调等功能分离设计。然而，随着通信场景日益复杂，传统方法面临诸多挑战。</p>
-<h2>二、研究方向分类</h2>
-<h3>2.1 信道估计</h3>
-<p>CNN、RNN等深度学习方法在信道估计中表现出色。</p>
-<h3>2.2 信号均衡</h3>
-<p>深度神经网络均衡器、Transformer均衡器等技术发展迅速。</p>
-<h3>2.3 一体化接收机</h3>
-<p>端到端学习、Autoencoder架构、DeepJSCC等成为研究热点。</p>
-<h2>三、关键技术挑战</h2>
-<p>可解释性、泛化能力、计算复杂度等问题仍需解决。</p>
-<h2>四、未来发展趋势</h2>
-<p>物理先验神经网络、可解释AI、RIS+AI、通感一体化、6G展望等方向值得关注。</p>
-<h2>五、总结</h2>
-<p>AI技术在通信接收机设计领域展现出巨大潜力。</p>`
+        excerpt: '调研报告：深度学习在通信接收机设计中的应用...',
+        content: '<h1>AI驱动的通信接收机设计综述</h1><p><strong>摘要：</strong>随着5G向6G演进，AI与通信的深度融合已成为未来无线通信系统的重要研究方向。本文综述了近年来深度学习在通信接收机设计中的研究进展，重点关注信道估计、信号均衡和一体化接收机等核心问题。</p><h2>一、引言</h2><p>传统的通信接收机通常采用模块化的设计思路，将信道估计、均衡、解调等功能分离设计。然而，随着通信场景日益复杂（如高速移动、高频段通信、密集网络等），传统方法面临诸多挑战：</p><ul><li>信道模型难以精确描述</li><li>复杂信道环境下的估计精度下降</li><li>计算复杂度与性能的权衡</li><li>难以自适应地处理动态变化的环境</li></ul><p>近年来，深度学习凭借其强大的特征提取和非线性映射能力，为通信接收机设计带来了新的思路。</p><h2>二、研究方向分类</h2><h3>2.1 信道估计 (Channel Estimation)</h3><p>信道估计是接收机设计的核心问题之一。传统方法包括最小二乘（LS）、最小均方误差（MMSE）等。AI方法主要从以下角度进行改进：</p><h4>基于CNN的信道估计</h4><p>卷积神经网络（CNN）能够有效提取信道的局部特征，适用于处理频率选择性和时间选择性衰落信道。</p><ul><li><strong>CSI Feedback:</strong> 利用深度学习压缩信道状态信息（CSI），如CsiNet等</li><li><strong>导频估计:</strong> 通过神经网络直接从接收信号中估计信道响应</li></ul><h4>基于RNN的信道估计</h4><p>循环神经网络（RNN）及其变体（LSTM、GRU）适合处理时变信道，能够捕捉信道的时序相关性。</p><h4>最新研究进展 (2025-2026)</h4><ul><li><strong>X-REFINE:</strong> 基于可解释AI的信道估计架构</li><li><strong>RSS辅助MIMO信道估计:</strong> 利用接收信号强度辅助估计</li><li><strong>深度学习友好干扰:</strong> 在ISAC系统中利用深度学习实现安全通信</li></ul><h3>2.2 信号均衡 (Signal Equalization)</h3><p>信号均衡用于抵消信道引起的符号间干扰（ISI）。</p><h4>深度神经网络均衡器</h4><ul><li><strong>DNN均衡器:</strong> 深度神经网络能够学习复杂的非线性信道映射</li><li><strong>CNN均衡器:</strong> 适用于处理频率域信道的频率选择性问题</li><li><strong>Transformer均衡器:</strong> 利用自注意力机制处理长距离依赖</li></ul><h3>2.3 一体化接收机 (Integrated Receiver)</h3><p>一体化接收机旨在通过单一神经网络替代传统接收机的多个模块。</p><h4>端到端学习</h4><ul><li><strong>Autoencoder架构:</strong> 编码器-信道模型-解码器联合优化</li><li><strong>DeepJSCC:</strong> 深度联合源信道编码</li></ul><h2>三、关键技术挑战</h2><ol><li><strong>可解释性:</strong> 深度学习模型的黑盒特性限制了其在关键通信系统中的应用</li><li><strong>泛化能力:</strong> 模型在训练分布外的性能衰减问题</li><li><strong>计算复杂度:</strong> 神经网络推理的计算开销</li><li><strong>数据需求:</strong> 有监督学习需要大量标注数据</li></ol><h2>四、未来发展趋势</h2><ol><li><strong>物理先验神经网络:</strong> 融合电磁波传播规律的神经网络设计</li><li><strong>可解释AI:</strong> 提高模型的可解释性和可信度</li><li><strong>RIS+AI:</strong> AI与智能反射面的深度结合</li><li><strong>通感一体化:</strong> 通信与感知联合优化</li><li><strong>6G展望:</strong> AI-native空口设计</li></ol><h2>五、总结</h2><p>AI技术在通信接收机设计领域展现出巨大潜力，从信道估计到信号均衡，再到一体化接收机，研究者们正在探索多种技术路径。尽管仍面临可解释性、泛化能力等挑战，但随着6G研究的深入，AI与通信的融合将更加紧密。</p>'
     },
     {
         id: 1,
@@ -76,8 +168,8 @@ const posts = [
         date: '2026-03-10',
         category: '技术',
         tags: ['JavaScript', 'Async', '前端'],
-        excerpt: '深入理解 JavaScript 中的异步编程，包括 Promise、async/await 等...',
-        content: '<h2>什么是异步编程</h2><p>异步编程是 JavaScript 中的核心概念。</p><h3>Promise</h3><pre><code>const promise = new Promise((resolve, reject) => {});</code></pre><h3>async/await</h3><pre><code>async function fetchData() { const result = await fetch(url); return result; }</code></pre>'
+        excerpt: '深入理解 JavaScript 中的异步编程...',
+        content: '<h2>什么是异步编程</h2><p>异步编程是 JavaScript 中的核心概念，让我们能够处理非阻塞操作。</p><h3>Promise</h3><pre><code>const promise = new Promise((resolve, reject) => {\n  // 异步操作\n});</code></pre><h3>async/await</h3><pre><code>async function fetchData() {\n  const result = await fetch(url);\n  return result;\n}</code></pre>'
     },
     {
         id: 3,
@@ -86,7 +178,7 @@ const posts = [
         category: '工具',
         tags: ['VS Code', '效率', '工具'],
         excerpt: '分享一些提升开发效率的 VS Code 插件...',
-        content: '<p>好的工具能让开发效率翻倍。</p><ul><li>GitLens - Git 增强</li><li>Prettier - 代码格式化</li><li>ESLint - 代码检查</li><li>Live Server - 本地服务器</li></ul>'
+        content: '<p>好的工具能让开发效率翻倍，以下是我常用的 VS Code 插件：</p><ul><li><strong>GitLens</strong> - Git 增强</li><li><strong>Prettier</strong> - 代码格式化</li><li><strong>ESLint</strong> - 代码检查</li><li><strong>Live Server</strong> - 本地服务器</li></ul>'
     },
     {
         id: 4,
@@ -95,9 +187,14 @@ const posts = [
         category: '技术',
         tags: ['Docker', '容器', 'DevOps'],
         excerpt: 'Docker 是现代软件开发不可或缺的工具，本文介绍基础用法...',
-        content: '<h2>为什么用 Docker</h2><p>Docker 可以让我们实现"一次构建，到处运行"。</p><h3>基本命令</h3><pre><code>docker build -t myapp .</code></pre>'
+        content: '<h2>为什么用 Docker</h2><p>Docker 可以让我们实现"一次构建，到处运行"。</p><h3>基本命令</h3><pre><code>docker build -t myapp .\ndocker run -p 8080:80 myapp\ndocker ps\ndocker stop container_id</code></pre>'
     }
 ];
+
+function getUrlParams() {
+    const params = new URLSearchParams(window.location.search);
+    return { id: params.get('id') };
+}
 
 function escapeHtml(text) {
     const div = document.createElement('div');
@@ -105,51 +202,19 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-function searchByTag(tag) {
-    window.location.href = 'index.html?tag=' + encodeURIComponent(tag);
-}
+const { id } = getUrlParams();
+const post = posts.find(p => p.id === parseInt(id));
 
-function getUrlParams() {
-    const params = new URLSearchParams(window.location.search);
-    return { id: params.get('id') };
+if (!post) {
+    document.getElementById('content').innerHTML = '<p>文章不存在</p>';
+} else {
+    document.title = post.title + ' - lucky-xing\'s Blog';
+    document.getElementById('content').innerHTML = 
+        '<h1>' + escapeHtml(post.title) + '</h1>' +
+        '<div class="post-meta"><span>📅 ' + post.date + '</span> · <span>📁 ' + post.category + '</span></div>' +
+        '<div class="post-content">' + post.content + '</div>' +
+        '<div class="post-tags">' + post.tags.map(tag => '<a href="index.html" class="tag">' + escapeHtml(tag) + '</a>').join('') + '</div>';
 }
-
-function initTheme() {
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    document.documentElement.setAttribute('data-theme', savedTheme);
-    document.getElementById('theme-toggle').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
-    document.getElementById('theme-toggle').addEventListener('click', () => {
-        const currentTheme = document.documentElement.getAttribute('data-theme');
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        document.documentElement.setAttribute('data-theme', newTheme);
-        localStorage.setItem('theme', newTheme);
-        document.getElementById('theme-toggle').textContent = newTheme === 'dark' ? '☀️' : '🌙';
-    });
-}
-
-function initMobileMenu() {
-    const btn = document.getElementById('mobile-menu-btn');
-    const menu = document.getElementById('mobile-menu');
-    btn.addEventListener('click', () => {
-        menu.classList.toggle('active');
-    });
-}
-
-function initPost() {
-    const { id } = getUrlParams();
-    const post = posts.find(p => p.id === parseInt(id));
-    if (!post) {
-        document.getElementById('content').innerHTML = '<p>文章不存在</p>';
-        return;
-    }
-    document.getElementById('content').innerHTML = '<article class="post-detail"><h1>' + escapeHtml(post.title) + '</h1><div class="post-meta"><span>📅 ' + post.date + '</span><span>📁 ' + post.category + '</span></div><div class="post-content">' + post.content + '</div><div class="post-tags">' + post.tags.map(tag => '<span class="tag" onclick="searchByTag(\'' + escapeHtml(tag) + '\')">' + escapeHtml(tag) + '</span>').join('') + '</div></article><div class="comments"><h3>💬 评论</h3><p>评论功能开发中... 可在 <a href="https://github.com/lucky-xing/lucky-xing.github.io/issues" target="_blank">GitHub Issues</a> 留言</p></div>';
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-    initTheme();
-    initMobileMenu();
-    initPost();
-});
     </script>
 </body>
 </html>
