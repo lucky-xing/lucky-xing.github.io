@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>lucky-xing's Blog</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="index">
+    <!-- 导航栏 -->
+    <header class="header">
+        <nav class="nav">
+            <a href="index.html" class="logo">🚀 lucky-xing</a>
+            <div class="nav-links">
+                <a href="index.html">首页</a>
+                <a href="archives.html">归档</a>
+                <a href="tags.html">标签</a>
+                <a href="about.html">关于</a>
+                <button id="theme-toggle" class="theme-btn" aria-label="切换主题">🌙</button>
+            </div>
+            <button class="mobile-menu-btn" id="mobile-menu-btn">☰</button>
+        </nav>
+    </header>
+
+    <!-- 移动端菜单 -->
+    <div class="mobile-menu" id="mobile-menu">
+        <a href="index.html">首页</a>
+        <a href="archives.html">归档</a>
+        <a href="tags.html">标签</a>
+        <a href="about.html">关于</a>
+    </div>
+
+    <!-- 搜索框 -->
+    <div class="search-container" id="search-container">
+        <div class="search-box">
+            <input type="text" id="search-input" placeholder="搜索文章...">
+            <button id="search-close">×</button>
+        </div>
+        <div class="search-results" id="search-results"></div>
+    </div>
+
+    <!-- 主内容 -->
+    <main class="main">
+        <!-- 侧边栏 -->
+        <aside class="sidebar">
+            <div class="profile-card">
+                <img src="avatar.png" alt="Avatar" class="avatar" onerror="this.style.display='none'">
+                <h3>lucky-xing</h3>
+                <p class="bio">热爱技术，持续学习中...</p>
+                <div class="social-links">
+                    <a href="https://github.com" target="_blank">GitHub</a>
+                </div>
+            </div>
+            
+            <div class="category-card">
+                <h4>分类</h4>
+                <ul id="category-list"></ul>
+            </div>
+
+            <div class="tag-cloud">
+                <h4>标签云</h4>
+                <div id="tag-cloud"></div>
+            </div>
+        </aside>
+
+        <!-- 文章列表 -->
+        <section class="content" id="content">
+            <div class="posts-list" id="posts-list"></div>
+        </section>
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="footer">
+        <p>© 2026 lucky-xing. Built with ❤️</p>
+        <p><a href="https://github.com/lucky-xing/lucky-xing.github.io" target="_blank">GitHub</a></p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
