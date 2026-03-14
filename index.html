@@ -7,7 +7,6 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body data-page="index">
-    <!-- 导航栏 -->
     <header class="header">
         <nav class="nav">
             <a href="index.html" class="logo">🚀 lucky-xing</a>
@@ -21,16 +20,12 @@
             <button class="mobile-menu-btn" id="mobile-menu-btn">☰</button>
         </nav>
     </header>
-
-    <!-- 移动端菜单 -->
     <div class="mobile-menu" id="mobile-menu">
         <a href="index.html">首页</a>
         <a href="archives.html">归档</a>
         <a href="tags.html">标签</a>
         <a href="about.html">关于</a>
     </div>
-
-    <!-- 搜索框 -->
     <div class="search-container" id="search-container">
         <div class="search-box">
             <input type="text" id="search-input" placeholder="搜索文章...">
@@ -38,43 +33,203 @@
         </div>
         <div class="search-results" id="search-results"></div>
     </div>
-
-    <!-- 主内容 -->
     <main class="main">
-        <!-- 侧边栏 -->
         <aside class="sidebar">
             <div class="profile-card">
-                <img src="avatar.png" alt="Avatar" class="avatar" onerror="this.style.display='none'">
                 <h3>lucky-xing</h3>
                 <p class="bio">热爱技术，持续学习中...</p>
                 <div class="social-links">
-                    <a href="https://github.com" target="_blank">GitHub</a>
+                    <a href="https://github.com/lucky-xing" target="_blank">GitHub</a>
                 </div>
             </div>
-            
             <div class="category-card">
                 <h4>分类</h4>
                 <ul id="category-list"></ul>
             </div>
-
             <div class="tag-cloud">
                 <h4>标签云</h4>
                 <div id="tag-cloud"></div>
             </div>
         </aside>
-
-        <!-- 文章列表 -->
         <section class="content" id="content">
             <div class="posts-list" id="posts-list"></div>
         </section>
     </main>
-
-    <!-- 页脚 -->
     <footer class="footer">
         <p>© 2026 lucky-xing. Built with ❤️</p>
-        <p><a href="https://github.com/lucky-xing/lucky-xing.github.io" target="_blank">GitHub</a></p>
     </footer>
+    <script>
+const posts = [
+    {
+        id: 5,
+        title: 'AI驱动的通信接收机设计综述',
+        date: '2026-03-14',
+        category: '技术',
+        tags: ['AI', '通信', '深度学习', '信道估计', '信号均衡', '接收机'],
+        excerpt: '调研报告：深度学习在通信接收机设计中的应用，包括信道估计、信号均衡、一体化接收机等核心技术的最新研究进展...',
+        content: '<h1>AI驱动的通信接收机设计综述</h1><p><strong>摘要：</strong>随着5G向6G演进，AI与通信的深度融合已成为未来无线通信系统的重要研究方向。</p>'
+    },
+    {
+        id: 1,
+        title: 'Hello World - 我的第一篇博客',
+        date: '2026-03-14',
+        category: '随笔',
+        tags: ['Hello World', '开场白'],
+        excerpt: '欢迎来到我的技术博客！这是一个全新的开始...',
+        content: '<p>欢迎来到我的技术博客！这是一个全新的开始。</p>'
+    },
+    {
+        id: 2,
+        title: 'JavaScript 异步编程指南',
+        date: '2026-03-10',
+        category: '技术',
+        tags: ['JavaScript', 'Async', '前端'],
+        excerpt: '深入理解 JavaScript 中的异步编程，包括 Promise、async/await 等...',
+        content: '<h2>什么是异步编程</h2><p>异步编程是 JavaScript 中的核心概念。</p>'
+    },
+    {
+        id: 3,
+        title: 'VS Code 插件推荐',
+        date: '2026-03-05',
+        category: '工具',
+        tags: ['VS Code', '效率', '工具'],
+        excerpt: '分享一些提升开发效率的 VS Code 插件...',
+        content: '<p>好的工具能让开发效率翻倍。</p>'
+    },
+    {
+        id: 4,
+        title: 'Docker 入门教程',
+        date: '2026-02-28',
+        category: '技术',
+        tags: ['Docker', '容器', 'DevOps'],
+        excerpt: 'Docker 是现代软件开发不可或缺的工具，本文介绍基础用法...',
+        content: '<h2>为什么用 Docker</h2><p>Docker 可以让我们实现"一次构建，到处运行"。</p>'
+    }
+];
 
-    <script src="app.js?v=20260314"></script>
+const categories = {};
+posts.forEach(post => {
+    categories[post.category] = (categories[post.category] || 0) + 1;
+});
+
+const tags = {};
+posts.forEach(post => {
+    post.tags.forEach(tag => {
+        tags[tag] = (tags[tag] || 0) + 1;
+    });
+});
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function renderPosts(postsToRender) {
+    const container = document.getElementById('posts-list');
+    container.innerHTML = postsToRender.map(post => '<article class="post-card"><h2><a href="post.html?id=' + post.id + '">' + escapeHtml(post.title) + '</a></h2><div class="post-meta"><span>📅 ' + post.date + '</span><span>📁 ' + post.category + '</span></div><p class="post-excerpt">' + escapeHtml(post.excerpt) + '</p><div class="post-tags">' + post.tags.map(tag => '<span class="tag">' + escapeHtml(tag) + '</span>').join('') + '</div></article>').join('');
+}
+
+function renderSidebar() {
+    const categoryList = document.getElementById('category-list');
+    categoryList.innerHTML = Object.entries(categories).map(([cat, count]) => '<li><a href="index.html?category=' + encodeURIComponent(cat) + '">' + cat + '<span>(' + count + ')</span></a></li>').join('');
+    
+    const tagCloud = document.getElementById('tag-cloud');
+    tagCloud.innerHTML = Object.entries(tags).map(([tag, count]) => '<span class="tag" onclick="searchByTag(\'' + escapeHtml(tag) + '\')">' + escapeHtml(tag) + ' (' + count + ')</span>').join('');
+}
+
+function initTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    document.getElementById('theme-toggle').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        document.getElementById('theme-toggle').textContent = newTheme === 'dark' ? '☀️' : '🌙';
+    });
+}
+
+function initMobileMenu() {
+    document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+        document.getElementById('mobile-menu').classList.toggle('active');
+    });
+}
+
+function initSearch() {
+    const searchInput = document.getElementById('search-input');
+    const searchContainer = document.getElementById('search-container');
+    const searchResults = document.getElementById('search-results');
+    
+    document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+            e.preventDefault();
+            searchContainer.classList.add('active');
+            searchInput.focus();
+        }
+        if (e.key === 'Escape') {
+            searchContainer.classList.remove('active');
+        }
+    });
+    
+    document.getElementById('search-close').addEventListener('click', () => {
+        searchContainer.classList.remove('active');
+    });
+    
+    searchContainer.addEventListener('click', (e) => {
+        if (e.target === searchContainer) {
+            searchContainer.classList.remove('active');
+        }
+    });
+    
+    searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        if (query.length < 2) {
+            searchResults.innerHTML = '';
+            return;
+        }
+        const results = posts.filter(post => 
+            post.title.toLowerCase().includes(query) ||
+            post.excerpt.toLowerCase().includes(query) ||
+            post.tags.some(tag => tag.toLowerCase().includes(query))
+        );
+        if (results.length === 0) {
+            searchResults.innerHTML = '<div class="search-result-item"><p>没有找到相关文章</p></div>';
+        } else {
+            searchResults.innerHTML = results.map(post => '<div class="search-result-item" onclick="window.location.href=\'post.html?id=' + post.id + '\'"><h4>' + escapeHtml(post.title) + '</h4><p>' + escapeHtml(post.excerpt) + '</p></div>').join('');
+        }
+    });
+}
+
+function searchByTag(tag) {
+    window.location.href = 'index.html?tag=' + encodeURIComponent(tag);
+}
+
+function getUrlParams() {
+    const params = new URLSearchParams(window.location.search);
+    return {
+        category: params.get('category'),
+        tag: params.get('tag')
+    };
+}
+
+function initIndex() {
+    const { category, tag } = getUrlParams();
+    let filteredPosts = [...posts];
+    if (category) filteredPosts = filteredPosts.filter(p => p.category === category);
+    if (tag) filteredPosts = filteredPosts.filter(p => p.tags.includes(tag));
+    filteredPosts.sort((a, b) => new Date(b.date) - new Date(a.date));
+    renderPosts(filteredPosts);
+    renderSidebar();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initTheme();
+    initMobileMenu();
+    initSearch();
+    initIndex();
+});
+    </script>
 </body>
 </html>

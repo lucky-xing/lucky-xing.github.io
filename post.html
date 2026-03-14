@@ -34,6 +34,122 @@
     <footer class="footer">
         <p>© 2026 lucky-xing. Built with ❤️</p>
     </footer>
-    <script src="app.js?v=20260314"></script>
+    <script>
+const posts = [
+    {
+        id: 5,
+        title: 'AI驱动的通信接收机设计综述',
+        date: '2026-03-14',
+        category: '技术',
+        tags: ['AI', '通信', '深度学习', '信道估计', '信号均衡', '接收机'],
+        excerpt: '调研报告：深度学习在通信接收机设计中的应用，包括信道估计、信号均衡、一体化接收机等核心技术的最新研究进展...',
+        content: `<h1>AI驱动的通信接收机设计综述</h1>
+<p><strong>摘要：</strong>随着5G向6G演进，AI与通信的深度融合已成为未来无线通信系统的重要研究方向。本文综述了近年来深度学习在通信接收机设计中的研究进展，重点关注信道估计、信号均衡和一体化接收机等核心问题。</p>
+<h2>一、引言</h2>
+<p>传统的通信接收机通常采用模块化的设计思路，将信道估计、均衡、解调等功能分离设计。然而，随着通信场景日益复杂，传统方法面临诸多挑战。</p>
+<h2>二、研究方向分类</h2>
+<h3>2.1 信道估计</h3>
+<p>CNN、RNN等深度学习方法在信道估计中表现出色。</p>
+<h3>2.2 信号均衡</h3>
+<p>深度神经网络均衡器、Transformer均衡器等技术发展迅速。</p>
+<h3>2.3 一体化接收机</h3>
+<p>端到端学习、Autoencoder架构、DeepJSCC等成为研究热点。</p>
+<h2>三、关键技术挑战</h2>
+<p>可解释性、泛化能力、计算复杂度等问题仍需解决。</p>
+<h2>四、未来发展趋势</h2>
+<p>物理先验神经网络、可解释AI、RIS+AI、通感一体化、6G展望等方向值得关注。</p>
+<h2>五、总结</h2>
+<p>AI技术在通信接收机设计领域展现出巨大潜力。</p>`
+    },
+    {
+        id: 1,
+        title: 'Hello World - 我的第一篇博客',
+        date: '2026-03-14',
+        category: '随笔',
+        tags: ['Hello World', '开场白'],
+        excerpt: '欢迎来到我的技术博客！这是一个全新的开始...',
+        content: '<p>欢迎来到我的技术博客！这是一个全新的开始。</p><h2>关于这个博客</h2><p>我会在这里分享技术学习心得、项目经验和生活感悟。</p><blockquote>keep learning, keep growing</blockquote><p>希望你喜欢这里的内容！</p>'
+    },
+    {
+        id: 2,
+        title: 'JavaScript 异步编程指南',
+        date: '2026-03-10',
+        category: '技术',
+        tags: ['JavaScript', 'Async', '前端'],
+        excerpt: '深入理解 JavaScript 中的异步编程，包括 Promise、async/await 等...',
+        content: '<h2>什么是异步编程</h2><p>异步编程是 JavaScript 中的核心概念。</p><h3>Promise</h3><pre><code>const promise = new Promise((resolve, reject) => {});</code></pre><h3>async/await</h3><pre><code>async function fetchData() { const result = await fetch(url); return result; }</code></pre>'
+    },
+    {
+        id: 3,
+        title: 'VS Code 插件推荐',
+        date: '2026-03-05',
+        category: '工具',
+        tags: ['VS Code', '效率', '工具'],
+        excerpt: '分享一些提升开发效率的 VS Code 插件...',
+        content: '<p>好的工具能让开发效率翻倍。</p><ul><li>GitLens - Git 增强</li><li>Prettier - 代码格式化</li><li>ESLint - 代码检查</li><li>Live Server - 本地服务器</li></ul>'
+    },
+    {
+        id: 4,
+        title: 'Docker 入门教程',
+        date: '2026-02-28',
+        category: '技术',
+        tags: ['Docker', '容器', 'DevOps'],
+        excerpt: 'Docker 是现代软件开发不可或缺的工具，本文介绍基础用法...',
+        content: '<h2>为什么用 Docker</h2><p>Docker 可以让我们实现"一次构建，到处运行"。</p><h3>基本命令</h3><pre><code>docker build -t myapp .</code></pre>'
+    }
+];
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function searchByTag(tag) {
+    window.location.href = 'index.html?tag=' + encodeURIComponent(tag);
+}
+
+function getUrlParams() {
+    const params = new URLSearchParams(window.location.search);
+    return { id: params.get('id') };
+}
+
+function initTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    document.getElementById('theme-toggle').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        document.getElementById('theme-toggle').textContent = newTheme === 'dark' ? '☀️' : '🌙';
+    });
+}
+
+function initMobileMenu() {
+    const btn = document.getElementById('mobile-menu-btn');
+    const menu = document.getElementById('mobile-menu');
+    btn.addEventListener('click', () => {
+        menu.classList.toggle('active');
+    });
+}
+
+function initPost() {
+    const { id } = getUrlParams();
+    const post = posts.find(p => p.id === parseInt(id));
+    if (!post) {
+        document.getElementById('content').innerHTML = '<p>文章不存在</p>';
+        return;
+    }
+    document.getElementById('content').innerHTML = '<article class="post-detail"><h1>' + escapeHtml(post.title) + '</h1><div class="post-meta"><span>📅 ' + post.date + '</span><span>📁 ' + post.category + '</span></div><div class="post-content">' + post.content + '</div><div class="post-tags">' + post.tags.map(tag => '<span class="tag" onclick="searchByTag(\'' + escapeHtml(tag) + '\')">' + escapeHtml(tag) + '</span>').join('') + '</div></article><div class="comments"><h3>💬 评论</h3><p>评论功能开发中... 可在 <a href="https://github.com/lucky-xing/lucky-xing.github.io/issues" target="_blank">GitHub Issues</a> 留言</p></div>';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initTheme();
+    initMobileMenu();
+    initPost();
+});
+    </script>
 </body>
 </html>
