@@ -2,56 +2,112 @@
 const posts = [
     {
         id: 5,
-        title: 'AI信号均衡方法调研综述',
-        date: '2026-03-15',
+        title: 'AI驱动的通信接收机设计综述',
+        date: '2026-03-14',
         category: '技术',
-        tags: ['AI', '信号处理', '均衡器', '深度学习'],
-        excerpt: '全面调研5种主要AI均衡方法：DNN、CNN、LSTM、Transformer、端到端，详细性能对比表格，与传统方法的收益对比分析',
-        content: `<h2>引言</h2>
-<p>随着深度学习在通信领域的广泛应用，AI驱动的信道均衡技术已成为研究热点。本文调研了当前主流的AI均衡方法。</p>
-<h2>主要方法</h2>
-<h3>1. DNN均衡器</h3>
-<p>基于深度神经网络的均衡方法，通过大量训练样本学习信道特性。</p>
-<h3>2. CNN均衡器</h3>
-<p>利用卷积神经网络提取局部特征，适合处理频率选择性信道。</p>
-<h3>3. LSTM均衡器</h3>
-<p>长短期记忆网络能够捕获时序相关性，适合快衰落信道。</p>
-<h3>4. Transformer均衡器</h3>
-<p>基于自注意力机制，能够建模长距离依赖关系。</p>
-<h3>5. 端到端均衡</h3>
-<p>将通信系统整体建模为神经网络，实现联合优化。</p>
-<h2>性能对比</h2>
-<table>
-<tr><th>方法</th><th>复杂度</th><th>性能提升</th></tr>
-<tr><td>DNN</td><td>中</td><td>2-3dB</td></tr>
-<tr><td>CNN</td><td>中</td><td>2.5-3.5dB</td></tr>
-<tr><td>LSTM</td><td>高</td><td>3-4dB</td></tr>
-<tr><td>Transformer</td><td>高</td><td>3.5-5dB</td></tr>
-</table>
-<h2>结论</h2>
-<p>Transformer-based方法在性能上表现最优，但复杂度较高。实际应用中需要权衡性能与复杂度。</p>`
-    },
-    {
-        id: 6,
-        title: 'Transformer均衡器详解',
-        date: '2026-03-15',
-        category: '技术',
-        tags: ['AI', 'Transformer', '信号处理', '深度学习'],
-        excerpt: '深入分析Transformer在信道均衡中的应用，论文核心创新点、网络架构、实验性能数据',
-        content: `<h2>论文概述</h2>
-<p>本文深入分析Transformer在信道均衡中的最新研究进展。</p>
-<h2>核心创新</h2>
+        tags: ['AI', '通信', '深度学习', '信道估计', '信号均衡', '接收机'],
+        excerpt: '调研报告：深度学习在通信接收机设计中的应用，包括信道估计、信号均衡、一体化接收机等核心技术的最新研究进展...',
+        content: `<h1>AI驱动的通信接收机设计综述</h1>
+<p><strong>摘要：</strong>随着5G向6G演进，AI与通信的深度融合已成为未来无线通信系统的重要研究方向。本文综述了近年来深度学习在通信接收机设计中的研究进展，重点关注信道估计、信号均衡和一体化接收机等核心问题。</p>
+
+<h2>一、引言</h2>
+<p>传统的通信接收机通常采用模块化的设计思路，将信道估计、均衡、解调等功能分离设计。然而，随着通信场景日益复杂（如高速移动、高频段通信、密集网络等），传统方法面临诸多挑战：</p>
 <ul>
-<li>自注意力机制建模信道长距离依赖</li>
-<li>位置编码捕获时序信息</li>
-<li>多头注意力提取多尺度特征</li>
+<li>信道模型难以精确描述</li>
+<li>复杂信道环境下的估计精度下降</li>
+<li>计算复杂度与性能的权衡</li>
+<li>难以自适应地处理动态变化的环境</li>
 </ul>
-<h2>网络架构</h2>
-<p>Transformer均衡器主要由编码器和解码器组成，采用对称结构设计。</p>
-<h2>实验结果</h2>
-<p>在典型信道条件下，Transformer均衡器相比传统LMMSE方法有显著性能提升。</p>
-<h2>实践建议</h2>
-<p>建议在计算资源充足的场景下使用Transformer方法，同时注意训练数据的质量和数量。</p>`
+<p>近年来，深度学习凭借其强大的特征提取和非线性映射能力，为通信接收机设计带来了新的思路。</p>
+
+<h2>二、研究方向分类</h2>
+
+<h3>2.1 信道估计 (Channel Estimation)</h3>
+<p>信道估计是接收机设计的核心问题之一。传统方法包括最小二乘（LS）、最小均方误差（MMSE）等。AI方法主要从以下角度进行改进：</p>
+
+<h4>基于CNN的信道估计</h4>
+<p>卷积神经网络（CNN）能够有效提取信道的局部特征，适用于处理频率选择性和时间选择性衰落信道。</p>
+<ul>
+<li><strong>CSI Feedback:</strong> 利用深度学习压缩信道状态信息（CSI），如CsiNet等</li>
+<li><strong>导频估计:</strong> 通过神经网络直接从接收信号中估计信道响应</li>
+</ul>
+
+<h4>基于RNN的信道估计</h4>
+<p>循环神经网络（RNN）及其变体（LSTM、GRU）适合处理时变信道，能够捕捉信道的时序相关性。</p>
+
+<h4>最新研究进展 (2025-2026)</h4>
+<ul>
+<li><strong>X-REFINE:</strong> 基于可解释AI的信道估计架构，通过XAI技术优化网络结构</li>
+<li><strong>RSS辅助MIMO信道估计:</strong> 利用接收信号强度辅助估计，在有限导频下提升精度</li>
+<li><strong>深度学习友好干扰:</strong> 在ISAC系统中利用深度学习实现安全通信</li>
+</ul>
+
+<h3>2.2 信号均衡 (Signal Equalization)</h3>
+<p>信号均衡用于抵消信道引起的符号间干扰（ISI），传统方法包括线性均衡、判决反馈均衡（DFE）等。</p>
+
+<h4>深度神经网络均衡器</h4>
+<ul>
+<li><strong>DNN均衡器:</strong> 深度神经网络能够学习复杂的非线性信道映射</li>
+<li><strong>CNN均衡器:</strong> 适用于处理频率域信道的频率选择性问题</li>
+<li><strong>Transformer均衡器:</strong> 利用自注意力机制处理长距离依赖</li>
+</ul>
+
+<h4>RIS辅助均衡</h4>
+<p>智能反射面（RIS）技术的发展为均衡带来了新的可能性：</p>
+<ul>
+<li><strong>RIS信道均衡:</strong> 研究RIS辅助的脉冲响应均衡和信号增强</li>
+<li><strong>深度强化学习优化:</strong> 利用DRL自适应调整RIS相位</li>
+</ul>
+
+<h3>2.3 一体化接收机 (Integrated Receiver)</h3>
+<p>一体化接收机旨在通过单一神经网络替代传统接收机的多个模块，实现端到端的联合优化。</p>
+
+<h4>端到端学习 (End-to-End Learning)</h4>
+<p>将发射机、信道和接收机作为一个可微系统进行联合训练：</p>
+<ul>
+<li><strong>Autoencoder架构:</strong> 编码器-信道模型-解码器联合优化</li>
+<li><strong>DeepJSCC:</strong> 深度联合源信道编码，实现更高效的通信</li>
+</ul>
+
+<h4>神经网络的接收机</h4>
+<ul>
+<li><strong>ONet:</strong> 经典的一体化接收机网络</li>
+<li><strong>注意力机制接收机:</strong> 引入Transformer架构处理复杂通信场景</li>
+</ul>
+
+<h2>三、关键技术挑战</h2>
+<ol>
+<li><strong>可解释性:</strong> 深度学习模型的黑盒特性限制了其在关键通信系统中的应用</li>
+<li><strong>泛化能力:</strong> 模型在训练分布外的性能衰减问题</li>
+<li><strong>计算复杂度:</strong> 神经网络推理的计算开销</li>
+<li><strong>数据需求:</strong> 有监督学习需要大量标注数据</li>
+<li><strong>物理先验:</strong> 如何有效融合通信领域的物理知识</li>
+</ol>
+
+<h2>四、未来发展趋势</h2>
+<ol>
+<li><strong>物理先验神经网络:</strong> 融合电磁波传播规律的神经网络设计</li>
+<li><strong>可解释AI:</strong> 提高模型的可解释性和可信度</li>
+<li><strong>迁移学习:</strong> 减少对特定场景的训练数据需求</li>
+<li><strong>RIS+AI:</strong> AI与智能反射面的深度结合</li>
+<li><strong>通感一体化:</strong> 通信与感知联合优化</li>
+<li><strong>6G展望:</strong> AI-native空口设计</li>
+</ol>
+
+<h2>五、总结</h2>
+<p>AI技术在通信接收机设计领域展现出巨大潜力，从信道估计到信号均衡，再到一体化接收机，研究者们正在探索多种技术路径。尽管仍面临可解释性、泛化能力等挑战，但随着6G研究的深入，AI与通信的融合将更加紧密。</p>
+
+<h2>参考文献</h2>
+<ol>
+<li>X-REFINE: XAI-based RElevance input-Filtering and archItecture fiNe-tuning for channel Estimation (2026)</li>
+<li>RIS-Enabled Wireless Channel Equalization: Adaptive RIS Equalizer and Deep Reinforcement Learning (2026)</li>
+<li>Indirect and Direct Multiuser Hybrid Beamforming for Far-Field and Near-Field Communications (2026)</li>
+<li>Deep Learning-Driven Friendly Jamming for Secure Multicarrier ISAC (2026)</li>
+<li>Machine Learning for the Internet of Underwater Things (2026)</li>
+</ol>
+
+<hr>
+<p><em>作者：lucky-xing | 日期：2026-03-14</em></p>`
     },
     {
         id: 1,

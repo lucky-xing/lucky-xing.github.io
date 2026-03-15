@@ -4,38 +4,103 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>归档 - lucky-xing's Blog</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #fafafa;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+        header { margin-bottom: 40px; }
+        h1 { font-size: 28px; font-weight: 600; margin-bottom: 8px; }
+        .nav {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+        .nav a {
+            color: #0066cc;
+            text-decoration: none;
+        }
+        .nav a:hover { text-decoration: underline; }
+        .archive-year { margin-bottom: 40px; }
+        .archive-year h2 {
+            font-size: 20px;
+            color: #0066cc;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #0066cc;
+        }
+        .archive-item {
+            display: flex;
+            gap: 16px;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .archive-item .date {
+            color: #888;
+            font-size: 14px;
+            min-width: 100px;
+        }
+        .archive-item a {
+            color: #333;
+            text-decoration: none;
+        }
+        .archive-item a:hover { color: #0066cc; }
+        footer {
+            margin-top: 80px;
+            padding-top: 40px;
+            border-top: 1px solid #eee;
+            color: #888;
+            font-size: 14px;
+        }
+    </style>
 </head>
-<body data-page="archives">
-    <header class="header">
-        <nav class="nav">
-            <a href="index.html" class="logo">🚀 lucky-xing</a>
-            <div class="nav-links">
+<body>
+    <div class="container">
+        <header>
+            <h1>归档</h1>
+            <nav class="nav">
                 <a href="index.html">首页</a>
                 <a href="archives.html">归档</a>
-                <a href="tags.html">标签</a>
                 <a href="about.html">关于</a>
-                <button id="theme-toggle" class="theme-btn" aria-label="切换主题">🌙</button>
-            </div>
-            <button class="mobile-menu-btn" id="mobile-menu-btn">☰</button>
-        </nav>
-    </header>
-    <div class="mobile-menu" id="mobile-menu">
-        <a href="index.html">首页</a>
-        <a href="archives.html">归档</a>
-        <a href="tags.html">标签</a>
-        <a href="about.html">关于</a>
+                <a href="https://github.com/lucky-xing" target="_blank">GitHub</a>
+            </nav>
+        </header>
+        <main id="archives-list"></main>
+        <footer>
+            <p>© 2026 lucky-xing. Built with ❤️</p>
+        </footer>
     </div>
-    <main class="main" style="margin-top: 100px;">
-        <section class="content">
-            <div class="archive-list" id="archives-list">
-                <!-- 归档列表由 JS 渲染 -->
-            </div>
-        </section>
-    </main>
-    <footer class="footer">
-        <p>© 2026 lucky-xing. Built with ❤️</p>
-    </footer>
-    <script src="app.js"></script>
+    <script>
+const posts = [
+    { id: 5, title: 'AI驱动的通信接收机设计综述', date: '2026-03-14' },
+    { id: 1, title: 'Hello World - 我的第一篇博客', date: '2026-03-14' },
+    { id: 2, title: 'JavaScript 异步编程指南', date: '2026-03-10' },
+    { id: 3, title: 'VS Code 插件推荐', date: '2026-03-05' },
+    { id: 4, title: 'Docker 入门教程', date: '2026-02-28' }
+];
+
+const archives = {};
+posts.forEach(post => {
+    const year = post.date.split('-')[0];
+    if (!archives[year]) archives[year] = [];
+    archives[year].push(post);
+});
+
+const container = document.getElementById('archives-list');
+container.innerHTML = Object.entries(archives).sort((a, b) => b[0] - a[0]).map(([year, yearPosts]) => 
+    '<div class="archive-year"><h2>' + year + '年</h2>' + 
+    yearPosts.sort((a, b) => new Date(b.date) - new Date(a.date)).map(post => 
+        '<div class="archive-item"><span class="date">' + post.date + '</span><a href="post.html?id=' + post.id + '">' + post.title + '</a></div>'
+    ).join('') + '</div>'
+).join('');
+    </script>
 </body>
 </html>
