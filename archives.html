@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>归档 - lucky-xing's Blog</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="archives">
+    <header class="header">
+        <nav class="nav">
+            <a href="index.html" class="logo">🚀 lucky-xing</a>
+            <div class="nav-links">
+                <a href="index.html">首页</a>
+                <a href="archives.html">归档</a>
+                <a href="tags.html">标签</a>
+                <a href="about.html">关于</a>
+                <button id="theme-toggle" class="theme-btn" aria-label="切换主题">🌙</button>
+            </div>
+            <button class="mobile-menu-btn" id="mobile-menu-btn">☰</button>
+        </nav>
+    </header>
+    <div class="mobile-menu" id="mobile-menu">
+        <a href="index.html">首页</a>
+        <a href="archives.html">归档</a>
+        <a href="tags.html">标签</a>
+        <a href="about.html">关于</a>
+    </div>
+    <main class="main" style="margin-top: 100px;">
+        <section class="content">
+            <div class="archive-list" id="archives-list">
+                <!-- 归档列表由 JS 渲染 -->
+            </div>
+        </section>
+    </main>
+    <footer class="footer">
+        <p>© 2026 lucky-xing. Built with ❤️</p>
+    </footer>
+    <script src="app.js"></script>
+</body>
+</html>
