@@ -80,6 +80,8 @@
     </div>
     <script>
 const posts = [
+    { id: 101, title: 'AI信号均衡技术调研综述', date: '2026-03-15', link: 'posts/2026/03/15/ai-equalization-survey.html' },
+    { id: 102, title: 'Transformer均衡器详解', date: '2026-03-15', link: 'posts/2026/03/15/transformer-equalizer-detail.html' },
     { id: 5, title: 'AI驱动的通信接收机设计综述', date: '2026-03-14' },
     { id: 1, title: 'Hello World - 我的第一篇博客', date: '2026-03-14' },
     { id: 2, title: 'JavaScript 异步编程指南', date: '2026-03-10' },
@@ -97,9 +99,10 @@ posts.forEach(post => {
 const container = document.getElementById('archives-list');
 container.innerHTML = Object.entries(archives).sort((a, b) => b[0] - a[0]).map(([year, yearPosts]) => 
     '<div class="archive-year"><h2>' + year + '年</h2>' + 
-    yearPosts.sort((a, b) => new Date(b.date) - new Date(a.date)).map(post => 
-        '<div class="archive-item"><span class="date">' + post.date + '</span><a href="post.html?id=' + post.id + '">' + post.title + '</a></div>'
-    ).join('') + '</div>'
+    yearPosts.sort((a, b) => new Date(b.date) - new Date(a.date)).map(post => {
+        const link = post.link || ('post.html?id=' + post.id);
+        return '<div class="archive-item"><span class="date">' + post.date + '</span><a href="' + link + '">' + post.title + '</a></div>';
+    }).join('') + '</div>'
 ).join('');
     </script>
 </body>
