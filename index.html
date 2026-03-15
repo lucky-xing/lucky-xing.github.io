@@ -105,6 +105,24 @@
     <script>
 const posts = [
     {
+        id: 101,
+        title: 'AI信号均衡技术调研综述',
+        date: '2026-03-15',
+        category: '技术',
+        tags: ['AI', '信号均衡', '深度学习', 'DNN', 'CNN', 'LSTM', 'Transformer'],
+        excerpt: '5种主要AI均衡方法（DNN、CNN、LSTM、Transformer、端到端）详细性能对比表格，与传统方法的收益对比分析',
+        link: 'posts/2026/03/15/ai-equalization-survey.html'
+    },
+    {
+        id: 102,
+        title: 'Transformer均衡器详解',
+        date: '2026-03-15',
+        category: '技术',
+        tags: ['AI', 'Transformer', '信号均衡', '深度学习'],
+        excerpt: '论文核心创新点、网络架构详解、实验性能数据、收益来源分析、实践建议',
+        link: 'posts/2026/03/15/transformer-equalizer-detail.html'
+    },
+    {
         id: 5,
         title: 'AI驱动的通信接收机设计综述',
         date: '2026-03-14',
@@ -160,14 +178,15 @@ function escapeHtml(text) {
 posts.sort((a, b) => new Date(b.date) - new Date(a.date));
 
 const container = document.getElementById('posts-list');
-container.innerHTML = posts.map(post => 
-    '<article class="post">' +
+container.innerHTML = posts.map(post => {
+    const link = post.link || ('post.html?id=' + post.id);
+    return '<article class="post">' +
         '<span class="post-date">' + post.date + ' · ' + post.category + '</span>' +
-        '<h2 class="post-title"><a href="post.html?id=' + post.id + '">' + escapeHtml(post.title) + '</a></h2>' +
+        '<h2 class="post-title"><a href="' + link + '">' + escapeHtml(post.title) + '</a></h2>' +
         '<p class="post-excerpt" style="color:#666;font-size:14px;margin:8px 0;">' + escapeHtml(post.excerpt) + '</p>' +
         '<div class="post-tags">' + post.tags.map(tag => '<span class="tag">' + escapeHtml(tag) + '</span>').join('') + '</div>' +
-    '</article>'
-).join('');
+    '</article>';
+}).join('');
     </script>
 </body>
 </html>
