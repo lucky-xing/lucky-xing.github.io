@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Context Compression via Explicit Information Transmission - lucky-xing's Blog</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.9; color: #333; background: #f5f7fa; padding: 20px; }
+        .container { max-width: 920px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px; text-align: center; }
+        .header h1 { font-size: 1.8em; margin-bottom: 10px; }
+        .header .meta { opacity: 0.9; font-size: 0.95em; }
+        .content { padding: 40px; }
+        h2 { color: #667eea; margin-top: 40px; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 2px solid #e8ecf1; font-size: 1.45em; }
+        h3 { color: #555; margin-top: 28px; margin-bottom: 14px; font-size: 1.2em; }
+        h4 { color: #666; margin-top: 20px; margin-bottom: 12px; font-size: 1.05em; }
+        p { margin-bottom: 16px; text-align: justify; }
+        ul, ol { margin: 15px 0 15px 28px; }
+        li { margin-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 0.9em; }
+        th, td { padding: 14px 16px; text-align: left; border-bottom: 1px solid #e8ecf1; }
+        th { background: #667eea; color: white; }
+        tr:hover { background: #f8f9fa; }
+        .tech-card { background: #f8f9fa; border-left: 4px solid #667eea; padding: 22px; margin: 24px 0; border-radius: 0 8px 8px 0; }
+        .tech-card h4 { color: #667eea; margin-top: 0; }
+        code { background: #f0f0f0; padding: 2px 6px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 0.9em; }
+        pre { background: #2d2d2d; color: #f8f8f2; padding: 20px; border-radius: 8px; overflow-x: auto; margin: 24px 0; font-size: 0.85em; line-height: 1.6; }
+        pre code { background: none; padding: 0; }
+        blockquote { border-left: 4px solid #667eea; padding-left: 20px; margin: 24px 0; color: #666; font-style: italic; }
+        footer { margin-top: 50px; padding-top: 24px; border-top: 1px solid #eee; text-align: center; color: #888; font-size: 0.9em; }
+        .back-link { padding: 20px 40px; background: #f8f9fa; }
+        .back-link a { color: #667eea; text-decoration: none; }
+        .figure { text-align: center; margin: 36px 0; }
+        .figure img { max-width: 100%; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
+        .figure-caption { color: #666; font-size: 0.9em; margin-top: 12px; }
+        .math { font-family: 'Times New Roman', serif; font-style: italic; }
+        .note { background: #e7f3ff; border-left: 4px solid #2196F3; padding: 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+        .warning { background: #fff3e0; border-left: 4px solid #ff9800; padding: 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Context Compression via Explicit Information Transmission</h1>
+            <div class="meta"><p>📅 2026-03-17 | 📚 论文解读</p></div>
+        </header>
+        <div class="back-link"><a href="/index.html">← 返回首页</a></div>
+        <div class="content">
+            <h2>一、引言：长上下文推理的困境</h2>
+            
+            <h3>1.1 为什么长上下文如此昂贵？</h3>
+            <p>随着大语言模型（LLM）的规模不断扩大，处理长上下文输入的计算和内存成本已成为实际部署的主要瓶颈。造成这种高成本的原因主要有两点：</p>
+            
+            <ul>
+                <li><strong>二次方复杂度的自注意力</strong>：标准Transformer的自注意力机制需要计算所有token对之间的注意力分数，对于长度为N的序列，计算复杂度为O(N²)</li>
+                <li><strong>不断增长的KV缓存</strong>：在自回归生成过程中，需要存储所有已处理token的Key和Value向量，内存占用随序列长度线性增长</li>
+            </ul>
+
+            <div class="warning">
+                <strong>现实问题：</strong>处理一篇100K token的文档可能需要数十GB的GPU显存，这在实际应用中几乎不可行。
+            </div>
+
+            <h3>1.2 上下文压缩的兴起</h3>
+            <p>为了解决上述问题，<strong>上下文压缩（Context Compression）</strong>技术应运而生。其核心思想是将长上下文压缩成少量紧凑的向量表示，从而降低推理成本。</p>
+            
+            <p>现有的压缩方法可以分为两大类：</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>类别</th>
+                        <th>核心思想</th>
+                        <th>优点</th>
+                        <th>缺点</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>硬压缩（Hard Compression）</strong></td>
+                        <td>根据重要性评分直接删除token</td>
+                        <td>实现简单，计算开销小</td>
+                        <td>离散、有损，高压缩率下信息丢失严重</td>
+                    </tr>
+                    <tr>
+                        <td><strong>软压缩（Soft Compression）</strong></td>
+                        <td>将多个token的信息聚合到连续向量中</td>
+                        <td>表达能力强，聚合粒度细</td>
+                        <td>现有方法存在结构性问题</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>1.3 现有软压缩方法的问题</h3>
+            <p>大多数现有的软压缩方法采用<strong>LLM-as-a-compressor</strong>范式：通过引入特殊的压缩token（gist/memory tokens），利用LLM内部的自注意力机制逐层迭代地从上下文token中吸收信息。</p>
+            
+            <div class="note">
+                <strong>论文核心发现：</strong>这种范式存在两个关键的结构性缺陷！
+            </div>
+
+            <h4>问题一：逐层表示覆盖（Representation Overwriting）</h4>
+            <p>在逐层迭代更新过程中，压缩token在早期层聚合的信息可能被后续层的更新所覆盖。同时，深层表示会逐渐偏向高度抽象的、专门用于生成的特征，导致：</p>
+            <ul>
+                <li>压缩器与解码器之间存在<strong>分布失配（Distribution Mismatch）</strong></li>
+                <li>压缩优化更加困难，性能下降</li>
+            </ul>
+
+            <h4>问题二：缺乏全局协调（Lack of Global Coordination）</h4>
+            <p>自注意力的聚合是各压缩token独立进行的，没有机制来协调不同token之间的容量分配：</p>
+            <ul>
+                <li>多个压缩token可能重复关注同一批上下文位置</li>
+                <li>其他重要位置被忽视</li>
+                <li>有限的压缩预算被低效利用</li>
+            </ul>
+
+            <h2>二、ComprExIT：显式信息传输框架</h2>
+            
+            <p>来自Jiangnan Ye等人发表的论文<strong>"Context Compression via Explicit Information Transmission"</strong>提出了ComprExIT（Context Compression via Explicit Information Transmission），这是一个全新的压缩范式。</p>
+            
+            <div class="tech-card">
+                <h4>核心思想</h4>
+                <p>ComprExIT将压缩过程从LLM内部的自注意力机制中<strong>解耦</strong>出来，转而对冻结LLM的隐藏状态进行显式信息传输。这种方法：</p>
+                <ul>
+                    <li>避免逐层表示漂移</li>
+                    <li>实现全局协调的信息分配</li>
+                    <li>只引入约1%的额外参数</li>
+                </ul>
+            </div>
+
+            <h3>2.1 两种传输维度</h3>
+            <p>ComprExIT沿两个正交维度执行信息传输：</p>
+
+            <h4>（1）深度传输（Depth-wise Transmission）</h4>
+            <p>沿层维度，选择性地将多层隐藏状态信息传输到token锚点，缓解逐层覆盖问题。</p>
+            
+            <h4>（2）宽度传输（Width-wise Transmission）</h4>
+            <p>沿token维度，将N个token锚点聚合成K个压缩槽位，通过全局优化的传输计划确保信息协调分配。</p>
+
+            <h3>2.2 Token锚点的构建（深度传输）</h3>
+            <p>首先，需要将LLM各层的隐藏状态聚合为token锚点。ComprExIT采用以下步骤：</p>
+
+            <h4>步骤1：结构化层混合</h4>
+            <p>对每个token位置t，首先进行层状态的加权混合：</p>
+            
+            <div class="tech-card">
+                <h4>层混合公式</h4>
+                <p><span class="math">h̄_t = Σ_{ℓ=1}^{L} w_ℓ · h_t^{(ℓ)}, Σ_{ℓ=1}^{L} w_ℓ = 1</span></p>
+                <p>其中 <span class="math">w_ℓ</span> 是可学习的层优先级权重（灵感来自DenseFormer）。</p>
+            </div>
+
+            <h4>步骤2：层门控计算</h4>
+            <p>基于混合后的上下文，计算层门控分数：</p>
+            
+            <div class="tech-card">
+                <h4>门控分数计算</h4>
+                <p><span class="math">s_{t,ℓ} = ⟨W_c · h̄_t, W_ℓ · h_t^{(ℓ)} + e_ℓ⟩</span></p>
+                <p>其中 <span class="math">e_ℓ</span> 是可学习的层嵌入，提供层索引信息。</p>
+            </div>
+
+            <h4>步骤3：门控归一化与聚合</h4>
+            <p>对门控分数进行softmax归一化（温度τ控制）：</p>
+            
+            <div class="tech-card">
+                <h4>门控系数</h4>
+                <p><span class="math">α_{t,ℓ} = exp(s_{t,ℓ}/τ) / Σ_{j=1}^{L} exp(s_{t,j}/τ)</span></p>
+                <p>最终生成token锚点：</p>
+                <p><span class="math">h̃_t = Σ_{ℓ=1}^{L} α_{t,ℓ} · W_a · h_t^{(ℓ)}</span></p>
+            </div>
+
+            <div class="note">
+                <strong>设计动机：</strong>不同token可以根据其语义重要性选择不同层的表示。重要实体token倾向于选择中间层（包含更丰富的上下文和关系信息），而不重要的token则更依赖早期层（捕获局部词汇特征）。
+            </div>
+
+            <h3>2.3 压缩槽位的构建（宽度传输）</h3>
+            <p>将N个token锚点压缩成K个槽位（K << N）。这是通过<strong>最优传输（Optimal Transport）</strong>理论来实现的。</p>
+
+            <h4>步骤1：构建接收者（Receivers）</h4>
+            <p>将token锚点序列划分为K个局部场（local fields），对每个场进行均值聚合：</p>
+            
+            <div class="tech-card">
+                <h4>接收者表示</h4>
+                <p><span class="math">r_k = (1/|ℱ_k|) Σ_{t∈ℱ_k} h̃_t</span></p>
+                <p>这种设计保持了原始序列的语义顺序。</p>
+            </div>
+
+            <h4>步骤2：构建效用矩阵（Utility Matrix）</h4>
+            <p>计算每个发送者（锚点）到每个接收者（槽位）的效用：</p>
+            
+            <div class="tech-card">
+                <h4>效用矩阵</h4>
+                <p><span class="math">U_{t,k} = cos(W_u · h̃_t, W_u · r_k)</span></p>
+                <p>使用余弦相似度衡量信息传输的"价值"。</p>
+            </div>
+
+            <h4>步骤3：信息容量学习</h4>
+            <p>每个发送者可以学习选择性地丢弃冗余信息：</p>
+            
+            <div class="tech-card">
+                <h4>发送者容量</h4>
+                <p><span class="math">ρ_t = exp(W_ρ · h̃_t) / Σ_{j=1}^{N} exp(W_ρ · h̃_j)</span></p>
+                <p>接收者容量设为均匀：<span class="math">ρ_k = 1/K</span></p>
+            </div>
+
+            <h4>步骤4：求解最优传输计划</h4>
+            <p>通过优化以下问题得到全局协调的传输计划：</p>
+            
+            <div class="tech-card">
+                <h4>最优传输问题</h4>
+                <p>最小化：<span class="math">Σ_{t,k} Π_{t,k} · C_{t,k}</span></p>
+                <p>约束条件：</p>
+                <ul>
+                    <li><span class="math">Σ_k Π_{t,k} = ρ_t, ∀t</span>（发送者容量约束）</li>
+                    <li><span class="math">Σ_t Π_{t,k} = ρ_k, ∀k</span>（接收者容量约束）</li>
+                </ul>
+                <p>其中成本 <span class="math">C_{t,k} = 1 - U_{t,k}</span></p>
+            </div>
+
+            <p>论文使用<strong>Sinkhorn算法</strong>（带熵正则化）高效求解这个问题，复杂度为O(T²)，其中T是分段长度（默认128）。</p>
+
+            <h3>2.4 最终压缩表示</h3>
+            <p>每个压缩槽位根据传输计划聚合信息：</p>
+            
+            <div class="tech-card">
+                <h4>压缩槽位生成</h4>
+                <p><span class="math">z_k = Σ_t Π_{t,k} · W_g · h̃_t</span></p>
+                <p>最后通过一个轻量级MLP进行表示对齐：</p>
+                <p><span class="math">c_k = MLP(z_k)</span></p>
+            </div>
+
+            <h3>2.5 两阶段训练方法</h3>
+            <p>ComprExIT采用两阶段训练：</p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>阶段</th>
+                        <th>目标</th>
+                        <th>数据</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>第一阶段：NTP</td>
+                        <td>下一个token预测，保持通用上下文信息</td>
+                        <td>SlimPajama (1B tokens)</td>
+                    </tr>
+                    <tr>
+                        <td>第二阶段：SFT</td>
+                        <td>下游任务微调，适应任务相关的选择性压缩</td>
+                        <td>MRQA (6个in-domain + 6个out-of-domain QA数据集)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>三、实验结果与分析</h2>
+
+            <h3>3.1 实验设置</h3>
+            <div class="tech-card">
+                <h4>模型与配置</h4>
+                <ul>
+                    <li><strong>基础模型</strong>：Llama-3.2-1B-Base 和 Llama-3.2-3B-Base</li>
+                    <li><strong>投影隐藏维度</strong>：256</li>
+                    <li><strong>Sinkhorn迭代次数</strong>：30</li>
+                    <li><strong>压缩率</strong>：4倍（512 → 128 tokens）</li>
+                    <li><strong>评估指标</strong>：Exact Match (EM) 和 F1</li>
+                </ul>
+            </div>
+
+            <h3>3.2 主实验结果</h3>
+            <p>在6个QA基准数据集上的实验结果：</p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>方法</th>
+                        <th>SQuAD</th>
+                        <th>NewsQA</th>
+                        <th>TriviaQA</th>
+                        <th>SearchQA</th>
+                        <th>HotpotQA</th>
+                        <th>NQ</th>
+                        <th>平均</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td colspan="8"><strong>Llama-3.2-1B</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Prompt tuning (无压缩)</td>
+                        <td>71.89/81.09</td>
+                        <td>30.72/45.76</td>
+                        <td>61.04/66.75</td>
+                        <td>64.03/70.64</td>
+                        <td>53.60/69.49</td>
+                        <td>53.03/66.59</td>
+                        <td>55.72/66.72</td>
+                    </tr>
+                    <tr>
+                        <td>ICAE</td>
+                        <td>36.84/50.21</td>
+                        <td>20.20/33.73</td>
+                        <td>57.59/63.54</td>
+                        <td>67.40/74.43</td>
+                        <td>40.67/57.04</td>
+                        <td>42.26/58.00</td>
+                        <td>44.16/56.16</td>
+                    </tr>
+                    <tr>
+                        <td>500×</td>
+                        <td>4.65/14.02</td>
+                        <td>1.85/5.27</td>
+                        <td>26.09/32.66</td>
+                        <td>17.44/25.59</td>
+                        <td>5.56/13.44</td>
+                        <td>5.58/13.89</td>
+                        <td>10.20/17.48</td>
+                    </tr>
+                    <tr>
+                        <td>Beacon</td>
+                        <td>24.88/39.50</td>
+                        <td>9.12/15.74</td>
+                        <td>0.51/2.15</td>
+                        <td>1.90/9.86</td>
+                        <td>31.23/46.35</td>
+                        <td>21.04/37.05</td>
+                        <td>14.78/25.11</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ComprExIT</strong></td>
+                        <td><strong>51.38/68.08</strong></td>
+                        <td><strong>30.39/49.12</strong></td>
+                        <td><strong>64.62/70.93</strong></td>
+                        <td><strong>71.91/78.93</strong></td>
+                        <td><strong>49.84/68.40</strong></td>
+                        <td><strong>45.93/63.88</strong></td>
+                        <td><strong>52.34/66.55</strong></td>
+                    </tr>
+                    <tr>
+                        <td colspan="8"><strong>Llama-3.2-3B</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Prompt tuning (无压缩)</td>
+                        <td>80.39/88.41</td>
+                        <td>35.23/50.98</td>
+                        <td>71.23/76.30</td>
+                        <td>72.04/78.42</td>
+                        <td>55.31/72.65</td>
+                        <td>59.46/73.32</td>
+                        <td>62.28/73.35</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ComprExIT</strong></td>
+                        <td>59.26/75.68</td>
+                        <td><strong>35.73/55.23</strong></td>
+                        <td><strong>72.97/78.86</strong></td>
+                        <td><strong>78.00/84.40</strong></td>
+                        <td>55.92/74.15</td>
+                        <td>52.23/68.95</td>
+                        <td><strong>59.02/72.88</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>3.3 关键发现</h3>
+            
+            <h4>（1）全面超越现有方法</h4>
+            <ul>
+                <li>ComprExIT在所有6个QA基准上<strong>一致优于</strong>所有压缩基线方法</li>
+                <li>在1B模型上平均EM提升<strong>8.18%</strong>（52.34 vs 44.16）</li>
+                <li>在3B模型上平均EM提升<strong>7.16%</strong>（59.02 vs 51.86）</li>
+            </ul>
+
+            <h4>（2）匹配甚至超越无压缩基线</h4>
+            <ul>
+                <li>在多个数据集上（TriviaQA、SearchQA等），ComprExIT<strong>超越了无压缩的prompt tuning基线</strong></li>
+                <li>原因： ComprExIT的选择机制可以<strong>过滤掉干扰信息</strong>，对信息检索类任务特别有利</li>
+            </ul>
+
+            <h4>（3）小模型上的稳定性</h4>
+            <div class="note">
+                <strong>重要发现：</strong>当从3B缩小到1B时，500×和Beacon方法性能急剧下降，而ComprExIT保持稳定！
+            </div>
+            <ul>
+                <li>500×和Beacon直接注入压缩token的KV状态到解码器</li>
+                <li>虽然保留更多内部特征，但更深度地耦合了压缩器和解码器的表示空间</li>
+                <li>ComprExIT以非侵入方式提供更清晰、对齐更好的表示，即使小模型也能表现良好</li>
+            </ul>
+
+            <h3>3.4 消融实验</h3>
+            <p>对关键设计选择进行消融：</p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>变体</th>
+                        <th>平均EM</th>
+                        <th>平均F1</th>
+                        <th>下降</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>完整 ComprExIT</td>
+                        <td>52.34</td>
+                        <td>66.55</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>无协调分配（窗口注意力）</td>
+                        <td>47.69</td>
+                        <td>61.94</td>
+                        <td>↓ 4.65 / ↓ 4.61</td>
+                    </tr>
+                    <tr>
+                        <td>无层聚合（只用最后一层）</td>
+                        <td>36.12</td>
+                        <td>49.35</td>
+                        <td>↓ 16.22 / ↓ 17.20</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="warning">
+                <strong>关键洞察：</strong>层聚合的影响最大（下降16%+），说明多层信息融合对压缩质量至关重要！
+            </div>
+
+            <h3>3.5 进一步分析</h3>
+            
+            <h4>（1）协调分配的效果</h4>
+            <p>论文通过可视化分析发现：</p>
+            <ul>
+                <li><strong>ICAE</strong>：压缩token之间存在显著的重叠（高Pearson相关系数），表明多个token重复关注同一内容</li>
+                <li><strong>ComprExIT</strong>：不同槽位之间相关性始终较低，说明每个token吸收了互补信息而非冗余信息</li>
+            </ul>
+
+            <h4>（2）层选择偏好</h4>
+            <p>分析门控权重发现：</p>
+            <ul>
+                <li>大部分门控权重分配给<strong>早期和中间层</strong>（第10层之前）</li>
+                <li>后期层持续被抑制，因为它们编码的是高度抽象的生成专用特征，保留价值较低</li>
+                <li>重要实体token倾向于选择中间层（更丰富的上下文关系信息）</li>
+            </ul>
+
+            <h3>3.6 零样本压缩能力</h3>
+            <p>只使用NTP预训练，不进行下游任务微调：</p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>方法</th>
+                        <th>1B 平均EM</th>
+                        <th>1B 平均F1</th>
+                        <th>3B 平均EM</th>
+                        <th>3B 平均F1</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>ICAE</td>
+                        <td>7.59</td>
+                        <td>16.00</td>
+                        <td>15.71</td>
+                        <td>25.93</td>
+                    </tr>
+                    <tr>
+                        <td>Beacon</td>
+                        <td>0.90</td>
+                        <td>2.72</td>
+                        <td>1.70</td>
+                        <td>4.36</td>
+                    </tr>
+                    <tr>
+                        <td>500×</td>
+                        <td>2.36</td>
+                        <td>8.17</td>
+                        <td>17.83</td>
+                        <td>29.52</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ComprExIT</strong></td>
+                        <td><strong>13.22</strong></td>
+                        <td><strong>25.50</strong></td>
+                        <td><strong>25.18</strong></td>
+                        <td><strong>38.09</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p>ComprExIT在零样本设置下显著优于所有基线，表明它不依赖于任务特定的监督信号，而是从通用语言建模目标中学习到可迁移的、对齐良好的压缩表示。</p>
+
+            <h2>四、总结与思考</h2>
+            
+            <h3>4.1 主要贡献</h3>
+            <ol>
+                <li><strong>识别问题</strong>：首次系统性地指出LLM-as-a-compressor范式的两个关键结构性缺陷：逐层表示覆盖和缺乏全局协调</li>
+                <li><strong>方法创新</strong>：提出 ComprExIT，将软压缩重新定义为冻结LLM隐藏状态上的显式信息传输问题</li>
+                <li><strong>工程优化</strong>：引入深度传输和宽度传输两个维度，通过最优传输实现全局协调的信息分配</li>
+                <li><strong>显著效果</strong>：在6个QA基准上始终优于现有方法，额外参数仅约1%</li>
+            </ol>
+
+            <h3>4.2 核心亮点</h3>
+            <ul>
+                <li><strong>解耦设计</strong>：将压缩与LLM内部自注意力解耦，避免了逐层表示漂移</li>
+                <li><strong>全局优化</strong>：通过最优传输理论实现信息分配的全局协调</li>
+                <li><strong>高效轻量</strong>：只引入约1%的额外参数</li>
+                <li><strong>稳定可扩展</strong>：在小模型上性能稳定，在各种任务上泛化良好</li>
+            </ul>
+
+            <h3>4.3 启发与展望</h3>
+            <p>这篇论文给我们的重要启示是：</p>
+            <ul>
+                <li>不要总是试图"训练"LLM来做某事，有时候<strong>直接操作其输出</strong>更有效</li>
+                <li><strong>最优传输</strong>理论为离散优化问题提供了优雅的解决方案</li>
+                <li>多层表示包含不同粒度的信息，<strong>选择性聚合</strong>比全量使用更有效</li>
+            </ul>
+
+            <h2>参考文献</h2>
+            <ol>
+                <li>Context Compression via Explicit Information Transmission. Jiangnan Ye, Hanqi Yan, Zhenyi Shen, Heng Chang, Ye Mao, Yulan He. arXiv:2602.03784, 2026. <a href="https://arxiv.org/abs/2602.03784" target="_blank" style="color:#667eea;">[arXiv]</a></li>
+                <li>In-context autoencoder for context compression in a large language model. T. Ge, H. Jing, L. Wang, X. Wang, S. Chen, F. Wei. ICLR 2024.</li>
+                <li>500× Compressor: Generalized prompt compression for large language models. Z. Li, Y. Su, N. Collier. ACL 2025.</li>
+                <li>Activation Beacon: Compressing context information into limited tokens for long context language models.</li>
+            </ol>
+        </div>
+        <footer>
+            <p>© 2026 lucky-xing. 原创内容，转载需授权。</p>
+        </footer>
+    </div>
+</body>
+</html>
