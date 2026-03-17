@@ -34,6 +34,8 @@
         .figure { text-align: center; margin: 30px 0; }
         .figure img { max-width: 100%; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .figure-caption { color: #666; font-size: 0.9em; margin-top: 10px; }
+        .highlight { background: #fff3cd; padding: 2px 6px; border-radius: 4px; }
+        .math { font-family: 'Times New Roman', serif; font-style: italic; }
     </style>
 </head>
 <body>
@@ -44,54 +46,130 @@
         </header>
         <div class="back-link"><a href="/index.html">← 返回首页</a></div>
         <div class="content">
-            <h2>引言</h2>
-            <p>现代大语言模型（LLM）普遍采用 <strong>PreNorm</strong> 架构下的残差连接（Residual Connections），这种设计虽然简单有效，但存在一个根本性问题：随着模型深度增加，所有层的输出以固定权重（=1）累加，导致隐藏状态幅度无限增长，逐层稀释每个层的贡献——这被称为 <strong>PreNorm 稀释问题</strong>。</p>
-            <p>来自 Kimi Team 的最新论文 <strong>Attention Residuals (AttnRes)</strong> 提出了一种优雅的解决方案：用注意力机制替代固定的残差累加，让每个层能够<strong>选择性</strong>地聚合前面的表示。</p>
+            <h2>引言：从ResNet到PreNorm的演进</h2>
+            <p>残差连接（Residual Connections）自从在ResNet中被提出以来，就成为了深度学习架构中最核心的设计之一。在Transformer出现后，残差连接同样被广泛应用，成为了构建深层Transformer不可或缺的基础组件。</p>
+            
+            <p>现代大语言模型（LLM）普遍采用两种残差连接变体：<strong>PostNorm</strong> 和 <strong>PreNorm</strong>。PostNorm将层归一化放在残差分支之后，而PreNorm则将层归一化放在残差分支之前。DeepMind的论文<a href="https://arxiv.org/abs/2203.00555" target="_blank">"Understanding the Difficulty of Training Deep Transformers"</a>表明，PreNorm相比PostNorm更容易训练，但这种优势并非没有代价。</p>
 
-            <h2>核心思想</h2>
-            <p>标准残差连接的公式很简单：</p>
-            <div class="tech-card">
-                <p><code>h_l = h_{l-1} + F_l(h_{l-1})</code></p>
-            </div>
-            <p>每个层的输出直接加到上一层的输出上，权重固定为1。这种<strong>均匀聚合</strong>（uniform aggregation）导致：</p>
+            <h2>PreNorm的隐藏问题：稀释效应</h2>
+            <p>尽管PreNorm在训练稳定性方面表现更好，但它存在一个被广泛忽视的<strong>根本性问题</strong>：随着模型深度增加，所有层的输出以固定权重（=1）进行累加，导致：</p>
+            
             <ul>
-                <li>隐藏状态幅度随深度指数增长</li>
-                <li>浅层学到的有意义特征被深层稀释，难以恢复</li>
-                <li>梯度范数在各层之间分布不均匀</li>
+                <li><strong>隐藏状态幅度无限增长</strong>：每一层的输出都会直接加到累积和上，层数越多，最终的隐藏状态向量范数越大</li>
+                <li><strong>浅层特征被稀释</strong>：后期层看到的"信号"是前面所有层输出的混合，早期层学到的有意义的表示被后来的噪声稀释</li>
+                <li><strong>各层贡献不均衡</strong>：深层对最终表示的贡献远大于浅层，但这种贡献是"均匀"而非"选择性的"</li>
             </ul>
 
-            <p>AttnRes 将固定累加替换为<strong>注意力机制</strong>：</p>
             <div class="tech-card">
-                <h4>AttnRes 公式</h4>
-                <p><code>h_l = Σ α_{i→l} · v_i</code></p>
-                <p>其中权重 α<sub>i→l</sub> 通过一个可学习的伪查询 w<sub>l</sub> 计算，实现了<strong>输入依赖的、内容感知的</strong>选择性聚合。</p>
+                <h4>PreNorm的数学表达式</h4>
+                <p>在标准PreNorm Transformer中，第l层的输出可以表示为：</p>
+                <p><span class="math">h_l = h_{l-1} + Norm(F_{l}(h_{l-1}))</span></p>
+                <p>经过L层后，最终输出为：</p>
+                <p><span class="math">h_L = h_0 + Σ_{i=1}^{L} Norm(F_i(h_{i-1}))</span></p>
+                <p>每一项的权重固定为1，这就是所谓的<strong>均匀聚合（Uniform Aggregation）</strong>。</p>
             </div>
 
-            <h2>方法详解</h2>
-            
-            <h3>Full AttnRes</h3>
-            <p>完整的 AttnRes 允许每一层 attends 到所有前面的层输出，如论文中的图 (b) 所示。但这需要 O(Ld) 的内存（L=层数，d=隐藏维度），在超大模型上不切实际。</p>
+            <h2>核心创新：Attention Residuals</h2>
+            <p>来自Kimi Team的最新论文<strong>Attention Residuals (AttnRes)</strong>提出了一个优雅的解决方案：用<strong>注意力机制</strong>替代固定的残差累加权重，让每个层能够<strong>输入依赖的、内容感知的</strong>方式选择性聚合前面的表示。</p>
 
-            <h3>Block AttnRes</h3>
-            <p>为解决内存问题，论文提出了 <strong>Block AttnRes</strong>：将层划分为 N 个块，在块内使用标准残差，块之间使用注意力聚合。约 8 个块就能恢复大部分 Full AttnRes 的收益，同时几乎无额外开销。</p>
+            <div class="tech-card">
+                <h4>AttnRes的核心公式</h4>
+                <p>AttnRes将固定权重累加替换为注意力加权：</p>
+                <p><span class="math">h_l = Σ_{i=0}^{l-1} α_{i→l} · v_i</span></p>
+                <p>其中：</p>
+                <ul>
+                    <li><span class="math">v_i</span> = 第i层的输出表示</li>
+                    <li><span class="math">α_{i→l}</span> = 从层i到层l的注意力权重（通过softmax归一化）</li>
+                </ul>
+                <p>关键创新在于：权重<span class="math">α_{i→l}</span>是通过一个<strong>可学习的伪查询向量</strong><span class="math">w_l</span>计算得出，实现了真正的输入依赖性。</p>
+            </div>
+
+            <h3>注意力权重的计算方式</h3>
+            <p>具体而言，对于第l层，AttnRes使用以下方式计算注意力权重：</p>
+            
+            <div class="tech-card">
+                <h4>伪查询注意力机制</h4>
+                <p>为每一层l引入一个可学习的伪查询向量<span class="math">w_l ∈ ℝ^d</span>：</p>
+                <p><span class="math">logit_{i→l} = (v_i · w_l) / √d</span></p>
+                <p><span class="math">α_{i→l} = softmax_i(logit_{i→l})</span></p>
+                <p>这样，每一层都可以"询问"前面的层："谁对我的输出最有贡献？"，而不是简单地将所有贡献等权相加。</p>
+            </div>
+
+            <h2>两种实现方案</h2>
+
+            <h3>1. Full AttnRes（完整版）</h3>
+            <p>最直接的实现方式：每一层都可以 attends 到之前所有层的输出。这种方法理论上效果最好，但内存开销为 O(Ld)，其中L是层数，d是隐藏维度。在超大模型上这会成为瓶颈。</p>
+
+            <h3>2. Block AttnRes（实用版）</h3>
+            <p>为解决内存问题，论文提出了分块版本的AttnRes：</p>
+            <ul>
+                <li>将L层划分为N个块（block）</li>
+                <li>块内使用标准残差连接（保持局部信息流动）</li>
+                <li>块之间使用注意力聚合（实现跨块选择性）</li>
+                <li>只需要 O(Nd) 的额外内存，其中N是块数（通常约8个）</li>
+            </ul>
 
             <div class="figure">
-                <img src="/assets/overview.png" alt="AttnRes 架构对比" />
-                <p class="figure-caption">(a) 标准残差均匀累加 (b) Full AttnRes: 每层 attends 到所有前续输出 (c) Block AttnRes: 块内标准残差，块间注意力</p>
+                <img src="/assets/overview.png" alt="AttnRes架构对比" />
+                <p class="figure-caption">(a) 标准残差：均匀的加法累加 (b) Full AttnRes：每层 attends 到所有前续输出 (c) Block AttnRes：块内标准残差，块间注意力聚合</p>
             </div>
 
-            <h2>实验结果</h2>
+            <h3>Block AttnRes的PyTorch伪代码</h3>
+            <pre><code>def block_attn_res(blocks: list[Tensor], partial_block: Tensor, proj: Linear, norm: RMSNorm) -> Tensor:
+    """
+    块间注意力：attend 到各块表示 + 当前部分和
+    blocks: 已完成的N个块表示 [B, T, D]
+    partial_block: 块内部分和 [B, T, D]
+    """
+    V = torch.stack(blocks + [partial_block])  # [N+1, B, T, D]
+    K = norm(V)
+    logits = torch.einsum('d, n b t d -> n b t', proj.weight.squeeze(), K)
+    h = torch.einsum('n b t, n b t d -> b t d', logits.softmax(0), V)
+    return h
 
-            <h3>扩展定律 (Scaling Laws)</h3>
-            <p>AttnRes 在所有计算预算下一致优于基线。Block AttnRes 的性能相当于用 <strong>1.25x 更多计算</strong> 训练的基线模型。</p>
+def forward(self, blocks, hidden_states):
+    partial_block = hidden_states
+    
+    # 在attention前应用block attnres
+    h = block_attn_res(blocks, partial_block, self.attn_res_proj, self.attn_res_norm)
+
+    # 到达块边界时，开始新块
+    if self.layer_number % (self.block_size // 2) == 0:
+        blocks.append(partial_block)
+        partial_block = None
+
+    # 自注意力层
+    attn_out = self.attn(self.attn_norm(h))
+    partial_block = partial_block + attn_out if partial_block is not None else attn_out
+
+    # MLP前再次应用block attnres
+    h = block_attn_res(blocks, partial_block, self.mlp_res_proj, self.mlp_res_norm)
+
+    # MLP层
+    mlp_out = self.mlp(self.mlp_norm(h))
+    partial_block = partial_block + mlp_out
+
+    return blocks, partial_block</code></pre>
+
+            <h2>实验结果深度解析</h2>
+
+            <h3>1. 扩展定律（Scaling Laws）</h3>
+            <p>论文在1M到200M参数规模的模型上进行了系统性的扩展定律实验，测试了不同计算预算（FLOPs）下的验证集loss。</p>
 
             <div class="figure">
                 <img src="/assets/scaling_law.png" alt="扩展定律实验结果" />
                 <p class="figure-caption">AttnRes (橙色) vs Baseline (蓝色) 在不同计算预算下的 loss 对比</p>
             </div>
 
-            <h3>下游任务性能</h3>
-            <p>在 Kimi Linear 48B / 3B activated, 1.4T tokens 上测试：</p>
+            <p>关键发现：</p>
+            <ul>
+                <li>AttnRes在<strong>所有计算预算</strong>下都一致优于基线</li>
+                <li>Block AttnRes的性能相当于用<strong>1.25x更多计算</strong>训练的基线模型</li>
+                <li>这意味着相同的计算资源，使用AttnRes可以获得~25%的性能提升</li>
+            </ul>
+
+            <h3>2. 下游任务性能</h3>
+            <p>论文在Kimi Linear 48B模型（3B activated，训练1.4T tokens）上进行了广泛的下游任务评估：</p>
             
             <table>
                 <thead>
@@ -100,82 +178,186 @@
                         <th>基准</th>
                         <th>Baseline</th>
                         <th>AttnRes</th>
+                        <th>提升</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td rowspan="4">通用</td>
+                        <td rowspan="4">通用能力</td>
                         <td>MMLU</td>
                         <td>73.5</td>
                         <td><strong>74.6</strong></td>
+                        <td>+1.1</td>
                     </tr>
                     <tr>
                         <td>GPQA-Diamond</td>
                         <td>36.9</td>
                         <td><strong>44.4</strong></td>
+                        <td><strong>+7.5</strong></td>
                     </tr>
                     <tr>
                         <td>BBH</td>
                         <td>76.3</td>
                         <td><strong>78.0</strong></td>
+                        <td>+1.7</td>
                     </tr>
                     <tr>
                         <td>TriviaQA</td>
                         <td>69.9</td>
                         <td><strong>71.8</strong></td>
+                        <td>+1.9</td>
                     </tr>
                     <tr>
                         <td rowspan="3">数学与代码</td>
                         <td>Math</td>
                         <td>53.5</td>
                         <td><strong>57.1</strong></td>
+                        <td><strong>+3.6</strong></td>
                     </tr>
                     <tr>
                         <td>HumanEval</td>
                         <td>59.1</td>
                         <td><strong>62.2</strong></td>
+                        <td><strong>+3.1</strong></td>
                     </tr>
                     <tr>
                         <td>MBPP</td>
                         <td>72.0</td>
                         <td><strong>73.9</strong></td>
+                        <td>+1.9</td>
                     </tr>
                     <tr>
-                        <td rowspan="2">中文</td>
+                        <td rowspan="2">中文理解</td>
                         <td>CMMLU</td>
                         <td>82.0</td>
                         <td><strong>82.9</strong></td>
+                        <td>+0.9</td>
                     </tr>
                     <tr>
                         <td>C-Eval</td>
                         <td>79.6</td>
                         <td><strong>82.5</strong></td>
+                        <td><strong>+2.9</strong></td>
                     </tr>
                 </tbody>
             </table>
 
-            <p>AttnRes 在所有任务上全面提升，最大收益在<strong>多步推理</strong>（GPQA-Diamond +7.5）和<strong>代码生成</strong>（HumanEval +3.1）。</p>
+            <h3>关键洞察</h3>
+            <ul>
+                <li><strong>最大收益任务</strong>：GPQA-Diamond（多步推理）提升了7.5个百分点，这是所有任务中最大的收益</li>
+                <li><strong>代码生成</strong>：HumanEval提升3.1，显示出AttnRes对需要精确执行的复杂任务特别有效</li>
+                <li><strong>数学推理</strong>：Math提升3.6，表明模型在多步推理能力上有显著增强</li>
+                <li><strong>全面提升</strong>：所有9个基准都有提升，没有出现负向任务</li>
+            </ul>
 
-            <h3>训练动态</h3>
-            <p>AttnRes 有效缓解了 PreNorm 稀释问题：输出幅度在各层间保持有界，梯度范数分布更均匀。</p>
+            <h3>3. 训练动态分析</h3>
+            <p>论文深入分析了AttnRes对训练过程的影响：</p>
 
             <div class="figure">
                 <img src="/assets/training_dynamics.png" alt="训练动态对比" />
-                <p class="figure-caption">AttnRes (右) vs Baseline (左): 输出幅度和梯度范数分布</p>
+                <p class="figure-caption">左图：输出幅度随层数变化；右图：梯度范数随层数变化。AttnRes有效控制了幅度增长和梯度分布</p>
             </div>
 
-            <h2>总结</h2>
-            <p>Attention Residuals 提出了一种优雅而有效的残差连接替代方案：</p>
+            <h4>输出幅度控制</h4>
+            <p>在标准PreNorm模型中，输出幅度随层数指数增长，这会导致：</p>
             <ul>
-                <li><strong>核心创新</strong>：用注意力机制替代固定权重累加，实现输入依赖的选择性聚合</li>
-                <li><strong>实用方案</strong>：Block AttnRes 在几乎无额外开销的情况下恢复大部分收益</li>
-                <li><strong>显著收益</strong>：在所有计算预算和下游任务上全面超越基线</li>
-                <li><strong>即插即用</strong>：可作为标准残差连接的直接替代</li>
+                <li>数值不稳定（需要更小的学习率）</li>
+                <li>训练后期难以收敛</li>
+                <li>推理时可能的数值溢出</li>
             </ul>
+            <p>AttnRes通过注意力加权自然地实现了<strong>幅度归一化</strong>：所有权重经过softmax后总和为1，因此最终的输出幅度是有界的。</p>
+
+            <h4>梯度分布优化</h4>
+            <p>标准PreNorm中，深层的梯度范数远大于浅层，导致：</p>
+            <ul>
+                <li>浅层参数更新不足</li>
+                <li>深层容易过拟合</li>
+                <li>训练早期浅层学不到有用的表示</li>
+            </ul>
+            <p>AttnRes使梯度在各层之间分布更均匀，每一层都能得到充分的训练信号。</p>
+
+            <h2>技术细节与实现考量</h2>
+
+            <h3>1. 伪查询向量的设计</h3>
+            <p>每个层l有一个独立的可学习参数<span class="math">w_l</span>（维度为d），这个设计：</p>
+            <ul>
+                <li>参数量：L × d（L是层数，d是隐藏维度）</li>
+                <li>相比整体模型参数量可忽略不计</li>
+                <li>每个层可以学习"关注"不同时期特征的偏好</li>
+            </ul>
+
+            <h3>2. 块大小的选择</h3>
+            <p>论文推荐约8个块（block），这意味着：</p>
+            <ul>
+                <li>块大小 = L / 8（L是总层数）</li>
+                <li>对于40层模型，块大小约为5层</li>
+                <li>可以在几乎无额外开销的情况下恢复大部分Full AttnRes的收益</li>
+            </ul>
+
+            <h3>3. 即插即用特性</h3>
+            <p>AttnRes一个重要优势是<strong>不需要改变模型架构</strong>，只需要：</p>
+            <ul>
+                <li>添加伪查询参数</li>
+                <li>修改残差连接的聚合方式</li>
+                <li>保持其他组件不变</li>
+            </ul>
+            <p>这使得它可以轻松集成到现有的预训练流程中。</p>
+
+            <h2>与其他工作的对比</h2>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>方法</th>
+                        <th>核心思想</th>
+                        <th>参数量</th>
+                        <th>收益</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Standard PreNorm</td>
+                        <td>固定权重=1累加</td>
+                        <td>0</td>
+                        <td>基线</td>
+                    </tr>
+                    <tr>
+                        <td>QKNorm</td>
+                        <td>归一化Query/Key</td>
+                        <td>0</td>
+                        <td>训练稳定</td>
+                    </tr>
+                    <tr>
+                        <td>DeepNorm</td>
+                        <td>调整初始化/残差权重</td>
+                        <td>0</td>
+                        <td>训练稳定</td>
+                    </tr>
+                    <tr>
+                        <td><strong>AttnRes</strong></td>
+                        <td>注意力加权聚合</td>
+                        <td>L×d</td>
+                        <td>显著提升</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>总结与展望</h2>
+            <p>Attention Residuals提出了一种<strong>简单而深刻</strong>的改进方案：将残差连接中的固定权重替换为注意力加权。这个改变虽然微小，但带来了显著的性能提升：</p>
+            
+            <ul>
+                <li><strong>理论贡献</strong>：首次揭示了PreNorm中"均匀聚合"的问题，并用"选择性聚合"来解决</li>
+                <li><strong>工程价值</strong>：Block AttnRes在几乎无额外开销的情况下实现~25%计算等效收益</li>
+                <li><strong>实践经验</strong>：在真实的大规模模型（48B参数）上验证有效</li>
+                <li><strong>即插即用</strong>：可以轻松集成到现有架构中</li>
+            </ul>
+
+            <p>这篇论文也提醒我们：在深度学习领域，一些看似"理所当然"的设计（如固定权重残差）可能隐藏着可以优化的空间。AttnRes的成功源于它对这一基础组件的重新思考。</p>
 
             <h2>参考文献</h2>
             <ol>
                 <li>Attention Residuals. Chen, Guangyu and Zhang, Yu and Su, Jianlin and Xu, Weixin and Pan, Siyuan and Wang, Yaoyu and Wang, Yucheng and Chen, Guanduo and Yin, Bohong and Chen, Yutian and Yan, Junjie and Wei, Ming and Zhang, Y. and Meng, Fanqing and Hong, Chao and Xie, Xiaotong and Liu, Shaowei and Lu, Enzhe and Tai, Yunpeng and Chen, Yanru and Men, Xin and Guo, Haiqing and Charles, Y. and Lu, Haoyu. <a href="https://github.com/MoonshotAI/Attention-Residuals" target="_blank" style="color:#667eea;">[GitHub]</a></li>
+                <li>Understanding the Difficulty of Training Deep Transformers. Wang, Yuxin and Ma, Xingyao and Zhang, Zichao and Ni, Yikang and Akolkar, Anjan and Li, Xiaodong and Mou, Chenguang and Xie, J. (2022) <a href="https://arxiv.org/abs/2203.00555" target="_blank" style="color:#667eea;">[arXiv]</a></li>
             </ol>
         </div>
         <footer>
