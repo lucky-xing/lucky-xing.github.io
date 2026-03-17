@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attention Residuals: 重新定义Transformer的残差连接 - lucky-xing's Blog</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.8; color: #333; background: #f5f7fa; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px; text-align: center; }
+        .header h1 { font-size: 1.8em; margin-bottom: 10px; }
+        .header .meta { opacity: 0.9; font-size: 0.95em; }
+        .content { padding: 40px; }
+        h2 { color: #667eea; margin-top: 35px; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #e8ecf1; font-size: 1.4em; }
+        h3 { color: #555; margin-top: 25px; margin-bottom: 12px; font-size: 1.15em; }
+        h4 { color: #666; margin-top: 18px; margin-bottom: 10px; }
+        p { margin-bottom: 15px; text-align: justify; }
+        ul, ol { margin: 15px 0 15px 25px; }
+        li { margin-bottom: 8px; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.9em; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #e8ecf1; }
+        th { background: #667eea; color: white; }
+        tr:hover { background: #f8f9fa; }
+        .tech-card { background: #f8f9fa; border-left: 4px solid #667eea; padding: 20px; margin: 20px 0; border-radius: 0 8px 8px 0; }
+        .tech-card h4 { color: #667eea; margin-top: 0; }
+        code { background: #f0f0f0; padding: 2px 6px; border-radius: 4px; font-family: 'Courier New', monospace; }
+        pre { background: #2d2d2d; color: #f8f8f2; padding: 20px; border-radius: 8px; overflow-x: auto; margin: 20px 0; }
+        pre code { background: none; padding: 0; }
+        blockquote { border-left: 4px solid #667eea; padding-left: 20px; margin: 20px 0; color: #666; font-style: italic; }
+        footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; text-align: center; color: #888; font-size: 0.9em; }
+        .back-link { padding: 20px 40px; background: #f8f9fa; }
+        .back-link a { color: #667eea; text-decoration: none; }
+        .figure { text-align: center; margin: 30px 0; }
+        .figure img { max-width: 100%; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .figure-caption { color: #666; font-size: 0.9em; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Attention Residuals: 重新定义Transformer的残差连接</h1>
+            <div class="meta"><p>📅 2026-03-17 | 📚 论文解读</p></div>
+        </header>
+        <div class="back-link"><a href="/index.html">← 返回首页</a></div>
+        <div class="content">
+            <h2>引言</h2>
+            <p>现代大语言模型（LLM）普遍采用 <strong>PreNorm</strong> 架构下的残差连接（Residual Connections），这种设计虽然简单有效，但存在一个根本性问题：随着模型深度增加，所有层的输出以固定权重（=1）累加，导致隐藏状态幅度无限增长，逐层稀释每个层的贡献——这被称为 <strong>PreNorm 稀释问题</strong>。</p>
+            <p>来自 Kimi Team 的最新论文 <strong>Attention Residuals (AttnRes)</strong> 提出了一种优雅的解决方案：用注意力机制替代固定的残差累加，让每个层能够<strong>选择性</strong>地聚合前面的表示。</p>
+
+            <h2>核心思想</h2>
+            <p>标准残差连接的公式很简单：</p>
+            <div class="tech-card">
+                <p><code>h_l = h_{l-1} + F_l(h_{l-1})</code></p>
+            </div>
+            <p>每个层的输出直接加到上一层的输出上，权重固定为1。这种<strong>均匀聚合</strong>（uniform aggregation）导致：</p>
+            <ul>
+                <li>隐藏状态幅度随深度指数增长</li>
+                <li>浅层学到的有意义特征被深层稀释，难以恢复</li>
+                <li>梯度范数在各层之间分布不均匀</li>
+            </ul>
+
+            <p>AttnRes 将固定累加替换为<strong>注意力机制</strong>：</p>
+            <div class="tech-card">
+                <h4>AttnRes 公式</h4>
+                <p><code>h_l = Σ α_{i→l} · v_i</code></p>
+                <p>其中权重 α<sub>i→l</sub> 通过一个可学习的伪查询 w<sub>l</sub> 计算，实现了<strong>输入依赖的、内容感知的</strong>选择性聚合。</p>
+            </div>
+
+            <h2>方法详解</h2>
+            
+            <h3>Full AttnRes</h3>
+            <p>完整的 AttnRes 允许每一层 attends 到所有前面的层输出，如论文中的图 (b) 所示。但这需要 O(Ld) 的内存（L=层数，d=隐藏维度），在超大模型上不切实际。</p>
+
+            <h3>Block AttnRes</h3>
+            <p>为解决内存问题，论文提出了 <strong>Block AttnRes</strong>：将层划分为 N 个块，在块内使用标准残差，块之间使用注意力聚合。约 8 个块就能恢复大部分 Full AttnRes 的收益，同时几乎无额外开销。</p>
+
+            <div class="figure">
+                <img src="/assets/overview.png" alt="AttnRes 架构对比" />
+                <p class="figure-caption">(a) 标准残差均匀累加 (b) Full AttnRes: 每层 attends 到所有前续输出 (c) Block AttnRes: 块内标准残差，块间注意力</p>
+            </div>
+
+            <h2>实验结果</h2>
+
+            <h3>扩展定律 (Scaling Laws)</h3>
+            <p>AttnRes 在所有计算预算下一致优于基线。Block AttnRes 的性能相当于用 <strong>1.25x 更多计算</strong> 训练的基线模型。</p>
+
+            <div class="figure">
+                <img src="/assets/scaling_law.png" alt="扩展定律实验结果" />
+                <p class="figure-caption">AttnRes (橙色) vs Baseline (蓝色) 在不同计算预算下的 loss 对比</p>
+            </div>
+
+            <h3>下游任务性能</h3>
+            <p>在 Kimi Linear 48B / 3B activated, 1.4T tokens 上测试：</p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>类别</th>
+                        <th>基准</th>
+                        <th>Baseline</th>
+                        <th>AttnRes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td rowspan="4">通用</td>
+                        <td>MMLU</td>
+                        <td>73.5</td>
+                        <td><strong>74.6</strong></td>
+                    </tr>
+                    <tr>
+                        <td>GPQA-Diamond</td>
+                        <td>36.9</td>
+                        <td><strong>44.4</strong></td>
+                    </tr>
+                    <tr>
+                        <td>BBH</td>
+                        <td>76.3</td>
+                        <td><strong>78.0</strong></td>
+                    </tr>
+                    <tr>
+                        <td>TriviaQA</td>
+                        <td>69.9</td>
+                        <td><strong>71.8</strong></td>
+                    </tr>
+                    <tr>
+                        <td rowspan="3">数学与代码</td>
+                        <td>Math</td>
+                        <td>53.5</td>
+                        <td><strong>57.1</strong></td>
+                    </tr>
+                    <tr>
+                        <td>HumanEval</td>
+                        <td>59.1</td>
+                        <td><strong>62.2</strong></td>
+                    </tr>
+                    <tr>
+                        <td>MBPP</td>
+                        <td>72.0</td>
+                        <td><strong>73.9</strong></td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">中文</td>
+                        <td>CMMLU</td>
+                        <td>82.0</td>
+                        <td><strong>82.9</strong></td>
+                    </tr>
+                    <tr>
+                        <td>C-Eval</td>
+                        <td>79.6</td>
+                        <td><strong>82.5</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p>AttnRes 在所有任务上全面提升，最大收益在<strong>多步推理</strong>（GPQA-Diamond +7.5）和<strong>代码生成</strong>（HumanEval +3.1）。</p>
+
+            <h3>训练动态</h3>
+            <p>AttnRes 有效缓解了 PreNorm 稀释问题：输出幅度在各层间保持有界，梯度范数分布更均匀。</p>
+
+            <div class="figure">
+                <img src="/assets/training_dynamics.png" alt="训练动态对比" />
+                <p class="figure-caption">AttnRes (右) vs Baseline (左): 输出幅度和梯度范数分布</p>
+            </div>
+
+            <h2>总结</h2>
+            <p>Attention Residuals 提出了一种优雅而有效的残差连接替代方案：</p>
+            <ul>
+                <li><strong>核心创新</strong>：用注意力机制替代固定权重累加，实现输入依赖的选择性聚合</li>
+                <li><strong>实用方案</strong>：Block AttnRes 在几乎无额外开销的情况下恢复大部分收益</li>
+                <li><strong>显著收益</strong>：在所有计算预算和下游任务上全面超越基线</li>
+                <li><strong>即插即用</strong>：可作为标准残差连接的直接替代</li>
+            </ul>
+
+            <h2>参考文献</h2>
+            <ol>
+                <li>Attention Residuals. Chen, Guangyu and Zhang, Yu and Su, Jianlin and Xu, Weixin and Pan, Siyuan and Wang, Yaoyu and Wang, Yucheng and Chen, Guanduo and Yin, Bohong and Chen, Yutian and Yan, Junjie and Wei, Ming and Zhang, Y. and Meng, Fanqing and Hong, Chao and Xie, Xiaotong and Liu, Shaowei and Lu, Enzhe and Tai, Yunpeng and Chen, Yanru and Men, Xin and Guo, Haiqing and Charles, Y. and Lu, Haoyu. <a href="https://github.com/MoonshotAI/Attention-Residuals" target="_blank" style="color:#667eea;">[GitHub]</a></li>
+            </ol>
+        </div>
+        <footer>
+            <p>© 2026 lucky-xing. 原创内容，转载需授权。</p>
+        </footer>
+    </div>
+</body>
+</html>
