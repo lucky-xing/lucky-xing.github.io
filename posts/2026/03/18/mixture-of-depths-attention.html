@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mixture-of-Depths Attention (MoDA) - 深度缩放的注意力机制 - lucky-xing's Blog</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.9; color: #333; background: #f5f7fa; padding: 20px; }
+        .container { max-width: 920px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px; text-align: center; }
+        .header h1 { font-size: 1.8em; margin-bottom: 10px; }
+        .header .meta { opacity: 0.9; font-size: 0.95em; }
+        .content { padding: 40px; }
+        h2 { color: #667eea; margin-top: 40px; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 2px solid #e8ecf1; font-size: 1.45em; }
+        h3 { color: #555; margin-top: 28px; margin-bottom: 14px; font-size: 1.2em; }
+        h4 { color: #666; margin-top: 20px; margin-bottom: 12px; font-size: 1.05em; }
+        p { margin-bottom: 16px; text-align: justify; }
+        ul, ol { margin: 15px 0 15px 28px; }
+        li { margin-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 0.85em; }
+        th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid #e8ecf1; }
+        th { background: #667eea; color: white; }
+        tr:hover { background: #f8f9fa; }
+        .tech-card { background: #f8f9fa; border-left: 4px solid #667eea; padding: 22px; margin: 24px 0; border-radius: 0 8px 8px 0; }
+        .tech-card h4 { color: #667eea; margin-top: 0; }
+        code { background: #f0f0f0; padding: 2px 6px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 0.9em; }
+        pre { background: #2d2d2d; color: #f8f8f2; padding: 20px; border-radius: 8px; overflow-x: auto; margin: 24px 0; font-size: 0.85em; line-height: 1.6; }
+        pre code { background: none; padding: 0; }
+        blockquote { border-left: 4px solid #667eea; padding-left: 20px; margin: 24px 0; color: #666; font-style: italic; }
+        footer { margin-top: 50px; padding-top: 24px; border-top: 1px solid #eee; text-align: center; color: #888; font-size: 0.9em; }
+        .back-link { padding: 20px 40px; background: #f8f9fa; }
+        .back-link a { color: #667eea; text-decoration: none; }
+        .figure { text-align: center; margin: 36px 0; }
+        .figure img { max-width: 100%; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
+        .figure-caption { color: #666; font-size: 0.9em; margin-top: 12px; }
+        .math { font-family: 'Times New Roman', serif; font-style: italic; }
+        .note { background: #e7f3ff; border-left: 4px solid #2196F3; padding: 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+        .warning { background: #fff3e0; border-left: 4px solid #ff9800; padding: 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Mixture-of-Depths Attention (MoDA)</h1>
+            <div class="meta"><p>📅 2026-03-18 | 📚 论文解读</p></div>
+        </header>
+        <div class="back-link"><a href="/index.html">← 返回首页</a></div>
+        <div class="content">
+            <h2>摘要</h2>
+            <p>随着大型语言模型（LLM）变得更深，它们经常遭受<strong>信号退化</strong>问题：在浅层形成的有效特征在经过多次残差更新后逐渐被稀释，导致在深层难以恢复。本文提出了<strong>Mixture-of-Depths Attention（MoDA）</strong>机制，允许每个注意力头同时关注当前层的序列KV对和前几层的深度KV对。实验表明，MoDA在1.5B参数模型上显著优于强基线方法，在10个验证基准上平均困惑度降低0.2，在10个下游任务上平均性能提升<strong>2.11%</strong>，同时仅增加3.7%的计算开销。</p>
+            
+            <div class="tech-card">
+                <h4>📌 核心贡献</h4>
+                <ul>
+                    <li>提出MoDA机制，让注意力头同时访问当前层序列KV和历史层深度KV</li>
+                    <li>设计硬件高效算法，解决非连续内存访问模式，达到FlashAttention-2 97.3%的效率</li>
+                    <li>在1.5B模型上实现困惑度下降0.2，下游任务平均提升2.11%</li>
+                </ul>
+            </div>
+
+            <h2>一、背景介绍</h2>
+            
+            <h3>1.1 深度缩放的挑战</h3>
+            <p>深度是大型语言模型性能提升的关键驱动力。然而，随着模型层数增加，一个显著问题逐渐浮现——<strong>信号退化（Signal Degradation）</strong>。</p>
+            <p>在Transformer架构中，每个注意力层和前馈网络层都通过残差连接进行信息传递。这种设计虽然便于优化，但随着层数加深，在浅层形成的有效特征会在层层传递中被逐渐稀释，就像在一幅画上反复叠加新颜色，原来的细节最终会消失。</p>
+            
+            <h3>1.2 现有方法回顾</h3>
+            <p>研究者们提出了多种机制来解决深度信息利用问题：</p>
+            
+            <table>
+                <tr>
+                    <th>方法</th>
+                    <th>描述</th>
+                    <th>优点</th>
+                    <th>缺点</th>
+                </tr>
+                <tr>
+                    <td>Depth Residual</td>
+                    <td>读取当前表示，通过加法写回</td>
+                    <td>简单易实现</td>
+                    <td>信息仍会被稀释</td>
+                </tr>
+                <tr>
+                    <td>Depth Dense</td>
+                    <td>读取历史表示集合，线性投影后拼接</td>
+                    <td>保留更多历史信息</td>
+                    <td>计算开销大</td>
+                </tr>
+                <tr>
+                    <td>Depth Attention</td>
+                    <td>使用注意力机制以数据依赖方式读取历史深度KV</td>
+                    <td>动态选择相关信息</td>
+                    <td>内存访问效率低</td>
+                </tr>
+                <tr>
+                    <td>MoDA (本文)</td>
+                    <td>结合深度注意力与标准序列注意力</td>
+                    <td>兼顾效率和效果</td>
+                    <td>实现复杂度较高</td>
+                </tr>
+            </table>
+
+            <h2>二、Mixture-of-Depths Attention 详解</h2>
+            
+            <h3>2.1 核心思想</h3>
+            <p>MoDA的核心创新在于：<strong>允许每个注意力头同时关注两类KV对</strong>：</p>
+            <ul>
+                <li><strong>序列KV对（Sequence KV）</strong>：来自当前层的输入序列</li>
+                <li><strong>深度KV对（Depth KV）</strong>：存储在"深度流"中的历史层KV缓存</li>
+            </ul>
+            
+            <div class="figure">
+                <img src="/assets/moda/pipeline.png" alt="MoDA Pipeline" />
+                <p class="figure-caption"><strong>图1：MoDA整体流程</strong><br/>MoDA同时维护序列KV缓存和深度KV缓存，每个查询可以访问两者的拼接结果</p>
+            </div>
+
+            <h3>2.2 机制对比</h3>
+            
+            <div class="figure">
+                <img src="/assets/moda/variants.png" alt="Variants Comparison" />
+                <p class="figure-caption"><strong>图2：深度流机制的概念对比</strong><br/>(a) Depth Residual：读取当前表示并通过加法写回；(b) Depth Dense：读取历史表示集合并线性投影后拼接；(c) Depth Attention：使用注意力机制读取历史深度KV；(d) MoDA：结合深度注意力与标准序列注意力，同时将当前层输出和KV写入深度流</p>
+            </div>
+
+            <h3>2.3 数学公式</h3>
+            <p>MoDA的注意力计算可以表示为：</p>
+            
+            <div class="tech-card">
+                <p><strong>Combined Softmax：</strong></p>
+                <p>$$
+                \text{Attention}(Q, K_{seq}, V_{seq}, K_{depth}, V_{depth}) = \text{softmax}\left(\frac{Q \cdot [K_{seq}, K_{depth}]^T}{\sqrt{d}}\right) \cdot [V_{seq}, V_{depth}]
+                $$</p>
+                <p>其中 $[K_{seq}, K_{depth}]$ 和 $[V_{seq}, V_{depth}]$ 分别表示序列KV和深度KV的拼接。</p>
+            </div>
+
+            <h3>2.4 硬件高效实现</h3>
+            
+            <div class="figure">
+                <img src="/assets/moda/hardware.png" alt="Hardware Efficient Implementation" />
+                <p class="figure-caption"><strong>图3：硬件高效实现</strong><br/>（左）Flash兼容的MoDA保持长度为T×L的深度KV缓存，每个查询需要扫描很长的拼接深度KV。（右）Chunk/Group感知的MoDA将查询按块大小C分组，并按块重新组织深度KV，将有效深度跨度从T×L减少到(C×L)/G</p>
+            </div>
+            
+            <p>MoDA面临的主要挑战是<strong>非连续的内存访问模式</strong>。为了解决这一问题，论文提出了两种优化策略：</p>
+            
+            <ul>
+                <li><strong>Flash兼容版本</strong>：保持深度KV缓存长度T×L，简化实现但查询需要扫描长序列</li>
+                <li><strong>Chunk/Group感知版本</strong>：将查询按块大小C分组，深度KV按块重排，有效深度跨度从T×L降至(C×L)/G</li>
+            </ul>
+
+            <h2>三、实验结果</h2>
+            
+            <h3>3.1 下游任务性能（400B tokens）</h3>
+            
+            <div class="figure">
+                <img src="/assets/moda/results.png" alt="Overall Results" />
+                <p class="figure-caption"><strong>图4：总体实验结果</strong><br/>MoDA在1.5B参数模型上相比OLMo2基线，在多个下游任务上取得显著提升</p>
+            </div>
+            
+            <table>
+                <tr>
+                    <th>Model</th>
+                    <th>PIQA</th>
+                    <th>HellaSwag</th>
+                    <th>WinoGrande</th>
+                    <th>OpenBookQA</th>
+                    <th>BoolQ</th>
+                    <th>SciQ</th>
+                    <th>ARC-E</th>
+                    <th>ARC-C</th>
+                    <th>COPA</th>
+                    <th>MMLU</th>
+                    <th>Avg</th>
+                </tr>
+                <tr>
+                    <td>OLMo2-700M</td>
+                    <td>73.72</td>
+                    <td>58.77</td>
+                    <td>55.33</td>
+                    <td>35.60</td>
+                    <td>56.24</td>
+                    <td>89.50</td>
+                    <td>66.84</td>
+                    <td>33.44</td>
+                    <td>77.00</td>
+                    <td>24.69</td>
+                    <td>57.11</td>
+                </tr>
+                <tr>
+                    <td><strong>MoDA-700M</strong></td>
+                    <td>73.39</td>
+                    <td>59.19</td>
+                    <td>60.22</td>
+                    <td>37.20</td>
+                    <td>59.33</td>
+                    <td>89.60</td>
+                    <td>67.37</td>
+                    <td>34.78</td>
+                    <td>82.00</td>
+                    <td>25.61</td>
+                    <td><strong>58.87</strong></td>
+                </tr>
+                <tr>
+                    <td>OLMo2-1.5B</td>
+                    <td>76.55</td>
+                    <td>65.86</td>
+                    <td>63.22</td>
+                    <td>38.80</td>
+                    <td>63.61</td>
+                    <td>90.60</td>
+                    <td>72.98</td>
+                    <td>42.47</td>
+                    <td>81.00</td>
+                    <td>27.73</td>
+                    <td>62.28</td>
+                </tr>
+                <tr>
+                    <td><strong>MoDA-1.5B</strong></td>
+                    <td>76.82</td>
+                    <td>66.24</td>
+                    <td>65.59</td>
+                    <td>41.60</td>
+                    <td>67.34</td>
+                    <td>92.10</td>
+                    <td>72.81</td>
+                    <td>46.82</td>
+                    <td>85.00</td>
+                    <td>29.59</td>
+                    <td><strong>64.39</strong></td>
+                </tr>
+            </table>
+            
+            <p>关键发现：MoDA-1.5B相比OLMo2-1.5B在下游任务上平均提升<strong>2.11%</strong>，特别是在WinoGrande（+2.37%）、BoolQ（+3.73%）、ARC-C（+4.35%）和COPA（+4.00%）等任务上提升显著。</p>
+
+            <h3>3.2 验证困惑度（越低越好）</h3>
+            
+            <table>
+                <tr>
+                    <th>Model</th>
+                    <th>C4</th>
+                    <th>ICE</th>
+                    <th>m2d2-s2orc</th>
+                    <th>Pile</th>
+                    <th>Wiki-text</th>
+                    <th>Books</th>
+                    <th>CC</th>
+                    <th>peS2o</th>
+                    <th>Reddit</th>
+                    <th>Stack</th>
+                    <th>Avg</th>
+                </tr>
+                <tr>
+                    <td>OLMo2-700M</td>
+                    <td>18.32</td>
+                    <td>17.43</td>
+                    <td>24.37</td>
+                    <td>9.53</td>
+                    <td>12.26</td>
+                    <td>16.78</td>
+                    <td>20.53</td>
+                    <td>9.17</td>
+                    <td>23.84</td>
+                    <td>3.93</td>
+                    <td>15.61</td>
+                </tr>
+                <tr>
+                    <td><strong>MoDA-700M</strong></td>
+                    <td>18.29</td>
+                    <td>17.24</td>
+                    <td>23.64</td>
+                    <td>9.48</td>
+                    <td>12.06</td>
+                    <td>16.58</td>
+                    <td>20.52</td>
+                    <td>9.14</td>
+                    <td>23.75</td>
+                    <td>3.90</td>
+                    <td><strong>15.46</strong></td>
+                </tr>
+                <tr>
+                    <td>OLMo2-1.5B</td>
+                    <td>16.16</td>
+                    <td>15.37</td>
+                    <td>21.10</td>
+                    <td>8.45</td>
+                    <td>10.41</td>
+                    <td>14.19</td>
+                    <td>18.13</td>
+                    <td>8.19</td>
+                    <td>21.21</td>
+                    <td>3.57</td>
+                    <td>13.67</td>
+                </tr>
+                <tr>
+                    <td><strong>MoDA-1.5B</strong></td>
+                    <td>15.97</td>
+                    <td>15.08</td>
+                    <td>20.92</td>
+                    <td>8.33</td>
+                    <td>10.16</td>
+                    <td>13.95</td>
+                    <td>17.88</td>
+                    <td>8.09</td>
+                    <td>20.85</td>
+                    <td>3.52</td>
+                    <td><strong>13.47</strong></td>
+                </tr>
+            </table>
+            
+            <p>MoDA-1.5B在10个验证基准上平均困惑度为13.47，相比OLMo2-1.5B的13.67降低了<strong>0.2</strong>。</p>
+
+            <h3>3.3 内核效率</h3>
+            
+            <table>
+                <tr>
+                    <th>序列长度 T</th>
+                    <th>FA2-Triton (ms)</th>
+                    <th>MoDA-Triton (ms)</th>
+                    <th>深度利用率</th>
+                    <th>额外时间</th>
+                </tr>
+                <tr>
+                    <td>4096</td>
+                    <td>7.970</td>
+                    <td>10.750</td>
+                    <td>12.50%</td>
+                    <td>25.86%</td>
+                </tr>
+                <tr>
+                    <td>8192</td>
+                    <td>28.700</td>
+                    <td>35.427</td>
+                    <td>12.50%</td>
+                    <td>18.99%</td>
+                </tr>
+                <tr>
+                    <td>16384</td>
+                    <td>116.700</td>
+                    <td>127.661</td>
+                    <td>12.50%</td>
+                    <td>8.59%</td>
+                </tr>
+                <tr>
+                    <td>32768</td>
+                    <td>459.854</td>
+                    <td>480.914</td>
+                    <td>12.50%</td>
+                    <td>4.38%</td>
+                </tr>
+                <tr>
+                    <td>65536</td>
+                    <td>1831.668</td>
+                    <td>1883.026</td>
+                    <td>12.50%</td>
+                    <td>2.73%</td>
+                </tr>
+            </table>
+            
+            <p>关键发现：在序列长度64K时，MoDA达到了<strong>FlashAttention-2 97.3%</strong>的效率。额外时间随序列长度增加而持续下降（从25.86%降至2.73%），证明了MoDA的可扩展性。</p>
+
+            <h3>3.4 注意力可视化</h3>
+            
+            <div class="figure">
+                <img src="/assets/moda/attention.png" alt="Attention Visualization" />
+                <p class="figure-caption"><strong>图5：MoDA注意力热力图</strong><br/>列对应均匀采样的层{0, 11, 23, 35}，行对应每层随机选择的注意力头。第一列仅显示序列KV的注意力，其余列显示拼接的序列KV | 深度KV；红色虚线标记两类KV之间的边界。可以看到，在所有层和注意力头中，相当比例的注意力质量持续分配给深度KV块</p>
+            </div>
+            
+            <p>注意力可视化验证了MoDA的有效性：<strong>深度KV块持续获得显著的注意力质量</strong>，表明MoDA有效利用了深度信息，而不仅仅是标准的序列注意力。</p>
+
+            <h2>四、总结与思考</h2>
+            
+            <h3>4.1 主要贡献</h3>
+            <ul>
+                <li><strong>创新机制</strong>：提出MoDA，让注意力头同时访问当前层和历史层的KV对</li>
+                <li><strong>高效实现</strong>：设计了硬件高效的Triton内核，达到FlashAttention-2 97.3%的效率</li>
+                <li><strong>显著提升</strong>：在1.5B模型上实现困惑度下降0.2，下游任务平均提升2.11%</li>
+                <li><strong>有趣发现</strong>：MoDA与post-norm结合使用效果优于pre-norm</li>
+            </ul>
+            
+            <h3>4.2 启发与展望</h3>
+            <p>MoDA的核心洞见是：深度本身就是一种宝贵的信息来源。在传统Transformer中，每层都在"重新开始"处理序列，而MoDA打破了这一限制，让模型可以访问历史层的"记忆"。</p>
+            <p>这种方法与人类认知有些相似——我们在处理新信息时，也会参考过去的经验和知识。未来可能的扩展方向包括：</p>
+            <ul>
+                <li>将MoDA应用于更大规模的模型（如7B、70B）</li>
+                <li>探索MoDA在多模态模型中的应用</li>
+                <li>研究MoDA与其他高效注意力机制的结合</li>
+            </ul>
+
+            <h2>参考文献</h2>
+            <ol>
+            <li>Mixture-of-Depths Attention. <a href="https://arxiv.org/abs/2603.15619" target="_blank" style="color:#667eea;">arXiv:2603.15619</a></li>
+            <li>OLMo2: Together AI's Large Language Model. <a href="https://arxiv.org/abs/2501.00656" target="_blank" style="color:#667eea;">arXiv:2501.00656</a></li>
+            <li>Flash Linear Attention. <a href="https://arxiv.org/abs/2312.06635" target="_blank" style="color:#667eea;">arXiv:2312.06635</a></li>
+            </ol>
+        </div>
+        <footer>
+            <p>© 2026 lucky-xing. 原创内容，转载需授权。</p>
+        </footer>
+    </div>
+</body>
+</html>
