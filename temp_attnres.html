@@ -1,0 +1,364 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attention Residuals: 閲嶆柊瀹氫箟Transformer鐨勬畫宸繛鎺?- lucky-xing's Blog</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.8; color: #333; background: #f5f7fa; padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px; text-align: center; }
+        .header h1 { font-size: 1.8em; margin-bottom: 10px; }
+        .header .meta { opacity: 0.9; font-size: 0.95em; }
+        .content { padding: 40px; }
+        h2 { color: #667eea; margin-top: 35px; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #e8ecf1; font-size: 1.4em; }
+        h3 { color: #555; margin-top: 25px; margin-bottom: 12px; font-size: 1.15em; }
+        h4 { color: #666; margin-top: 18px; margin-bottom: 10px; }
+        p { margin-bottom: 15px; text-align: justify; }
+        ul, ol { margin: 15px 0 15px 25px; }
+        li { margin-bottom: 8px; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 0.9em; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #e8ecf1; }
+        th { background: #667eea; color: white; }
+        tr:hover { background: #f8f9fa; }
+        .tech-card { background: #f8f9fa; border-left: 4px solid #667eea; padding: 20px; margin: 20px 0; border-radius: 0 8px 8px 0; }
+        .tech-card h4 { color: #667eea; margin-top: 0; }
+        code { background: #f0f0f0; padding: 2px 6px; border-radius: 4px; font-family: 'Courier New', monospace; }
+        pre { background: #2d2d2d; color: #f8f8f2; padding: 20px; border-radius: 8px; overflow-x: auto; margin: 20px 0; }
+        pre code { background: none; padding: 0; }
+        blockquote { border-left: 4px solid #667eea; padding-left: 20px; margin: 20px 0; color: #666; font-style: italic; }
+        footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #eee; text-align: center; color: #888; font-size: 0.9em; }
+        .back-link { padding: 20px 40px; background: #f8f9fa; }
+        .back-link a { color: #667eea; text-decoration: none; }
+        .figure { text-align: center; margin: 30px 0; }
+        .figure img { max-width: 100%; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .figure-caption { color: #666; font-size: 0.9em; margin-top: 10px; }
+        .highlight { background: #fff3cd; padding: 2px 6px; border-radius: 4px; }
+        .math { font-family: 'Times New Roman', serif; font-style: italic; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Attention Residuals: 閲嶆柊瀹氫箟Transformer鐨勬畫宸繛鎺?/h1>
+            <div class="meta"><p>馃搮 2026-03-17 | 馃摎 璁烘枃瑙ｈ</p></div>
+        </header>
+        <div class="back-link"><a href="/index.html">鈫?杩斿洖棣栭〉</a></div>
+        <div class="content">
+            <h2>寮曡█锛氫粠ResNet鍒癙reNorm鐨勬紨杩?/h2>
+            <p>娈嬪樊杩炴帴锛圧esidual Connections锛夎嚜浠庡湪ResNet涓鎻愬嚭浠ユ潵锛屽氨鎴愪负浜嗘繁搴﹀涔犳灦鏋勪腑鏈€鏍稿績鐨勮璁′箣涓€銆傚湪Transformer鍑虹幇鍚庯紝娈嬪樊杩炴帴鍚屾牱琚箍娉涘簲鐢紝鎴愪负浜嗘瀯寤烘繁灞俆ransformer涓嶅彲鎴栫己鐨勫熀纭€缁勪欢銆?/p>
+            
+            <p>鐜颁唬澶ц瑷€妯″瀷锛圠LM锛夋櫘閬嶉噰鐢ㄤ袱绉嶆畫宸繛鎺ュ彉浣擄細<strong>PostNorm</strong> 鍜?<strong>PreNorm</strong>銆侾ostNorm灏嗗眰褰掍竴鍖栨斁鍦ㄦ畫宸垎鏀箣鍚庯紝鑰孭reNorm鍒欏皢灞傚綊涓€鍖栨斁鍦ㄦ畫宸垎鏀箣鍓嶃€侱eepMind鐨勮鏂?a href="https://arxiv.org/abs/2203.00555" target="_blank">"Understanding the Difficulty of Training Deep Transformers"</a>琛ㄦ槑锛孭reNorm鐩告瘮PostNorm鏇村鏄撹缁冿紝浣嗚繖绉嶄紭鍔垮苟闈炴病鏈変唬浠枫€?/p>
+
+            <h2>PreNorm鐨勯殣钘忛棶棰橈細绋€閲婃晥搴?/h2>
+            <p>灏界PreNorm鍦ㄨ缁冪ǔ瀹氭€ф柟闈㈣〃鐜版洿濂斤紝浣嗗畠瀛樺湪涓€涓骞挎硾蹇借鐨?strong>鏍规湰鎬ч棶棰?/strong>锛氶殢鐫€妯″瀷娣卞害澧炲姞锛屾墍鏈夊眰鐨勮緭鍑轰互鍥哄畾鏉冮噸锛?1锛夎繘琛岀疮鍔狅紝瀵艰嚧锛?/p>
+            
+            <ul>
+                <li><strong>闅愯棌鐘舵€佸箙搴︽棤闄愬闀?/strong>锛氭瘡涓€灞傜殑杈撳嚭閮戒細鐩存帴鍔犲埌绱Н鍜屼笂锛屽眰鏁拌秺澶氾紝鏈€缁堢殑闅愯棌鐘舵€佸悜閲忚寖鏁拌秺澶?/li>
+                <li><strong>娴呭眰鐗瑰緛琚█閲?/strong>锛氬悗鏈熷眰鐪嬪埌鐨?淇″彿"鏄墠闈㈡墍鏈夊眰杈撳嚭鐨勬贩鍚堬紝鏃╂湡灞傚鍒扮殑鏈夋剰涔夌殑琛ㄧず琚悗鏉ョ殑鍣０绋€閲?/li>
+                <li><strong>鍚勫眰璐＄尞涓嶅潎琛?/strong>锛氭繁灞傚鏈€缁堣〃绀虹殑璐＄尞杩滃ぇ浜庢祬灞傦紝浣嗚繖绉嶈础鐚槸"鍧囧寑"鑰岄潪"閫夋嫨鎬х殑"</li>
+            </ul>
+
+            <div class="tech-card">
+                <h4>PreNorm鐨勬暟瀛﹁〃杈惧紡</h4>
+                <p>鍦ㄦ爣鍑哖reNorm Transformer涓紝绗琹灞傜殑杈撳嚭鍙互琛ㄧず涓猴細</p>
+                <p>$h_l = h_{l-1} + Norm(F_{l}(h_{l-1}))$</p>
+                <p>缁忚繃L灞傚悗锛屾渶缁堣緭鍑轰负锛?/p>
+                <p>$h_L = h_0 + 危_{i=1}^{L} Norm(F_i(h_{i-1}))$</p>
+                <p>姣忎竴椤圭殑鏉冮噸鍥哄畾涓?锛岃繖灏辨槸鎵€璋撶殑<strong>鍧囧寑鑱氬悎锛圲niform Aggregation锛?/strong>銆?/p>
+            </div>
+
+            <h2>鏍稿績鍒涙柊锛欰ttention Residuals</h2>
+            <p>鏉ヨ嚜Kimi Team鐨勬渶鏂拌鏂?strong>Attention Residuals (AttnRes)</strong>鎻愬嚭浜嗕竴涓紭闆呯殑瑙ｅ喅鏂规锛氱敤<strong>娉ㄦ剰鍔涙満鍒?/strong>鏇夸唬鍥哄畾鐨勬畫宸疮鍔犳潈閲嶏紝璁╂瘡涓眰鑳藉<strong>杈撳叆渚濊禆鐨勩€佸唴瀹规劅鐭ョ殑</strong>鏂瑰紡閫夋嫨鎬ц仛鍚堝墠闈㈢殑琛ㄧず銆?/p>
+
+            <div class="tech-card">
+                <h4>AttnRes鐨勬牳蹇冨叕寮?/h4>
+                <p>AttnRes灏嗗浐瀹氭潈閲嶇疮鍔犳浛鎹负娉ㄦ剰鍔涘姞鏉冿細</p>
+                <p>$h_l = 危_{i=0}^{l-1} 伪_{i鈫抣} 路 v_i$</p>
+                <p>鍏朵腑锛?/p>
+                <ul>
+                    <li>$v_i$ = 绗琲灞傜殑杈撳嚭琛ㄧず</li>
+                    <li>$伪_{i鈫抣}$ = 浠庡眰i鍒板眰l鐨勬敞鎰忓姏鏉冮噸锛堥€氳繃softmax褰掍竴鍖栵級</li>
+                </ul>
+                <p>鍏抽敭鍒涙柊鍦ㄤ簬锛氭潈閲?span class="math">伪_{i鈫抣}$鏄€氳繃涓€涓?strong>鍙涔犵殑浼煡璇㈠悜閲?/strong>$w_l$璁＄畻寰楀嚭锛屽疄鐜颁簡鐪熸鐨勮緭鍏ヤ緷璧栨€с€?/p>
+            </div>
+
+            <h3>娉ㄦ剰鍔涙潈閲嶇殑璁＄畻鏂瑰紡</h3>
+            <p>鍏蜂綋鑰岃█锛屽浜庣l灞傦紝AttnRes浣跨敤浠ヤ笅鏂瑰紡璁＄畻娉ㄦ剰鍔涙潈閲嶏細</p>
+            
+            <div class="tech-card">
+                <h4>浼煡璇㈡敞鎰忓姏鏈哄埗</h4>
+                <p>涓烘瘡涓€灞俵寮曞叆涓€涓彲瀛︿範鐨勪吉鏌ヨ鍚戦噺$w_l 鈭?鈩漗d$锛?/p>
+                <p>$logit_{i鈫抣} = (v_i 路 w_l) / 鈭歞$</p>
+                <p>$伪_{i鈫抣} = softmax_i(logit_{i鈫抣})$</p>
+                <p>杩欐牱锛屾瘡涓€灞傞兘鍙互"璇㈤棶"鍓嶉潰鐨勫眰锛?璋佸鎴戠殑杈撳嚭鏈€鏈夎础鐚紵"锛岃€屼笉鏄畝鍗曞湴灏嗘墍鏈夎础鐚瓑鏉冪浉鍔犮€?/p>
+            </div>
+
+            <h2>涓ょ瀹炵幇鏂规</h2>
+
+            <h3>1. Full AttnRes锛堝畬鏁寸増锛?/h3>
+            <p>鏈€鐩存帴鐨勫疄鐜版柟寮忥細姣忎竴灞傞兘鍙互 attends 鍒颁箣鍓嶆墍鏈夊眰鐨勮緭鍑恒€傝繖绉嶆柟娉曠悊璁轰笂鏁堟灉鏈€濂斤紝浣嗗唴瀛樺紑閿€涓?O(Ld)锛屽叾涓璍鏄眰鏁帮紝d鏄殣钘忕淮搴︺€傚湪瓒呭ぇ妯″瀷涓婅繖浼氭垚涓虹摱棰堛€?/p>
+
+            <h3>2. Block AttnRes锛堝疄鐢ㄧ増锛?/h3>
+            <p>涓鸿В鍐冲唴瀛橀棶棰橈紝璁烘枃鎻愬嚭浜嗗垎鍧楃増鏈殑AttnRes锛?/p>
+            <ul>
+                <li>灏哃灞傚垝鍒嗕负N涓潡锛坆lock锛?/li>
+                <li>鍧楀唴浣跨敤鏍囧噯娈嬪樊杩炴帴锛堜繚鎸佸眬閮ㄤ俊鎭祦鍔級</li>
+                <li>鍧椾箣闂翠娇鐢ㄦ敞鎰忓姏鑱氬悎锛堝疄鐜拌法鍧楅€夋嫨鎬э級</li>
+                <li>鍙渶瑕?O(Nd) 鐨勯澶栧唴瀛橈紝鍏朵腑N鏄潡鏁帮紙閫氬父绾?涓級</li>
+            </ul>
+
+            <div class="figure">
+                <img src="/assets/overview.png" alt="AttnRes鏋舵瀯瀵规瘮" />
+                <p class="figure-caption">(a) 鏍囧噯娈嬪樊锛氬潎鍖€鐨勫姞娉曠疮鍔?(b) Full AttnRes锛氭瘡灞?attends 鍒版墍鏈夊墠缁緭鍑?(c) Block AttnRes锛氬潡鍐呮爣鍑嗘畫宸紝鍧楅棿娉ㄦ剰鍔涜仛鍚?/p>
+            </div>
+
+            <h3>Block AttnRes鐨凱yTorch浼唬鐮?/h3>
+            <pre><code>def block_attn_res(blocks: list[Tensor], partial_block: Tensor, proj: Linear, norm: RMSNorm) -> Tensor:
+    """
+    鍧楅棿娉ㄦ剰鍔涳細attend 鍒板悇鍧楄〃绀?+ 褰撳墠閮ㄥ垎鍜?    blocks: 宸插畬鎴愮殑N涓潡琛ㄧず [B, T, D]
+    partial_block: 鍧楀唴閮ㄥ垎鍜?[B, T, D]
+    """
+    V = torch.stack(blocks + [partial_block])  # [N+1, B, T, D]
+    K = norm(V)
+    logits = torch.einsum('d, n b t d -> n b t', proj.weight.squeeze(), K)
+    h = torch.einsum('n b t, n b t d -> b t d', logits.softmax(0), V)
+    return h
+
+def forward(self, blocks, hidden_states):
+    partial_block = hidden_states
+    
+    # 鍦╝ttention鍓嶅簲鐢╞lock attnres
+    h = block_attn_res(blocks, partial_block, self.attn_res_proj, self.attn_res_norm)
+
+    # 鍒拌揪鍧楄竟鐣屾椂锛屽紑濮嬫柊鍧?    if self.layer_number % (self.block_size // 2) == 0:
+        blocks.append(partial_block)
+        partial_block = None
+
+    # 鑷敞鎰忓姏灞?    attn_out = self.attn(self.attn_norm(h))
+    partial_block = partial_block + attn_out if partial_block is not None else attn_out
+
+    # MLP鍓嶅啀娆″簲鐢╞lock attnres
+    h = block_attn_res(blocks, partial_block, self.mlp_res_proj, self.mlp_res_norm)
+
+    # MLP灞?    mlp_out = self.mlp(self.mlp_norm(h))
+    partial_block = partial_block + mlp_out
+
+    return blocks, partial_block</code></pre>
+
+            <h2>瀹為獙缁撴灉娣卞害瑙ｆ瀽</h2>
+
+            <h3>1. 鎵╁睍瀹氬緥锛圫caling Laws锛?/h3>
+            <p>璁烘枃鍦?M鍒?00M鍙傛暟瑙勬ā鐨勬ā鍨嬩笂杩涜浜嗙郴缁熸€х殑鎵╁睍瀹氬緥瀹為獙锛屾祴璇曚簡涓嶅悓璁＄畻棰勭畻锛團LOPs锛変笅鐨勯獙璇侀泦loss銆?/p>
+
+            <div class="figure">
+                <img src="/assets/scaling_law.png" alt="鎵╁睍瀹氬緥瀹為獙缁撴灉" />
+                <p class="figure-caption">AttnRes (姗欒壊) vs Baseline (钃濊壊) 鍦ㄤ笉鍚岃绠楅绠椾笅鐨?loss 瀵规瘮</p>
+            </div>
+
+            <p>鍏抽敭鍙戠幇锛?/p>
+            <ul>
+                <li>AttnRes鍦?strong>鎵€鏈夎绠楅绠?/strong>涓嬮兘涓€鑷翠紭浜庡熀绾?/li>
+                <li>Block AttnRes鐨勬€ц兘鐩稿綋浜庣敤<strong>1.25x鏇村璁＄畻</strong>璁粌鐨勫熀绾挎ā鍨?/li>
+                <li>杩欐剰鍛崇潃鐩稿悓鐨勮绠楄祫婧愶紝浣跨敤AttnRes鍙互鑾峰緱~25%鐨勬€ц兘鎻愬崌</li>
+            </ul>
+
+            <h3>2. 涓嬫父浠诲姟鎬ц兘</h3>
+            <p>璁烘枃鍦↘imi Linear 48B妯″瀷锛?B activated锛岃缁?.4T tokens锛変笂杩涜浜嗗箍娉涚殑涓嬫父浠诲姟璇勪及锛?/p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>绫诲埆</th>
+                        <th>鍩哄噯</th>
+                        <th>Baseline</th>
+                        <th>AttnRes</th>
+                        <th>鎻愬崌</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td rowspan="4">閫氱敤鑳藉姏</td>
+                        <td>MMLU</td>
+                        <td>73.5</td>
+                        <td><strong>74.6</strong></td>
+                        <td>+1.1</td>
+                    </tr>
+                    <tr>
+                        <td>GPQA-Diamond</td>
+                        <td>36.9</td>
+                        <td><strong>44.4</strong></td>
+                        <td><strong>+7.5</strong></td>
+                    </tr>
+                    <tr>
+                        <td>BBH</td>
+                        <td>76.3</td>
+                        <td><strong>78.0</strong></td>
+                        <td>+1.7</td>
+                    </tr>
+                    <tr>
+                        <td>TriviaQA</td>
+                        <td>69.9</td>
+                        <td><strong>71.8</strong></td>
+                        <td>+1.9</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="3">鏁板涓庝唬鐮?/td>
+                        <td>Math</td>
+                        <td>53.5</td>
+                        <td><strong>57.1</strong></td>
+                        <td><strong>+3.6</strong></td>
+                    </tr>
+                    <tr>
+                        <td>HumanEval</td>
+                        <td>59.1</td>
+                        <td><strong>62.2</strong></td>
+                        <td><strong>+3.1</strong></td>
+                    </tr>
+                    <tr>
+                        <td>MBPP</td>
+                        <td>72.0</td>
+                        <td><strong>73.9</strong></td>
+                        <td>+1.9</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">涓枃鐞嗚В</td>
+                        <td>CMMLU</td>
+                        <td>82.0</td>
+                        <td><strong>82.9</strong></td>
+                        <td>+0.9</td>
+                    </tr>
+                    <tr>
+                        <td>C-Eval</td>
+                        <td>79.6</td>
+                        <td><strong>82.5</strong></td>
+                        <td><strong>+2.9</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>鍏抽敭娲炲療</h3>
+            <ul>
+                <li><strong>鏈€澶ф敹鐩婁换鍔?/strong>锛欸PQA-Diamond锛堝姝ユ帹鐞嗭級鎻愬崌浜?.5涓櫨鍒嗙偣锛岃繖鏄墍鏈変换鍔′腑鏈€澶х殑鏀剁泭</li>
+                <li><strong>浠ｇ爜鐢熸垚</strong>锛欻umanEval鎻愬崌3.1锛屾樉绀哄嚭AttnRes瀵归渶瑕佺簿纭墽琛岀殑澶嶆潅浠诲姟鐗瑰埆鏈夋晥</li>
+                <li><strong>鏁板鎺ㄧ悊</strong>锛歁ath鎻愬崌3.6锛岃〃鏄庢ā鍨嬪湪澶氭鎺ㄧ悊鑳藉姏涓婃湁鏄捐憲澧炲己</li>
+                <li><strong>鍏ㄩ潰鎻愬崌</strong>锛氭墍鏈?涓熀鍑嗛兘鏈夋彁鍗囷紝娌℃湁鍑虹幇璐熷悜浠诲姟</li>
+            </ul>
+
+            <h3>3. 璁粌鍔ㄦ€佸垎鏋?/h3>
+            <p>璁烘枃娣卞叆鍒嗘瀽浜咥ttnRes瀵硅缁冭繃绋嬬殑褰卞搷锛?/p>
+
+            <div class="figure">
+                <img src="/assets/training_dynamics.png" alt="璁粌鍔ㄦ€佸姣? />
+                <p class="figure-caption">宸﹀浘锛氳緭鍑哄箙搴﹂殢灞傛暟鍙樺寲锛涘彸鍥撅細姊害鑼冩暟闅忓眰鏁板彉鍖栥€侫ttnRes鏈夋晥鎺у埗浜嗗箙搴﹀闀垮拰姊害鍒嗗竷</p>
+            </div>
+
+            <h4>杈撳嚭骞呭害鎺у埗</h4>
+            <p>鍦ㄦ爣鍑哖reNorm妯″瀷涓紝杈撳嚭骞呭害闅忓眰鏁版寚鏁板闀匡紝杩欎細瀵艰嚧锛?/p>
+            <ul>
+                <li>鏁板€间笉绋冲畾锛堥渶瑕佹洿灏忕殑瀛︿範鐜囷級</li>
+                <li>璁粌鍚庢湡闅句互鏀舵暃</li>
+                <li>鎺ㄧ悊鏃跺彲鑳界殑鏁板€兼孩鍑?/li>
+            </ul>
+            <p>AttnRes閫氳繃娉ㄦ剰鍔涘姞鏉冭嚜鐒跺湴瀹炵幇浜?strong>骞呭害褰掍竴鍖?/strong>锛氭墍鏈夋潈閲嶇粡杩噑oftmax鍚庢€诲拰涓?锛屽洜姝ゆ渶缁堢殑杈撳嚭骞呭害鏄湁鐣岀殑銆?/p>
+
+            <h4>姊害鍒嗗竷浼樺寲</h4>
+            <p>鏍囧噯PreNorm涓紝娣卞眰鐨勬搴﹁寖鏁拌繙澶т簬娴呭眰锛屽鑷达細</p>
+            <ul>
+                <li>娴呭眰鍙傛暟鏇存柊涓嶈冻</li>
+                <li>娣卞眰瀹规槗杩囨嫙鍚?/li>
+                <li>璁粌鏃╂湡娴呭眰瀛︿笉鍒版湁鐢ㄧ殑琛ㄧず</li>
+            </ul>
+            <p>AttnRes浣挎搴﹀湪鍚勫眰涔嬮棿鍒嗗竷鏇村潎鍖€锛屾瘡涓€灞傞兘鑳藉緱鍒板厖鍒嗙殑璁粌淇″彿銆?/p>
+
+            <h2>鎶€鏈粏鑺備笌瀹炵幇鑰冮噺</h2>
+
+            <h3>1. 浼煡璇㈠悜閲忕殑璁捐</h3>
+            <p>姣忎釜灞俵鏈変竴涓嫭绔嬬殑鍙涔犲弬鏁?span class="math">w_l$锛堢淮搴︿负d锛夛紝杩欎釜璁捐锛?/p>
+            <ul>
+                <li>鍙傛暟閲忥細L 脳 d锛圠鏄眰鏁帮紝d鏄殣钘忕淮搴︼級</li>
+                <li>鐩告瘮鏁翠綋妯″瀷鍙傛暟閲忓彲蹇界暐涓嶈</li>
+                <li>姣忎釜灞傚彲浠ュ涔?鍏虫敞"涓嶅悓鏃舵湡鐗瑰緛鐨勫亸濂?/li>
+            </ul>
+
+            <h3>2. 鍧楀ぇ灏忕殑閫夋嫨</h3>
+            <p>璁烘枃鎺ㄨ崘绾?涓潡锛坆lock锛夛紝杩欐剰鍛崇潃锛?/p>
+            <ul>
+                <li>鍧楀ぇ灏?= L / 8锛圠鏄€诲眰鏁帮級</li>
+                <li>瀵逛簬40灞傛ā鍨嬶紝鍧楀ぇ灏忕害涓?灞?/li>
+                <li>鍙互鍦ㄥ嚑涔庢棤棰濆寮€閿€鐨勬儏鍐典笅鎭㈠澶ч儴鍒咶ull AttnRes鐨勬敹鐩?/li>
+            </ul>
+
+            <h3>3. 鍗虫彃鍗崇敤鐗规€?/h3>
+            <p>AttnRes涓€涓噸瑕佷紭鍔挎槸<strong>涓嶉渶瑕佹敼鍙樻ā鍨嬫灦鏋?/strong>锛屽彧闇€瑕侊細</p>
+            <ul>
+                <li>娣诲姞浼煡璇㈠弬鏁?/li>
+                <li>淇敼娈嬪樊杩炴帴鐨勮仛鍚堟柟寮?/li>
+                <li>淇濇寔鍏朵粬缁勪欢涓嶅彉</li>
+            </ul>
+            <p>杩欎娇寰楀畠鍙互杞绘澗闆嗘垚鍒扮幇鏈夌殑棰勮缁冩祦绋嬩腑銆?/p>
+
+            <h2>涓庡叾浠栧伐浣滅殑瀵规瘮</h2>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>鏂规硶</th>
+                        <th>鏍稿績鎬濇兂</th>
+                        <th>鍙傛暟閲?/th>
+                        <th>鏀剁泭</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Standard PreNorm</td>
+                        <td>鍥哄畾鏉冮噸=1绱姞</td>
+                        <td>0</td>
+                        <td>鍩虹嚎</td>
+                    </tr>
+                    <tr>
+                        <td>QKNorm</td>
+                        <td>褰掍竴鍖朡uery/Key</td>
+                        <td>0</td>
+                        <td>璁粌绋冲畾</td>
+                    </tr>
+                    <tr>
+                        <td>DeepNorm</td>
+                        <td>璋冩暣鍒濆鍖?娈嬪樊鏉冮噸</td>
+                        <td>0</td>
+                        <td>璁粌绋冲畾</td>
+                    </tr>
+                    <tr>
+                        <td><strong>AttnRes</strong></td>
+                        <td>娉ㄦ剰鍔涘姞鏉冭仛鍚?/td>
+                        <td>L脳d</td>
+                        <td>鏄捐憲鎻愬崌</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>鎬荤粨涓庡睍鏈?/h2>
+            <p>Attention Residuals鎻愬嚭浜嗕竴绉?strong>绠€鍗曡€屾繁鍒?/strong>鐨勬敼杩涙柟妗堬細灏嗘畫宸繛鎺ヤ腑鐨勫浐瀹氭潈閲嶆浛鎹负娉ㄦ剰鍔涘姞鏉冦€傝繖涓敼鍙樿櫧鐒跺井灏忥紝浣嗗甫鏉ヤ簡鏄捐憲鐨勬€ц兘鎻愬崌锛?/p>
+            
+            <ul>
+                <li><strong>鐞嗚璐＄尞</strong>锛氶娆℃彮绀轰簡PreNorm涓?鍧囧寑鑱氬悎"鐨勯棶棰橈紝骞剁敤"閫夋嫨鎬ц仛鍚?鏉ヨВ鍐?/li>
+                <li><strong>宸ョ▼浠峰€?/strong>锛欱lock AttnRes鍦ㄥ嚑涔庢棤棰濆寮€閿€鐨勬儏鍐典笅瀹炵幇~25%璁＄畻绛夋晥鏀剁泭</li>
+                <li><strong>瀹炶返缁忛獙</strong>锛氬湪鐪熷疄鐨勫ぇ瑙勬ā妯″瀷锛?8B鍙傛暟锛変笂楠岃瘉鏈夋晥</li>
+                <li><strong>鍗虫彃鍗崇敤</strong>锛氬彲浠ヨ交鏉鹃泦鎴愬埌鐜版湁鏋舵瀯涓?/li>
+            </ul>
+
+            <p>杩欑瘒璁烘枃涔熸彁閱掓垜浠細鍦ㄦ繁搴﹀涔犻鍩燂紝涓€浜涚湅浼?鐞嗘墍褰撶劧"鐨勮璁★紙濡傚浐瀹氭潈閲嶆畫宸級鍙兘闅愯棌鐫€鍙互浼樺寲鐨勭┖闂淬€侫ttnRes鐨勬垚鍔熸簮浜庡畠瀵硅繖涓€鍩虹缁勪欢鐨勯噸鏂版€濊€冦€?/p>
+
+            <h2>鍙傝€冩枃鐚?/h2>
+            <ol>
+                <li>Attention Residuals. Chen, Guangyu and Zhang, Yu and Su, Jianlin and Xu, Weixin and Pan, Siyuan and Wang, Yaoyu and Wang, Yucheng and Chen, Guanduo and Yin, Bohong and Chen, Yutian and Yan, Junjie and Wei, Ming and Zhang, Y. and Meng, Fanqing and Hong, Chao and Xie, Xiaotong and Liu, Shaowei and Lu, Enzhe and Tai, Yunpeng and Chen, Yanru and Men, Xin and Guo, Haiqing and Charles, Y. and Lu, Haoyu. <a href="https://github.com/MoonshotAI/Attention-Residuals" target="_blank" style="color:#667eea;">[GitHub]</a></li>
+                <li>Understanding the Difficulty of Training Deep Transformers. Wang, Yuxin and Ma, Xingyao and Zhang, Zichao and Ni, Yikang and Akolkar, Anjan and Li, Xiaodong and Mou, Chenguang and Xie, J. (2022) <a href="https://arxiv.org/abs/2203.00555" target="_blank" style="color:#667eea;">[arXiv]</a></li>
+            </ol>
+        </div>
+        <footer>
+            <p>漏 2026 lucky-xing. 鍘熷垱鍐呭锛岃浆杞介渶鎺堟潈銆?/p>
+        </footer>
+    </div>
+</body>
+</html>
