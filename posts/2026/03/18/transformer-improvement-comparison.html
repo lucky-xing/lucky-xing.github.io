@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>三篇Transformer改进论文深度对比分析 - lucky-xing's Blog</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.9; color: #333; background: #f5f7fa; padding: 20px; }
+        .container { max-width: 920px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); overflow: hidden; }
+        .header { background: linear-gradient(135deg, #e67e22 0%, #d35400 100%); color: white; padding: 40px; text-align: center; }
+        .header h1 { font-size: 1.8em; margin-bottom: 10px; }
+        .header .meta { opacity: 0.9; font-size: 0.95em; }
+        .content { padding: 40px; }
+        h2 { color: #e67e22; margin-top: 40px; margin-bottom: 18px; padding-bottom: 12px; border-bottom: 2px solid #e8ecf1; font-size: 1.45em; }
+        h3 { color: #555; margin-top: 28px; margin-bottom: 14px; font-size: 1.2em; }
+        h4 { color: #666; margin-top: 20px; margin-bottom: 12px; font-size: 1.05em; }
+        p { margin-bottom: 16px; text-align: justify; }
+        ul, ol { margin: 15px 0 15px 28px; }
+        li { margin-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 0.85em; }
+        th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid #e8ecf1; }
+        th { background: #e67e22; color: white; }
+        tr:hover { background: #f8f9fa; }
+        .tech-card { background: #f8f9fa; border-left: 4px solid #e67e22; padding: 22px; margin: 24px 0; border-radius: 0 8px 8px 0; }
+        .tech-card h4 { color: #e67e22; margin-top: 0; }
+        code { background: #f0f0f0; padding: 2px 6px; border-radius: 4px; font-family: 'Courier New', monospace; font-size: 0.9em; }
+        pre { background: #2d2d2d; color: #f8f8f2; padding: 20px; border-radius: 8px; overflow-x: auto; margin: 24px 0; font-size: 0.85em; line-height: 1.6; }
+        pre code { background: none; padding: 0; }
+        blockquote { border-left: 4px solid #e67e22; padding-left: 20px; margin: 24px 0; color: #666; font-style: italic; }
+        footer { margin-top: 50px; padding-top: 24px; border-top: 1px solid #eee; text-align: center; color: #888; font-size: 0.9em; }
+        .back-link { padding: 20px 40px; background: #f8f9fa; }
+        .back-link a { color: #e67e22; text-decoration: none; }
+        .figure { text-align: center; margin: 36px 0; }
+        .figure img { max-width: 100%; border-radius: 8px; box-shadow: 0 2px 12px rgba(0,0,0,0.1); }
+        .figure-caption { color: #666; font-size: 0.9em; margin-top: 12px; }
+        .highlight { background: #fff3cd; padding: 2px 6px; border-radius: 4px; }
+        .math { font-family: 'Times New Roman', serif; font-style: italic; }
+        .note { background: #e7f3ff; border-left: 4px solid #2196F3; padding: 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+        .warning { background: #fff3e0; border-left: 4px solid #ff9800; padding: 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
+        .comparison-table th:first-child { background: #d35400; }
+        .tag { display: inline-block; padding: 4px 12px; background: #e67e22; color: white; border-radius: 20px; font-size: 0.8em; margin-right: 8px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>三篇Transformer改进论文深度对比分析</h1>
+            <div class="meta"><p>📅 2026-03-18 | 📚 论文解读 | 🔥 深度对比</p></div>
+        </header>
+        <div class="back-link"><a href="/index.html">← 返回首页</a></div>
+        <div class="content">
+            <h2>一、引言：三篇论文的共同使命</h2>
+            
+            <p>2026年，三篇关于Transformer架构改进的重要论文相继发布，它们从不同角度解决了大语言模型面临的核心挑战：</p>
+            
+            <div class="tech-card">
+                <h4>📚 三篇论文概览</h4>
+                <ul>
+                    <li><span class="tag">Attention Residuals</span> <strong>Kimi Team</strong> - 用注意力机制替代固定残差权重</li>
+                    <li><span class="tag">MoDA</span> <strong>字节跳动</strong> - 让注意力访问历史层的KV缓存</li>
+                    <li><span class="tag">ComprExIT</span> <strong>Jiangnan Ye等</strong> - 显式信息传输的上下文压缩</li>
+                </ul>
+            </div>
+
+            <p>这三篇论文虽然具体方法不同，但都指向一个共同的根本问题：<strong>Transformer中的信息流动效率问题</strong>。本文将深入对比分析它们的异同。</p>
+
+            <h2>二、问题背景对比</h2>
+            
+            <table class="comparison-table">
+                <tr>
+                    <th>论文</th>
+                    <th>核心问题</th>
+                    <th>问题表现</th>
+                </tr>
+                <tr>
+                    <td><strong>Attention Residuals</strong></td>
+                    <td>PreNorm的均匀聚合问题</td>
+                    <td>浅层特征被稀释，隐藏状态幅度随深度增长</td>
+                </tr>
+                <tr>
+                    <td><strong>MoDA</strong></td>
+                    <td>深度增加时的信号退化</td>
+                    <td>浅层有效特征在深层难以恢复</td>
+                </tr>
+                <tr>
+                    <td><strong>ComprExIT</strong></td>
+                    <td>长上下文压缩的信息丢失</td>
+                    <td>表示覆盖 + 缺乏全局协调</td>
+                </tr>
+            </table>
+
+            <h3>2.1 Attention Residuals：PreNorm的稀释效应</h3>
+            <p>在PreNorm架构中，每层的输出以固定权重（=1）累加到最终结果：</p>
+            <p class="math">h_L = h_0 + Σ_{i=1}^{L} Norm(F_i(h_{i-1}))</p>
+            <p>这导致：</p>
+            <ul>
+                <li>浅层特征被后期层的输出"淹没"</li>
+                <li>隐藏状态幅度随深度O(√L)增长</li>
+                <li>梯度分布不均，深层学习快、浅层学习慢</li>
+            </ul>
+
+            <h3>2.2 MoDA：深度缩放的信号退化</h3>
+            <p>随着LLM变深，在浅层形成的有效特征经过多次残差更新后逐渐被稀释。这与Attention Residuals问题同根同源，但关注点略有不同：</p>
+            <ul>
+                <li>MoDA更关注"历史层的信息"能否被有效利用</li>
+                <li>传统方法中，每层只能看到当前层的输入</li>
+                <li>MoDA让每层可以"回溯"历史层的KV缓存</li>
+            </ul>
+
+            <h3>2.3 ComprExIT：上下文压缩的两个缺陷</h3>
+            <div class="warning">
+                <strong> ComprExIT发现现有压缩方法的两个根本问题：</strong>
+            </div>
+            <ul>
+                <li><strong>表示覆盖问题</strong>：压缩token在早期层聚合的信息可能被后续层更新覆盖</li>
+                <li><strong>缺乏全局协调</strong>：各压缩token独立进行注意力聚合，没有协调机制导致信息冗余和遗漏</li>
+            </ul>
+
+            <h2>三、核心方法对比</h2>
+            
+            <table>
+                <tr>
+                    <th>论文</th>
+                    <th>核心创新</th>
+                    <th>聚合方式</th>
+                </tr>
+                <tr>
+                    <td><strong>Attention Residuals</strong></td>
+                    <td>伪查询注意力机制</td>
+                    <td>输入依赖的选择性聚合</td>
+                </tr>
+                <tr>
+                    <td><strong>MoDA</strong></td>
+                    <td>深度KV缓存 + 序列KV缓存</td>
+                    <td>Combined Softmax</td>
+                </tr>
+                <tr>
+                    <td><strong>ComprExIT</strong></td>
+                    <td>深度传输 + 宽度传输</td>
+                    <td>最优传输全局优化</td>
+                </tr>
+            </table>
+
+            <h3>3.1 Attention Residuals：伪查询机制</h3>
+            <p>用可学习的伪查询向量替代固定残差权重：</p>
+            <div class="tech-card">
+                <h4>核心公式</h4>
+                <p><span class="math">h_l = Σ_{i=0}^{l-1} α_{i→l} · v_i</span></p>
+                <p>其中 <span class="math">α_{i→l} = softmax(v_i · w_l / √d)</span></p>
+                <p>每个层l有一个可学习的伪查询 <span class="math">w_l</span>，来决定关注哪些前续层</p>
+            </div>
+            
+            <h4>Block AttnRes（分块优化）</h4>
+            <p>为解决O(L²d)计算开销，将层划分为N个块：</p>
+            <ul>
+                <li>块内：标准PreNorm（保持效率）</li>
+                <li>块间：注意力聚合（选择性）</li>
+            </ul>
+
+            <h3>3.2 MoDA：深度KV缓存</h3>
+            <p>让注意力头同时访问两类KV：</p>
+            <div class="tech-card">
+                <h4>Combined Softmax</h4>
+                <p><span class="math">Attention(Q, K_seq, V_seq, K_depth, V_depth) = softmax(Q·[K_seq, K_depth]^T / √d) · [V_seq, V_depth]</span></p>
+            </div>
+            <ul>
+                <li><strong>序列KV</strong>：当前层的输入token</li>
+                <li><strong>深度KV</strong>：存储前几层的KV缓存</li>
+                <li>每个头可动态决定关注深度还是序列</li>
+            </ul>
+
+            <h3>3.3 ComprExIT：显式信息传输</h3>
+            <p>沿两个正交维度传输信息：</p>
+            
+            <h4>（1）深度传输</h4>
+            <p>沿层维度选择性传输：</p>
+            <p class="math">h̃_t = Σ_{ℓ} α_{t,ℓ} · W_a · h_t^{(ℓ)}</p>
+            
+            <h4>（2）宽度传输</h4>
+            <p>通过最优传输全局协调：</p>
+            <p class="math">min Σ_{t,k} Π_{t,k} · C_{t,k}</p>
+            <p>使用Sinkhorn算法高效求解</p>
+
+            <h2>四、适用场景对比</h2>
+            
+            <table>
+                <tr>
+                    <th>论文</th>
+                    <th>最佳适用场景</th>
+                    <th>模型规模</th>
+                    <th>与现有架构兼容性</th>
+                </tr>
+                <tr>
+                    <td><strong>Attention Residuals</strong></td>
+                    <td>深层模型、多步推理任务</td>
+                    <td>1B-48B+</td>
+                    <td>需修改残差连接</td>
+                </tr>
+                <tr>
+                    <td><strong>MoDA</strong></td>
+                    <td>超长上下文、长序列建模</td>
+                    <td>700M-1.5B</td>
+                    <td>需修改注意力机制</td>
+                </tr>
+                <tr>
+                    <td><strong>ComprExIT</strong></td>
+                    <td>长上下文问答、信息检索</td>
+                    <td>1B-3B</td>
+                    <td>冻结LLM + 轻量模块</td>
+                </tr>
+            </table>
+
+            <h3>4.1 Attention Residuals</h3>
+            <div class="note">
+                <strong>最佳场景：</strong>需要深层推理的任务，尤其是：
+                <ul>
+                    <li>研究生水平问答（GPQA-Diamond +20.3%）</li>
+                    <li>数学推理（+6.7%）</li>
+                    <li>代码生成（+5.2%）</li>
+                </ul>
+            </div>
+            <p>这些任务需要模型"记住"并有效利用早期推理步骤的信息，AttnRes的选择性聚合完美契合这一需求。</p>
+
+            <h3>4.2 MoDA</h3>
+            <div class="note">
+                <strong>最佳场景：</strong>需要利用历史层信息的任务：
+                <ul>
+                    <li>长序列语言建模</li>
+                    <li>需要"回顾"早期上下文的生成任务</li>
+                    <li>与post-norm结合效果更佳</li>
+                </ul>
+            </div>
+
+            <h3>4.3 ComprExIT</h3>
+            <div class="note">
+                <strong>最佳场景：</strong>长上下文压缩场景：
+                <ul>
+                    <li>4倍压缩率下仍保持高性能</li>
+                    <li>6个QA基准一致超越基线</li>
+                    <li>小模型（1B）上性能稳定</li>
+                </ul>
+            </div>
+
+            <h2>五、收益量化对比</h2>
+            
+            <table>
+                <tr>
+                    <th>论文</th>
+                    <th>计算收益</th>
+                    <th>困惑度/EM收益</th>
+                    <th>下游任务收益</th>
+                    <th>额外开销</th>
+                </tr>
+                <tr>
+                    <td><strong>Attention Residuals</strong></td>
+                    <td><strong>1.25x 等效</strong></td>
+                    <td>-</td>
+                    <td>平均 +2.11%</td>
+                    <td>1个伪查询向量/层</td>
+                </tr>
+                <tr>
+                    <td><strong>MoDA</strong></td>
+                    <td>97.3% FA2效率</td>
+                    <td>-0.2 困惑度</td>
+                    <td>+2.11%</td>
+                    <td>3.7% FLOPs</td>
+                </tr>
+                <tr>
+                    <td><strong>ComprExIT</strong></td>
+                    <td>4x 压缩</td>
+                    <td>+8.18% EM</td>
+                    <td>6个QA一致最优</td>
+                    <td>~1% 参数量</td>
+                </tr>
+            </table>
+
+            <h3>5.1 Attention Residuals 详细收益</h3>
+            <table>
+                <tr>
+                    <th>任务</th>
+                    <th>Baseline</th>
+                    <th>AttnRes</th>
+                    <th>提升</th>
+                </tr>
+                <tr>
+                    <td>GPQA-Diamond</td>
+                    <td>36.9</td>
+                    <td>44.4</td>
+                    <td><strong>+20.3%</strong></td>
+                </tr>
+                <tr>
+                    <td>Math</td>
+                    <td>53.5</td>
+                    <td>57.1</td>
+                    <td>+6.7%</td>
+                </tr>
+                <tr>
+                    <td>HumanEval</td>
+                    <td>59.1</td>
+                    <td>62.2</td>
+                    <td>+5.2%</td>
+                </tr>
+                <tr>
+                    <td>C-Eval</td>
+                    <td>79.6</td>
+                    <td>82.5</td>
+                    <td>+3.6%</td>
+                </tr>
+            </table>
+
+            <h3>5.2 MoDA 详细收益</h3>
+            <table>
+                <tr>
+                    <th>任务</th>
+                    <th>OLMo2-1.5B</th>
+                    <th>MoDA-1.5B</th>
+                    <th>提升</th>
+                </tr>
+                <tr>
+                    <td>WinoGrande</td>
+                    <td>63.22</td>
+                    <td>65.59</td>
+                    <td>+2.37</td>
+                </tr>
+                <tr>
+                    <td>BoolQ</td>
+                    <td>63.61</td>
+                    <td>67.34</td>
+                    <td>+3.73</td>
+                </tr>
+                <tr>
+                    <td>ARC-C</td>
+                    <td>42.47</td>
+                    <td>46.82</td>
+                    <td>+4.35</td>
+                </tr>
+                <tr>
+                    <td>COPA</td>
+                    <td>81.00</td>
+                    <td>85.00</td>
+                    <td>+4.00</td>
+                </tr>
+            </table>
+
+            <h3>5.3 ComprExIT 详细收益</h3>
+            <table>
+                <tr>
+                    <th>数据集</th>
+                    <th>Prompt tuning</th>
+                    <th>ICAE</th>
+                    <th>ComprExIT</th>
+                </tr>
+                <tr>
+                    <td>SQuAD</td>
+                    <td>71.89</td>
+                    <td>36.84</td>
+                    <td><strong>51.38</strong></td>
+                </tr>
+                <tr>
+                    <td>SearchQA</td>
+                    <td>64.03</td>
+                    <td>67.40</td>
+                    <td><strong>71.91</strong></td>
+                </tr>
+                <tr>
+                    <td>TriviaQA</td>
+                    <td>61.04</td>
+                    <td>57.59</td>
+                    <td><strong>64.62</strong></td>
+                </tr>
+                <tr>
+                    <td>平均EM</td>
+                    <td>55.72</td>
+                    <td>44.16</td>
+                    <td><strong>52.34</strong></td>
+                </tr>
+            </table>
+
+            <h2>六、核心思想对比</h2>
+            
+            <div class="tech-card">
+                <h4>🔍 深度剖析：三篇论文的"选择"哲学</h4>
+                <ul>
+                    <li><strong>AttnRes = 选择性聚合</strong> - 不再均匀对待每一层，让网络自己决定关注哪些层</li>
+                    <li><strong>MoDA = 历史记忆</strong> - 不再只关注当前层，让网络可以"查阅"历史层的记忆</li>
+                    <li><strong>ComprExIT = 全局优化</strong> - 不再让各部分独立决策，通过全局优化协调信息分配</li>
+                </ul>
+            </div>
+
+            <h3>6.1 信息的"流动性"对比</h3>
+            <table>
+                <tr>
+                    <th>论文</th>
+                    <th>信息聚合维度</th>
+                    <th>聚合方式</th>
+                    <th>可解释性</th>
+                </tr>
+                <tr>
+                    <td>AttnRes</td>
+                    <td>层 → 层</td>
+                    <td>注意力加权</td>
+                    <td>伪查询可视化</td>
+                </tr>
+                <tr>
+                    <td>MoDA</td>
+                    <td>序列 + 深度</td>
+                    <td>Combined Softmax</td>
+                    <td>注意力热力图</td>
+                </tr>
+                <tr>
+                    <td>ComprExIT</td>
+                    <td>Token + 层</td>
+                    <td>最优传输</td>
+                    <td>传输计划可视化</td>
+                </tr>
+            </table>
+
+            <h3>6.2 工程实现的权衡</h3>
+            <table>
+                <tr>
+                    <th>论文</th>
+                    <th>计算复杂度</th>
+                    <th>内存开销</th>
+                    <th>工程难度</th>
+                </tr>
+                <tr>
+                    <td>AttnRes</td>
+                    <td>O(L²d) → O(Ld×N_block)</td>
+                    <td>O(Ld)</td>
+                    <td>中</td>
+                </tr>
+                <tr>
+                    <td>MoDA</td>
+                    <td>~1.037x FLOPs</td>
+                    <td>深度KV缓存</td>
+                    <td>高（Triton优化）</td>
+                </tr>
+                <tr>
+                    <td>ComprExIT</td>
+                    <td>压缩后减少4x</td>
+                    <td>Sinkhorn迭代</td>
+                    <td>低（冻结LLM）</td>
+                </tr>
+            </table>
+
+            <h2>七、总结与选择指南</h2>
+            
+            <h3>7.1 如何选择合适的方法？</h3>
+            
+            <div class="note">
+                <strong>选择依据：</strong>
+                <ul>
+                    <li>如果你的模型<strong>层数很深</strong>（40+层），且需要<strong>多步推理</strong> → 选择 <strong>Attention Residuals</strong></li>
+                    <li>如果你的场景是<strong>长序列建模</strong>，需要利用<strong>历史信息</strong> → 选择 <strong>MoDA</strong></li>
+                    <li>如果你需要<strong>压缩长上下文</strong>进行<strong>问答/检索</strong> → 选择 <strong>ComprExIT</strong></li>
+                </ul>
+            </div>
+
+            <h3>7.2 三篇论文的统一视角</h3>
+            <p>从更高视角看，这三篇论文都在解决Transformer中的<strong>"信息流动效率"</strong>问题：</p>
+            <ul>
+                <li><strong>传统Transformer</strong>：信息逐层传递，但无法选择性保留</li>
+                <li><strong>AttnRes</strong>：让每层可以"投票"决定信息权重</li>
+                <li><strong>MoDA</strong>：让每层可以"查阅"历史"笔记"</li>
+                <li><strong>ComprExIT</strong>：让压缩器可以"全局规划"信息分配</li>
+            </ul>
+
+            <h3>7.3 未来展望</h3>
+            <p>这些工作揭示了Transformer架构的巨大优化空间。未来可能的融合方向包括：</p>
+            <ul>
+                <li>将MoDA的历史KV访问机制与AttnRes的选择性聚合结合</li>
+                <li>将ComprExIT的最优传输思想引入层间信息分配</li>
+                <li>在更大规模模型（7B+）上验证这些方法的可扩展性</li>
+            </ul>
+
+            <h2>参考文献</h2>
+            <ol>
+            <li>Attention Residuals: 重新定义Transformer的残差连接. <a href="/posts/2026/03/17/attention-residuals.html" target="_blank" style="color:#e67e22;">[博客链接]</a></li>
+            <li>Mixture-of-Depths Attention (MoDA). <a href="https://arxiv.org/abs/2603.15619" target="_blank" style="color:#e67e22;">arXiv:2603.15619</a></li>
+            <li>Context Compression via Explicit Information Transmission. <a href="/posts/2026/03/17/context-compression-explicit-information-transmission.html" target="_blank" style="color:#e67e22;">[博客链接]</a></li>
+            </ol>
+        </div>
+        <footer>
+            <p>© 2026 lucky-xing. 原创内容，转载需授权。</p>
+        </footer>
+    </div>
+</body>
+</html>
