@@ -329,7 +329,7 @@ if (!post) {
     document.title = post.title + ' - lucky-xing\'s Blog';
     document.getElementById('post-title').textContent = post.title;
     document.getElementById('post-date').textContent = post.date;
-    document.getElementById('post-category').textContent = post.id === 5 ? '通信' : '学习';
+    const categoryLink = document.createElement('a'); categoryLink.href = post.id === 5 ? 'communication.html' : 'learning.html'; categoryLink.textContent = post.id === 5 ? '通信' : '学习'; document.getElementById('post-category').replaceChildren(categoryLink);
     document.getElementById('content').innerHTML = post.content;
     document.getElementById('post-tags').innerHTML = post.tags.map(tag => '<a href="index.html" class="tag">' + tag + '</a>').join('');
 }
