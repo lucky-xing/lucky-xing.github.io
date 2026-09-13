@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mixture-of-Depths Attention (MoDA) - 深度缩放的注意力机制 - lucky-xing's Blog</title>
+    <title>Mixture-of-Depths Attention (MoDA) - 深度缩放的注意力机制 · Lighting Future</title>
     <script>
     (function() {
         document.querySelectorAll('span.math').forEach(function(el) {
@@ -63,14 +63,14 @@
         .note { background: #e7f3ff; border-left: 4px solid #2196F3; padding: 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
         .warning { background: #fff3e0; border-left: 4px solid #ff9800; padding: 16px; margin: 20px 0; border-radius: 0 6px 6px 0; }
     </style>
-</head>
-<body>
+    <link rel="stylesheet" href="../../../../style.css"></head>
+<body class="article-page theme-ai"><header class="article-site-header"><a class="brand" href="../../../../index.html"><span class="mark">LF</span>Lighting Future</a><nav aria-label="文章导航"><a href="../../../../ai.html">AI</a><a href="../../../../ai-model-structure.html">模型结构洞察</a></nav></header>
     <div class="container">
         <header class="header">
             <h1>Mixture-of-Depths Attention (MoDA)</h1>
             <div class="meta"><p>📅 2026-03-18 | 📚 论文解读</p></div>
         </header>
-        <div class="back-link"><a href="/index.html">← 返回首页</a> <a href="../../../../ai.html">· AI 板块</a></div>
+        <div class="back-link"><a href="../../../../ai.html">AI</a><span>/</span><a href="../../../../ai-model-structure.html">AI模型结构洞察分析</a></div>
         <div class="content">
             <h2>摘要</h2>
             <p>随着大型语言模型（LLM）变得更深，它们经常遭受<strong>信号退化</strong>问题：在浅层形成的有效特征在经过多次残差更新后逐渐被稀释，导致在深层难以恢复。本文提出了<strong>Mixture-of-Depths Attention（MoDA）</strong>机制，允许每个注意力头同时关注当前层的序列KV对和前几层的深度KV对。实验表明，MoDA在1.5B参数模型上显著优于强基线方法，在10个验证基准上平均困惑度降低0.2，在10个下游任务上平均性能提升<strong>2.11%</strong>，同时仅增加3.7%的计算开销。</p>
