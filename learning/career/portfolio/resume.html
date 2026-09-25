@@ -1,36 +1,21 @@
 <!doctype html>
 <html lang="zh-CN">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>匿名技术简历 · 简历与作品集 · Lighting Future</title>
-  <meta name="description" content="匿名技术简历：无线物理层 AI 模型低精度推理、模型压缩、算子优化及算芯协同验证。">
-  <link rel="stylesheet" href="../../../style.css?v=20260925-portfolio-1">
-</head>
-<body class="career-page resume-page">
-  <a class="skip" href="#resume-content">跳到简历正文</a>
-  <header class="wrap"><a class="brand" href="../../../index.html"><span class="mark">LF</span>Lighting Future</a><nav aria-label="主导航"><a href="../../../index.html">首页</a><a href="../../../ai.html">AI</a><a href="../../../finance.html">投资理财</a><a href="../../../communication.html">通信</a><a href="../../../learning.html" aria-current="page">学习</a><a href="../../../world.html">看世界</a></nav></header>
-  <main class="wrap resume-main">
-    <div class="breadcrumb"><a href="../../../index.html">首页</a><span>/</span><a href="../../../learning.html">学习</a><span>/</span><a href="../index.html">职业进阶</a><span>/</span><a href="index.html">简历与作品集</a><span>/</span><span>技术简历</span></div>
-    <div class="resume-hero"><span class="resume-kicker">ANONYMIZED RESUME / 2026.09</span><h1>AI 算法与<br><em>算芯协同优化</em></h1><p>聚焦无线物理层 AI 模型的低精度推理、模型压缩和硬件感知优化，覆盖数据格式、PTQ/QAT、算子近似及实现验证。</p><div class="resume-pill-row"><span>低精度推理</span><span>模型压缩</span><span>算子优化</span><span>硬件验证</span></div></div>
-    <div class="resume-privacy" role="note"><strong>公开展示版本</strong><p>姓名、照片、联系方式、学校及实验室、雇主和部门名称均已隐藏。项目描述基于原简历整理，未上传原始 PDF。</p></div>
-    <div id="resume-content" class="resume-layout">
-      <aside class="resume-aside">
-        <section><h2>教育背景</h2><div class="resume-education"><strong>硕士</strong><span>通信与信息系统方向</span><small>学校信息已隐藏</small></div><div class="resume-education"><strong>本科</strong><span>电子信息方向</span><small>学校信息已隐藏</small></div></section>
-        <section><h2>技术能力</h2><ul><li>Python、PyTorch、C、Linux</li><li>PTQ / QAT、混合精度推理</li><li>块浮点与低精度数据格式</li><li>结构化剪枝、稀疏注意力</li><li>Attention、Softmax、GELU 的优化与验证</li></ul></section>
-      </aside>
-      <div class="resume-detail">
-        <section><span class="resume-section-number">01 / EXPERIENCE</span><h2>工作经历</h2><div class="resume-role"><div><h3>AI 算法及应用工程师</h3><span>通信技术企业 · 算法研发团队</span></div><time>2024.10 — 至今</time></div><ul><li>负责无线空口 AI 模型的低精度推理、模型压缩及性能优化，在算力、时延和精度约束下调整模型结构与计算方式。</li><li>参与 AI 计算核和低精度数据格式方案，结合处理器资源配比开展硬件感知优化。</li><li>建立算法原型到硬件实现的精度、性能验证流程，支持量化方案和算子优化落地。</li></ul></section>
-        <section><span class="resume-section-number">02 / PROJECTS</span><h2>项目经历</h2>
-          <article class="resume-project"><div class="resume-project-head"><h3>无线物理层 AI 专用计算核</h3><span>2024 — 2025</span></div><p class="resume-project-intro">面向无线物理层 AI 模型首次芯片化部署，参与低精度计算格式及模型部署方案设计。</p><ul><li>结合模型的数据分布，参与块浮点格式设计，并构建配套的 PTQ / QAT 模拟量化方案。</li><li>通过数据分布变换、融合旋转与舍入优化降低低比特量化误差，提高低精度模型可部署比例。</li><li>将硬件侧 C 实现封装为 Python 可调用模块，嵌入模型进行精度与性能联合验证。</li></ul><p class="resume-result"><strong>结果</strong> 支持线性计算 W4A8、非线性计算 8/16 bit 的混合精度方案，建立算法方案到硬件模型的验证链路。</p></article>
-          <article class="resume-project"><div class="resume-project-head"><h3>传统通信与 AI 融合计算核</h3><span>2025 — 至今</span></div><p class="resume-project-intro">在优先满足传统通信算法实时性要求的约束下，提升统一计算核对 AI 模型的支持能力。</p><ul><li>结合硬件资源变化调整 AI 计算方式，分析 Attention、Softmax、GELU 等模块的执行瓶颈。</li><li>使用近似计算与低成本实现优化部分非线性算子，降低有限硬件资源下的开销。</li><li>通过层数裁剪、Embedding 降维、结构化剪枝和稀疏注意力压缩模型计算量。</li></ul><p class="resume-result"><strong>结果</strong> 原简历记录模型计算需求约降低 10 倍，计算图与算子优化带来约 1.3 倍端到端推理加速；两项指标采用不同口径。</p></article>
-        </section>
-        <section><span class="resume-section-number">03 / FOCUS</span><h2>能力方向</h2><div class="resume-focus"><div><strong>算法到硬件</strong><p>将量化和模型结构方案映射到硬件资源约束，并建立实现一致性验证。</p></div><div><strong>精度与性能</strong><p>同时检查算子误差、模型业务指标和系统级时延，明确各类收益的测量口径。</p></div></div></section>
-      </div>
-    </div>
-    <div class="next-chapter"><span>简历与作品集</span><a href="index.html">返回列表 →</a></div>
-  </main>
-  <footer class="wrap"><a class="brand" href="../../../index.html">Lighting Future</a><span>保持好奇。持续记录。</span><a href="https://github.com/lucky-xing/">GitHub ↗</a></footer>
-  <script src="../../../theme-motion.js" defer></script>
-</body>
-</html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>匿名技术简历 · 简历与作品集 · Lighting Future</title><meta name="description" content="匿名技术简历：无线物理层 AI 低精度推理、模型压缩、算子优化与算芯协同。"><link rel="stylesheet" href="../../../style.css?v=20260925-resume-2"></head>
+<body class="career-page resume-page resume-v2">
+<a class="skip" href="#resume-content">跳到简历正文</a>
+<header class="wrap"><a class="brand" href="../../../index.html"><span class="mark">LF</span>Lighting Future</a><nav aria-label="主导航"><a href="../../../index.html">首页</a><a href="../../../ai.html">AI</a><a href="../../../finance.html">投资理财</a><a href="../../../communication.html">通信</a><a href="../../../learning.html" aria-current="page">学习</a><a href="../../../world.html">看世界</a></nav></header>
+<main class="wrap resume-main">
+<div class="breadcrumb"><a href="../../../index.html">首页</a><span>/</span><a href="../../../learning.html">学习</a><span>/</span><a href="../index.html">职业进阶</a><span>/</span><a href="index.html">简历与作品集</a><span>/</span><span>技术简历</span></div>
+<section class="resume-cover" aria-labelledby="resume-title"><div class="resume-cover-copy"><span class="resume-kicker">TECHNICAL RESUME · ANONYMIZED</span><h1 id="resume-title">把 AI 模型<br>带到<span>计算核上</span></h1><p>具备无线物理层 AI 模型低精度推理、模型压缩及算芯协同优化经验，覆盖低精度数据格式、PTQ/QAT、模型结构优化、算子近似和硬件实现验证。能够结合芯片微架构及业务时延约束推进算法方案落地。</p><div class="resume-pill-row"><span>低精度数据格式</span><span>模型压缩</span><span>算子近似</span><span>硬件验证</span></div></div><div class="resume-cover-metrics" aria-label="简历重点"><div><strong>W4A8</strong><span>线性计算方案</span></div><div><strong>约 10×</strong><span>模型计算需求压缩</span></div><div><strong>约 1.3×</strong><span>端到端推理加速</span></div></div></section>
+<p class="resume-public-note">公开展示版：姓名、照片、联系方式、学校及实验室、雇主及部门名称已隐藏；原始 PDF 未上传。两项倍数分别来自模型压缩与算子优化。</p>
+<nav class="resume-jump" aria-label="简历目录"><a href="#experience">工作经历</a><a href="#projects">项目经历</a><a href="#skills">专业技能</a><a href="#education">教育背景</a></nav>
+<div id="resume-content" class="resume-v2-layout"><div class="resume-v2-main">
+<section id="experience" class="resume-v2-section"><div class="resume-v2-section-head"><span>01 / EXPERIENCE</span><h2>工作经历</h2></div><div class="resume-v2-role"><div><h3>AI 算法及应用工程师</h3><p>企业及部门信息已隐藏 · 无线空口 AI 方向</p></div><time>2024.10 — 至今</time></div><ul class="resume-v2-bullets"><li>负责无线空口 AI 模型低精度推理、模型压缩及性能优化，围绕<strong>算力、时延和精度约束</strong>优化模型结构与计算方式。</li><li>参与 AI 核架构及低精度数据格式设计，结合处理器微架构开展算芯协同与硬件感知优化。</li><li>建立算法原型到硬件实现的精度与性能验证流程，支撑量化方案、算子优化及模型小型化方案落地。</li></ul></section>
+<section id="projects" class="resume-v2-section"><div class="resume-v2-section-head"><span>02 / PROJECTS</span><h2>项目经历</h2></div>
+<article class="resume-v2-project"><div class="resume-v2-project-top"><span class="resume-project-index">PROJECT 01</span><time>2024.10 — 2025.11</time></div><h3>第一代无线通信物理层 AI 核设计</h3><p class="resume-v2-position">关键贡献者</p><div class="resume-v2-context"><strong>项目背景</strong><p>面向无线物理层 AI 模型首次芯片化部署需求，从零开始定制通信 AI 专用计算核。围绕模型计算特征、低精度数据格式及硬件实现约束，完成计算能力定义和低精度部署方案设计。</p></div><div class="resume-v2-contributions"><div><b>01</b><h4>低精度数据格式与量化方案</h4><p>结合无线物理层 AI 模型的长尾分布特征，参与块浮点（Block Floating Point）格式设计，并构建配套 PTQ/QAT 模拟量化方案。</p></div><div><b>02</b><h4>低比特误差控制</h4><p>通过数据分布变换、融合旋转及舍入优化降低低比特量化误差，持续提升 W4A8 模型可部署比例。</p></div><div><b>03</b><h4>算法与硬件实现对齐</h4><p>将硬件侧 C 实现封装为 Python 可调用模块并嵌入模型，进行精度和性能联合验证，建立算法模型与芯片实现之间的验证流程。</p></div></div><div class="resume-v2-result"><span>项目成果</span><p>支撑首代通信 AI 计算核从方案定义到模型部署验证；实现线性计算 W4A8、非线性计算 8/16 bit 的混合精度方案，打通低精度算法到硬件实现的验证链路。</p></div></article>
+<article class="resume-v2-project"><div class="resume-v2-project-top"><span class="resume-project-index">PROJECT 02</span><time>2025.10 — 至今</time></div><h3>无线物理层传统通信 + AI 融合核设计</h3><p class="resume-v2-position">关键贡献者</p><div class="resume-v2-context"><strong>项目背景</strong><p>为降低硬件资源开销并提高计算资源复用效率，设计统一计算核同时承载传统通信算法与 AI 模型。核心约束是优先保障传统通信算法的性能和实时性，再在有限算力与硬件资源下提升 AI 空口模型的部署能力。</p></div><div class="resume-v2-contributions"><div><b>01</b><h4>算芯协同优化</h4><p>针对无线空口模型特点，协同硬件侧进行架构设计；在算法侧优化计算方式，提高统一核对 AI 负载的执行效率。</p></div><div><b>02</b><h4>核心算子近似优化</h4><p>针对 Attention、Softmax、GELU 等开销较高的模块，开展近似计算及低成本实现优化，降低对有限硬件资源的占用。</p></div><div><b>03</b><h4>模型结构小型化</h4><p>通过层数裁剪、Embedding 降维、结构化剪枝、Sparse Attention 等手段压缩 AI 模型计算量，同时保持业务性能符合要求。</p></div></div><div class="resume-v2-result"><span>项目成果</span><p>原简历记录：模型结构压缩实现约 10 倍的计算需求压缩；计算图及核心算子优化实现约 1.3 倍端到端推理加速，支持传统算法与 AI 模型在统一核上的协同部署。</p></div></article>
+</section></div>
+<aside class="resume-v2-rail"><section id="skills" class="resume-v2-side-card"><span>03 / CAPABILITIES</span><h2>专业技能</h2><dl><dt>AI 推理与模型优化</dt><dd>模型量化、混合精度推理、结构化剪枝、Sparse Attention 等模型压缩与推理优化方法。</dd><dt>算芯协同与性能优化</dt><dd>结合处理器微架构、算力及访存约束，进行模型结构优化和硬件感知优化。</dd><dt>算子与低精度计算</dt><dd>熟悉 Attention、Softmax、GELU、MoE 等核心算子，具备算子近似、低精度计算及精度对齐经验。</dd><dt>编程与框架</dt><dd>Python、PyTorch、C、Linux。</dd></dl></section><section id="education" class="resume-v2-side-card"><span>04 / EDUCATION</span><h2>教育背景</h2><div class="resume-v2-degree"><strong>硕士</strong><p>通信与信息系统</p><time>2021.09 — 2024.07</time><small>院校及实验室信息已隐藏</small></div><div class="resume-v2-degree"><strong>本科</strong><p>电子信息科学与技术</p><time>2017.09 — 2021.06</time><small>院校信息已隐藏</small></div></section><div class="resume-v2-method"><span>从算法到硬件</span><ol><li>低精度格式</li><li>模型与算子优化</li><li>硬件实现对齐</li><li>精度与性能验证</li></ol></div></aside></div>
+<div class="next-chapter"><span>简历与作品集</span><a href="index.html">返回列表 →</a></div>
+</main><footer class="wrap"><a class="brand" href="../../../index.html">Lighting Future</a><span>保持好奇。持续记录。</span><a href="https://github.com/lucky-xing/">GitHub ↗</a></footer><script src="../../../theme-motion.js" defer></script>
+</body></html>
