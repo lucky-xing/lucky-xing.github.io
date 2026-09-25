@@ -18,3 +18,5 @@
 
 - 2026-09-25：已发布周五盘前日报，覆盖近24小时并更新滚动股票池；https://lucky-xing.github.io/finance/daily/2026-09-25.html
 
+
+- 2026-09-26：中秋休市观察日报已生成，A股9月25日至27日休市，暂不新增标的；已发布：https://lucky-xing.github.io/finance/daily/2026-09-26.html
