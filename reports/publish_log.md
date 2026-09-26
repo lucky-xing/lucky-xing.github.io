@@ -20,3 +20,5 @@
 
 
 - 2026-09-26：中秋休市观察日报已生成，A股9月25日至27日休市，暂不新增标的；已发布：https://lucky-xing.github.io/finance/daily/2026-09-26.html
+
+- 2026-09-27：已发布周日市场周报与下周展望；A股中秋休市，周一重筛候选池；https://lucky-xing.github.io/finance/daily/2026-09-27.html
