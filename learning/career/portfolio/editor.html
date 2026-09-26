@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>编辑简历草稿 · 简历与作品集 · Lighting Future</title>
+  <meta name="description" content="在浏览器本机编辑匿名简历草稿并整理目标岗位要求。">
+  <link rel="stylesheet" href="../../../style.css?v=20260926-resume-editor-1">
+  <link rel="stylesheet" href="resume-editor.css?v=20260926-1">
+</head>
+<body class="career-page resume-editor-page">
+  <a class="skip" href="#editor-panel">跳到编辑说明</a>
+  <header class="wrap"><a class="brand" href="../../../index.html"><span class="mark">LF</span>Lighting Future</a><nav aria-label="主导航"><a href="../../../index.html">首页</a><a href="../../../ai.html">AI</a><a href="../../../finance.html">投资理财</a><a href="../../../communication.html">通信</a><a href="../../../learning.html" aria-current="page">学习</a><a href="../../../world.html">看世界</a></nav></header>
+  <main class="wrap editor-main">
+    <div class="breadcrumb"><a href="../../../index.html">首页</a><span>/</span><a href="../../../learning.html">学习</a><span>/</span><a href="../index.html">职业进阶</a><span>/</span><a href="index.html">简历与作品集</a><span>/</span><span>编辑草稿</span></div>
+    <div class="editor-heading"><span>RESUME WORKSPACE</span><h1>编辑简历草稿</h1><p>直接点击右侧简历文字修改。编辑内容保存在当前浏览器；公开页面只有我收到你的草稿并更新网站后才会改变。</p></div>
+    <div class="editor-layout">
+      <section id="editor-panel" class="editor-panel" aria-label="编辑与交接">
+        <div class="editor-panel-intro"><strong>岗位信息</strong><p>填入目标岗位和岗位描述，我会据此调整简历的表达重点。请勿在公开网站上填写姓名、联系方式、真实校名或雇主名称。</p></div>
+        <label for="target-role">目标岗位</label><input id="target-role" type="text" placeholder="例如：异构算力工程师" autocomplete="off">
+        <label for="job-description">岗位要求</label><textarea id="job-description" rows="8" placeholder="粘贴岗位职责、任职要求，以及你特别想突出的能力"></textarea>
+        <label for="extra-notes">补充或新增内容</label><textarea id="extra-notes" rows="5" placeholder="如果需要增加项目、修改结构，写在这里"></textarea>
+        <div class="editor-actions"><button type="button" id="save-draft">保存到本机</button><button type="button" id="copy-draft">复制给 Codex</button><button type="button" id="download-draft">下载草稿</button><button type="button" id="import-button">导入草稿</button><button type="button" id="reset-draft">恢复公开版</button><input id="import-draft" type="file" accept=".json,application/json" hidden></div>
+        <p id="editor-status" class="editor-status" role="status" aria-live="polite">正在加载公开版简历…</p>
+        <div class="editor-next"><strong>下一步</strong><ol><li>编辑简历，填写目标岗位及要求。</li><li>点击“复制给 Codex”，将内容粘贴到我们当前的对话。</li><li>我会核对真实性与打码，做小幅岗位优化，再更新公开网页。</li></ol></div>
+        <a class="editor-public-link" href="resume.html">查看当前公开版简历 →</a>
+      </section>
+      <div class="editor-preview"><div class="editor-preview-head"><span>可编辑预览</span><span>点击正文文字修改</span></div><iframe id="resume-frame" title="可编辑的简历预览" src="resume.html"></iframe></div>
+    </div>
+  </main>
+  <footer class="wrap"><a class="brand" href="../../../index.html">Lighting Future</a><span>保持好奇。持续记录。</span><a href="https://github.com/lucky-xing/">GitHub ↗</a></footer>
+  <script src="resume-editor.js?v=20260926-1" defer></script>
+</body>
+</html>

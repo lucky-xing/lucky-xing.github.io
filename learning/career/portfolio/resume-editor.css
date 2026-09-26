@@ -1,0 +1,35 @@
+.portfolio-edit-entry{display:flex;align-items:center;justify-content:space-between;gap:24px;margin:20px 0 40px;padding:24px 30px;border:1px solid #8d85ff3d;border-radius:15px;background:#111322}
+.portfolio-edit-entry strong{color:#fff;font-size:19px}
+.portfolio-edit-entry p{max-width:650px;margin:5px 0 0;color:#aeb0c3;font-size:15px}
+.portfolio-edit-entry a{flex:none;padding:10px 17px;border:1px solid #a99fff70;border-radius:9px;color:#e5dfff;text-decoration:none;font-weight:700}
+.portfolio-edit-entry a:hover{background:#8d85ff22}
+.editor-main{max-width:1500px}
+.editor-heading{margin:0 0 26px;padding:20px 0 24px;border-bottom:1px solid #ffffff22}
+.editor-heading span{color:#a99fff;font:12px "Cascadia Code",Consolas,monospace;letter-spacing:.1em}
+.editor-heading h1{margin:8px 0 9px;color:#fff;font-size:clamp(35px,5vw,56px);line-height:1.2}
+.editor-heading p{max-width:950px;margin:0;color:#aeb0c3;font-size:16px}
+.editor-layout{display:grid;grid-template-columns:minmax(285px,360px) minmax(0,1fr);gap:20px;align-items:start;margin-bottom:70px}
+.editor-panel,.editor-preview{border:1px solid #8d85ff37;border-radius:16px;background:#111321;overflow:hidden}
+.editor-panel{padding:24px}
+.editor-panel-intro{margin-bottom:22px;padding-bottom:19px;border-bottom:1px solid #8d85ff2e}
+.editor-panel-intro strong{color:#fff;font-size:20px}
+.editor-panel-intro p{margin:8px 0 0;color:#aeb0c3;font-size:14px;line-height:1.7}
+.editor-panel label{display:block;margin:18px 0 7px;color:#e2dfff;font-size:14px;font-weight:700}
+.editor-panel input[type=text],.editor-panel textarea{display:block;width:100%;padding:11px 12px;border:1px solid #8d85ff4a;border-radius:8px;background:#0b0e1b;color:#fff;font:15px/1.55 inherit;resize:vertical}
+.editor-panel input:focus,.editor-panel textarea:focus{outline:2px solid #b4aaff;outline-offset:2px}
+.editor-panel input::placeholder,.editor-panel textarea::placeholder{color:#777b92}
+.editor-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:22px}
+.editor-actions button{min-height:40px;padding:8px 9px;border:1px solid #8d85ff55;border-radius:8px;background:#1b1b36;color:#e5e2ff;font:700 13px/1.3 inherit;cursor:pointer}
+.editor-actions button:hover{background:#302b5c;border-color:#b4aaff}
+.editor-actions #copy-draft{background:#aca3ff;color:#111226}
+.editor-actions #copy-draft:hover{background:#c6bfff}
+.editor-status{min-height:44px;margin:16px 0 0;color:#b9b4ef;font-size:13px;line-height:1.6}
+.editor-next{padding:17px;border:1px solid #8d85ff31;border-radius:9px;background:#ffffff06}
+.editor-next strong{color:#fff}
+.editor-next ol{margin:10px 0 0;padding-left:21px;color:#aeb0c3;font-size:13px;line-height:1.75}
+.editor-public-link{display:inline-block;margin-top:19px;color:#bdb5ff;text-decoration:underline;text-underline-offset:3px;font-size:14px}
+.editor-preview{min-width:0;background:#080913}
+.editor-preview-head{display:flex;justify-content:space-between;gap:12px;padding:13px 18px;border-bottom:1px solid #8d85ff33;color:#c8c3ec;font-size:13px}
+.editor-preview iframe{display:block;width:100%;height:min(1150px,85vh);min-height:620px;border:0;background:#080913}
+@media(max-width:960px){.editor-layout{grid-template-columns:1fr}.editor-panel{order:2}.editor-preview{order:1}.editor-preview iframe{height:650px}}
+@media(max-width:640px){.editor-preview-head{display:block}.editor-preview-head span+span{display:block;color:#8d8fa8}.portfolio-edit-entry{display:block;padding:22px}.portfolio-edit-entry a{display:inline-block;margin-top:17px}.editor-panel{padding:20px}.editor-preview iframe{height:600px;min-height:0}}
