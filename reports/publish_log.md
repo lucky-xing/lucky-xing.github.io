@@ -26,3 +26,5 @@
 - 2026-09-28：已生成周一盘前日报；覆盖9月25日至今早并衔接9月24日A股最后交易日；待确认发布：https://lucky-xing.github.io/finance/daily/2026-09-28.html
 
 - 2026-09-29：已生成盘前视角日报，数据截止北京时间07:45；发布链接：https://lucky-xing.github.io/finance/daily/2026-09-29.html
+
+- 2026-09-30：补发盘前视角日报，信息截止北京时间07:45，实际发布晚于盘前；https://lucky-xing.github.io/finance/daily/2026-09-30.html
