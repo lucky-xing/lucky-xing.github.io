@@ -30,3 +30,5 @@
 - 2026-09-30：补发盘前视角日报，信息截止北京时间07:45，实际发布晚于盘前；https://lucky-xing.github.io/finance/daily/2026-09-30.html
 
 - 2026-10-05：国庆休市观察；覆盖10月2日以来并衔接9月30日A股最后交易日；https://lucky-xing.github.io/finance/daily/2026-10-05.html
+
+- 2026-10-06：国庆休市观察补发，覆盖10月5日08:50至10月6日10:34并衔接A股9月30日；https://lucky-xing.github.io/finance/daily/2026-10-06.html
