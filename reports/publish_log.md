@@ -34,3 +34,7 @@
 - 2026-10-06：国庆休市观察补发，覆盖10月5日08:50至10月6日10:34并衔接A股9月30日；https://lucky-xing.github.io/finance/daily/2026-10-06.html
 
 - 2026-10-07：国庆休市观察，覆盖10月6日以来并衔接A股9月30日，提示10月8日复市验证；https://lucky-xing.github.io/finance/daily/2026-10-07.html
+
+- 2026-10-08：节后首日盘前视角补发，信息截止07:45，实际发布晚于开盘；https://lucky-xing.github.io/finance/daily/2026-10-08.html
+
+- 2026-10-09：已生成盘前日报，覆盖10月8日08:00至10月9日08:00；https://lucky-xing.github.io/finance/daily/2026-10-09.html
