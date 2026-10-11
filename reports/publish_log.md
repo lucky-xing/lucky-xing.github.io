@@ -42,3 +42,5 @@
 - 2026-10-11：周报与下周展望，已核行情截至10/9，周末新增资讯抓取失败明确标缺；https://lucky-xing.github.io/finance/daily/2026-10-11.html
 
 - 2026-10-11修订：东方财富补核周末政策、商品汇率及三股同口径行情资金，VIX/BTC保留最新值缺项；https://lucky-xing.github.io/finance/daily/2026-10-11.html
+
+- 2026-10-12：周一覆盖10/9 00:00至10/12 07:49；新增铜矿与玻纤待核样本，明确行情缺项；https://lucky-xing.github.io/finance/daily/2026-10-12.html
