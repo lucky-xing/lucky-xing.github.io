@@ -38,3 +38,5 @@
 - 2026-10-08：节后首日盘前视角补发，信息截止07:45，实际发布晚于开盘；https://lucky-xing.github.io/finance/daily/2026-10-08.html
 
 - 2026-10-09：已生成盘前日报，覆盖10月8日08:00至10月9日08:00；https://lucky-xing.github.io/finance/daily/2026-10-09.html
+
+- 2026-10-11：周报与下周展望，已核行情截至10/9，周末新增资讯抓取失败明确标缺；https://lucky-xing.github.io/finance/daily/2026-10-11.html
