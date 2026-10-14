@@ -46,3 +46,5 @@
 - 2026-10-12：周一覆盖10/9 00:00至10/12 07:49；新增铜矿与玻纤待核样本，明确行情缺项；https://lucky-xing.github.io/finance/daily/2026-10-12.html
 
 - 2026-10-13：近24小时盘前日报，10/12完整行情重筛银行样本、退出资源材料，标明出口退税生效日；https://lucky-xing.github.io/finance/daily/2026-10-13.html
+
+- 2026-10-14：08:43信息截止补发，重筛油气样本并退出银行，行情资金10/13；https://lucky-xing.github.io/finance/daily/2026-10-14.html
