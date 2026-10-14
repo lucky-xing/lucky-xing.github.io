@@ -48,3 +48,5 @@
 - 2026-10-13：近24小时盘前日报，10/12完整行情重筛银行样本、退出资源材料，标明出口退税生效日；https://lucky-xing.github.io/finance/daily/2026-10-13.html
 
 - 2026-10-14：08:43信息截止补发，重筛油气样本并退出银行，行情资金10/13；https://lucky-xing.github.io/finance/daily/2026-10-14.html
+
+- 2026-10-15：07:49截止，官方CPI及曲线、BTC平台报价补核，六股重筛保留油气第2期；https://lucky-xing.github.io/finance/daily/2026-10-15.html
