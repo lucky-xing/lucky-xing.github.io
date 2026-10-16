@@ -52,3 +52,5 @@
 - 2026-10-15：07:49截止，官方CPI及曲线、BTC平台报价补核，六股重筛保留油气第2期；https://lucky-xing.github.io/finance/daily/2026-10-15.html
 
 - 2026-10-16：08:44截止补发，撤销油气条件、重筛消费防御并标明除息/数据缺口；https://lucky-xing.github.io/finance/daily/2026-10-16.html
+
+- 2026-10-17：周六休市观察，07:44截止，六股重筛并校准海油正式除息基准；https://lucky-xing.github.io/finance/daily/2026-10-17.html
