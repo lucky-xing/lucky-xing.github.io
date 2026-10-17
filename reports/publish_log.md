@@ -54,3 +54,5 @@
 - 2026-10-16：08:44截止补发，撤销油气条件、重筛消费防御并标明除息/数据缺口；https://lucky-xing.github.io/finance/daily/2026-10-16.html
 
 - 2026-10-17：周六休市观察，07:44截止，六股重筛并校准海油正式除息基准；https://lucky-xing.github.io/finance/daily/2026-10-17.html
+
+- 2026-10-18：周报与下周展望，07:47截止，核周收益、官方休市和GTC日程，保存六股数据依据；https://lucky-xing.github.io/finance/daily/2026-10-18.html
