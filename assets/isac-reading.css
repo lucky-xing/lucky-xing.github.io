@@ -20,3 +20,11 @@
 
 /* Scientific content: locally rendered equations and source figures. */
 .isac-report .equation{overflow-x:auto;overflow-y:hidden;margin:26px 0;padding:18px 14px;border:1px solid #8d85ff36;border-radius:10px;background:#171827;color:#f5f5fa;font-size:1.02em;letter-spacing:normal}.isac-report .equation mjx-container{min-width:max-content;margin:0!important}.isac-report .math-inline{white-space:normal;letter-spacing:normal}.isac-report mjx-container{color:inherit}.isac-report .paper-figure{margin:32px 0;padding:18px;border:1px solid #8d85ff38;border-radius:14px;background:#171827}.isac-report .paper-figure>a{display:block;background:white;border-radius:6px;padding:10px}.isac-report .paper-figure img{display:block;max-width:100%;height:auto;margin:0 auto;background:#fff}.isac-report .paper-figure figcaption{margin-top:14px;color:#d3cfdf;font-size:14px;line-height:1.85;font-weight:400}.isac-report .result-figure img{width:100%}.isac-report .report h4{font-family:inherit;color:#fff;font-size:19px}.isac-report .report table{max-width:100%}@media(max-width:700px){.isac-report .equation{padding:16px 10px;font-size:.94em}.isac-report .paper-figure{margin:24px 0;padding:10px}.isac-report .paper-figure>a{padding:5px}.isac-report .paper-figure figcaption{font-size:13px}}
+
+.category-page .subsection-photo-link{position:relative;isolation:isolate;overflow:hidden;min-height:390px;display:flex;flex-direction:column;justify-content:flex-end;padding:34px;background:#080b13}
+.category-page .subsection-photo-link::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(5,8,15,.08) 22%,rgba(5,8,15,.56) 64%,rgba(5,8,15,.94) 100%)}
+.category-page .subsection-photo-link .subsection-card-image{position:absolute;inset:0;z-index:0;width:100%;height:100%;object-fit:cover;filter:saturate(.92) brightness(.82);transition:filter .5s ease,transform .5s ease}
+.category-page .subsection-photo-link:hover .subsection-card-image{filter:saturate(1.08) brightness(.92);transform:scale(1.035)}
+.category-page .subsection-photo-link>:not(.subsection-card-image){position:relative;z-index:2}
+.isac-section .category-hero .theme-image{object-position:center center}
+@media(max-width:700px){.category-page .subsection-photo-link{min-height:300px;padding:24px}}
