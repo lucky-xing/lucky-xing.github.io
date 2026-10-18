@@ -1,80 +1,319 @@
 <!DOCTYPE html>
 
-<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><title>从导频到环境地图：Pilot-Based 无线定位与建图调研 · 兴耀未来</title><link href="../../../../style.css" rel="stylesheet"/><meta content="精读导频驱动的协作定位建图流程，补全反射点几何推导，辨析定位精度、遮挡剔除与地图质量的证据边界。" name="description"/><link href="../../../../assets/isac-reading.css?v=20261018-typography" rel="stylesheet"/></head><body class="category-page theme-communication isac-report"><a class="skip" href="#main">跳到正文</a><header class="wrap"><a class="brand" href="../../../../index.html"><span class="mark">兴</span>兴耀未来</a><nav aria-label="主导航"><a href="../../../../index.html">首页</a><a href="../../../../ai.html">AI</a><a href="../../../../finance.html">投资理财</a><a aria-current="page" href="../../../../communication.html">通信</a><a href="../../../../learning.html">学习</a><a href="../../../../world.html">看世界</a></nav></header><main class="report" id="main"><div class="breadcrumb"><a href="../../../../communication.html">通信</a><span>/</span><a href="../../../../communication/isac/">通感</a><span>/</span><span>论文调研</span></div><p class="kicker">ISAC / RESEARCH NOTE · 001</p><h1 id="pilot-based-end-to-end-radio-positioning-and-mapping">从导频到环境地图：Pilot-Based End-to-End Radio Positioning and Mapping 调研报告</h1><p>日期：2026-10-18　｜　栏目：通信 / 通感　｜　类型：论文精读与研究评估</p><nav aria-label="文章目录" class="toc"><strong>阅读导航</strong><a href="#1">1. 研究结论与阅读定位</a><a href="#2">2. 论文做了什么</a><a href="#3">3. 信号处理链如何理解</a><a href="#4">4. 单次反射点恢复：补全几何推导</a><a href="#5">5. 为什么遮挡可以帮助识别多次反射</a><a href="#6">6. 实验结果及其证据边界</a><a href="#7">7. 贡献与局限应如何评价</a><a href="#8">8. 如何设计有价值的复现</a><a href="#9">9. 值得继续研究的方向</a><a href="#10">10. 阅读后的判断</a><a href="#_1">参考资料与版本说明</a></nav>
-<h2 id="1">1. 研究结论与阅读定位</h2>
-<p>这篇论文的价值在于把通信导频、几何定位、反射点恢复和环境轮廓提取接成一条可解释的处理链。它提供了研究通感建图的清晰基线，但距离复杂街区中持续可靠的环境重建仍有差距。适合关注无线定位、毫米波多径、协作感知和无线数字孪生的读者精读。</p>
-<p>“End-to-End”在这里表示完整信号处理流程，不能据此理解成神经网络端到端训练。评价它时，应分别检查定位精度、地图几何质量和错误路径处理能力，不能让一个漂亮的定位数字代替整套系统的验证。</p>
-<p>论文全名为 <strong>Pilot-Based End-to-End Radio Positioning and Mapping for ISAC: Beyond Point-Based Landmarks</strong>，作者为 Yu Ge、Musa Furkan Keskin、Hui Chen、Ossi Kaltiokallio、Mengting Li、Mikko Valkama、Christos Masouros 和 Henk Wymeersch。发表于 GLOBECOM 2025，第 746–751 页，DOI：<a href="https://doi.org/10.1109/GLOBECOM59602.2025.11432739">10.1109/GLOBECOM59602.2025.11432739</a>。技术阅读以 <a href="https://arxiv.org/html/2505.07402v1">arXiv v1 全文</a>为基础，并核对了 <a href="https://research.chalmers.se/publication/551814/file/551814_Fulltext.pdf">Chalmers 收录的会议版全文</a>。以下标为“分析”“推导”“建议”的内容是本报告的判断，并非作者实验结论。</p>
-<h2 id="2">2. 论文做了什么</h2>
-<p><strong>论文方法概述（对应原文 II–IV 节）：</strong> 多基站接收多用户的上行 OFDM 导频，通过空间增广张量分解估计时延、方位角和俯仰角；利用最短路径作为直视路径定位用户，再按单次反射模型恢复其余路径的入射点（IP）。融合中心用 DBSCAN 聚类、凸包表达扩展地标，并依据用户—IP、基站—IP 两段路径的遮挡关系剔除可疑点。这里的协作主要发生在地图点集融合层，各基站先独立定位自己的用户。<a href="https://arxiv.org/html/2505.07402v1#S3">方法来源</a></p>
-<p><strong>分析：</strong> 单个入射点只告诉我们“信号可能在哪里与环境相互作用”；一组带空间范围的几何对象则能回答“这片表面大概延伸到哪里”。后者既是更丰富的输出，又能反过来检查候选传播路径是否合理。这种把地图用于验证观测的思路，是值得借鉴的设计。</p>
-<p>但凸包属于几何表达。它没有自动赋予地标建筑类型、材质、可穿透性等语义，也不能保证恢复完整建筑实体。应将结果理解为受无线可观测性限制的环境表面近似。</p>
-<h2 id="3">3. 信号处理链如何理解</h2>
-<h3 id="31">3.1 从导频中提取几何信息</h3>
-<p>阵列不同天线之间的相位差编码到达方向；不同子载波之间的相位变化编码传播时延。已知导频使接收端能够消除已知调制因素，集中估计传播参数。把观测组织为“水平阵列 × 垂直阵列 × 频率”的张量，可以利用这些维度的结构，而不只是把所有数据摊平成一个长向量。</p>
-<p>论文使用的空间增广可理解为利用频率结构构造更大的空间—频率表示，以改善分解中的可辨识性。它不会凭空增加物理孔径、带宽或独立观测；实际收益仍取决于路径间的角度与时延差异、信噪比、路径数选择和数值求解。这也是复现时应单独验证前端的原因。</p>
-<h3 id="32">3.2 先定位，再建图的误差传递</h3>
-<p>若用户位置有偏差，恢复的每一个反射点都会继承该偏差；聚类和凸包随后会把点级偏差变成地图结构偏差。后处理能够去掉明显不合理的点，却不能自动补偿基站朝向错误、阵列校准偏差或系统时延偏差。</p>
-<p>因此，本报告建议把系统看成一条误差传播链：信道参数误差 → 用户位置误差 → IP 误差 → 聚类错误 → 遮挡判断错误。只测试最后的地图图像，难以查明失败来自哪一环。</p>
-<h2 id="4">4. 单次反射点恢复：补全几何推导</h2>
-<p>本节是基于距离几何的独立推导，用来补充论文略去的闭式求解。令基站位置为 b，用户位置为 p，基站指向反射点的全局单位方向为 u，总传播距离为 L。候选反射点写成 q = b + r u，其中 r ≥ 0。</p>
-<p>单次反射要求：</p>
-<pre><code class="language-text">||q − p|| + ||q − b|| = L
-</code></pre>
-<p>令 d = p − b，代入可得 ||r u − d|| = L − r。平方并整理：</p>
-<pre><code class="language-text">r = (L² − ||d||²) / [2(L − u·d)]
-q = b + r u
-</code></pre>
-<p>这相当于求一条到达方向射线与等总路程曲面的交点。在三维空间，等总路程曲面是椭球面；二维剖面才是椭圆。</p>
-<p><strong>实现检查：</strong> 若 τ 表示单程传播时延，应使用 L = cτ；若输入是未换算的往返测距时间，必须先按 RTT 协议和处理时延校正。原文式（9）直接将距离之和写成 τ，而前文将 τ 定义为时延，存在量纲表达需澄清之处。复现时应显式统一单位，不能直接把秒代入米制坐标。</p>
-<p>解出 r 后还要验证 L ≥ ||d||、0 ≤ r ≤ L，并将 q 回代检查残差。分母接近零意味着几何退化或病态，微小测量误差可能被放大。建议记录退化比例并拒绝不满足物理约束的解，避免把数值异常交给 DBSCAN 兜底。</p>
-<h2 id="5">5. 为什么遮挡可以帮助识别多次反射</h2>
-<p><strong>机制分析：</strong> 当传播实际上经过两个或更多反射点，却强行用一个点解释时，算法仍可能找到满足“最后到达方向 + 总路程”的虚假位置。这类虚假位置可能成团出现，因此密度聚类不能保证清除它们。</p>
-<p>可见性检验增加了另一种约束：如果把候选点当作真正的单次反射点，那么用户到它、它到基站的两段直线都应能够通过环境。若中间穿过另一个地标，候选解释就值得怀疑。</p>
-<p>这里的关键是“值得怀疑”，而不是“证明路径必为多次反射”。地图本身由有误差的点生成：错误凸包可能挡住正确点，稀疏地标可能漏掉遮挡，透明或可穿透结构也不符合硬遮挡假设。多次反射形成的假点还可能恰好落在无遮挡区域。因此该规则适合作为几何一致性筛选，不能视为完备的路径阶数分类器。</p>
-<p>更稳健的延伸方向是把硬剔除改成概率评分，联合路径长度残差、点位协方差、跨视角重复观测次数与遮挡置信度。对于地图尚不稳定的区域，可以先降低观测权重，再随新数据决定保留或删除。</p>
-<h2 id="6">6. 实验结果及其证据边界</h2>
-<p>下表为论文 V 节报告的信息，具体参数与图示以<a href="https://arxiv.org/html/2505.07402v1#S5">原文实验部分</a>为准。</p>
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><title>从导频到环境地图：Pilot-Based 无线定位与建图调研 · 兴耀未来</title><link href="../../../../style.css" rel="stylesheet"/><meta content="精读导频驱动的协作定位建图流程，补全反射点几何推导，辨析定位精度、遮挡剔除与地图质量的证据边界。" name="description"/><link href="../../../../assets/isac-reading.css?v=20261018-methods" rel="stylesheet"/><script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']],processEscapes:true},svg:{fontCache:'local'},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer="" src="../../../../assets/vendor/mathjax/tex-svg-full.js"></script></head><body class="category-page theme-communication isac-report"><a class="skip" href="#main">跳到正文</a><header class="wrap"><a class="brand" href="../../../../index.html"><span class="mark">兴</span>兴耀未来</a><nav aria-label="主导航"><a href="../../../../index.html">首页</a><a href="../../../../ai.html">AI</a><a href="../../../../finance.html">投资理财</a><a aria-current="page" href="../../../../communication.html">通信</a><a href="../../../../learning.html">学习</a><a href="../../../../world.html">看世界</a></nav></header><main class="report" id="main"><div class="breadcrumb"><a href="../../../../communication.html">通信</a><span>/</span><a href="../../../../communication/isac/">通感</a><span>/</span><span>论文调研</span></div><p class="kicker">ISAC / RESEARCH NOTE · 001</p><h1 id="pilot-based">从导频到环境地图：Pilot-Based 无线定位与建图调研</h1><p>日期：2026-10-18　｜　通信 / 通感　｜　论文精读与方法分析　｜　修订：补充完整建模、求解公式与原文结果图</p><nav aria-label="文章目录" class="toc"><strong>阅读导航</strong><a href="#1">1. 研究问题、贡献与证据概览</a><a href="#2">2. 详细问题建模：已知量、未知量和测量关系</a><a href="#3">3. 从原始信号到路径参数：如何转换与求解</a><a href="#4">4. 从路径参数到用户位置与反射点</a><a href="#5">5. 从反射点到扩展地标：聚类、凸包与遮挡检验</a><a href="#6">6. 实验设置、结果原图与对比分析</a><a href="#7">7. 贡献与局限应如何评价</a><a href="#8">8. 如何设计有价值的复现</a><a href="#9">9. 值得继续研究的方向</a><a href="#10">10. 阅读后的判断</a><a href="#_1">参考资料与版本说明</a></nav>
+
+<h2 id="1">1. 研究问题、贡献与证据概览</h2>
+<p>这篇论文研究的不是“如何训练一个直接输出地图的神经网络”，而是：<strong>能否只使用通信链路中的导频，在定位用户的同时，把多径反射点组织成带形状和范围的环境地标，并剔除多次反射形成的虚假结构？</strong> 文中的端到端指从接收信号到位置与地图的完整处理流程。</p>
+<p>论文全名为 <em>Pilot-Based End-to-End Radio Positioning and Mapping for ISAC: Beyond Point-Based Landmarks</em>。作者为 Yu Ge、Musa Furkan Keskin、Hui Chen、Ossi Kaltiokallio、Mengting Li、Mikko Valkama、Christos Masouros、Henk Wymeersch；发表于 GLOBECOM 2025，746–751 页，<a href="https://doi.org/10.1109/GLOBECOM59602.2025.11432739">正式 DOI</a>。本报告依据 <a href="https://arxiv.org/html/2505.07402v1">arXiv v1</a>逐节分析，并核对<a href="https://research.chalmers.se/publication/551814/file/551814_Fulltext.pdf">会议版全文</a>。公式使用统一符号重新整理，括号中的“原文式”标明对应关系；标为“推导”“分析”“建议”的内容由本报告补充。</p>
 <table>
 <thead>
 <tr>
-<th>项目</th>
-<th>论文设置或报告值</th>
+<th>要回答的问题</th>
+<th>论文的处理</th>
+<th>实际证据</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>验证环境</td>
-<td>三栋建筑的 T 形路口，Wireless InSite 射线追踪；非硬件实测</td>
+<td>通信导频怎样变成几何观测？</td>
+<td>空间增广张量分解，提取时延、方位角与俯仰角</td>
+<td>在射线追踪生成的信号上运行完整处理链</td>
 </tr>
 <tr>
-<td>协作规模</td>
-<td>4 个基站、3 个车辆用户；轨迹每 5 m 采样</td>
+<td>多径点怎样变成扩展地标？</td>
+<td>先恢复入射点，再 DBSCAN 聚类和凸包建模</td>
+<td>图 4 中的立面轮廓，而不只是散点</td>
 </tr>
 <tr>
-<td>无线配置</td>
-<td>27.2 GHz、400 MHz 带宽、120 kHz 子载波间隔、12 个 OFDM 符号、8×8 阵列</td>
+<td>多次反射造成的假点怎样处理？</td>
+<td>使用用户—点、基站—点的遮挡一致性检验</td>
+<td>原文图 3/4 的处理前后可视化，及删点比例</td>
 </tr>
 <tr>
-<td>其他条件</td>
-<td>用户高度已知为 1.5 m；活跃基站—用户链路确保有直视路径；RTT 假定消除时钟偏移</td>
+<td>定位达到什么水平？</td>
+<td>直视路径约束下的最大似然定位</td>
+<td>MAE 0.21 m，95.9% 案例误差小于 1 m</td>
 </tr>
 <tr>
-<td>聚类与统计</td>
-<td>ε = 3 m，最小点数 5；100 次 Monte Carlo</td>
-</tr>
-<tr>
-<td>用户定位</td>
-<td>MAE 0.21 m；95.9% 的案例误差小于 1 m</td>
-</tr>
-<tr>
-<td>建图示例</td>
-<td>870 个估计 IP 中，379 个距真实立面不超过 2 m；后处理删除 43.1% 的估计 IP；图 3、4 为单次 MC 可视化</td>
+<td>是否优于其他建图算法？</td>
+<td>未做同条件的外部算法定量对照</td>
+<td>不能据此声称 SOTA 或固定幅度的精度提升</td>
 </tr>
 </tbody>
 </table>
-<p><strong>结果解读：</strong> 定位数字说明该配置下前端与直视定位链有较好的精度，不能外推为无直视街区中的定位能力。论文的地图图示支持后处理改善视觉几何结构；它没有给出完整的地图精度—召回率评估。</p>
-<p>43.1% 是删除点占输入点的比例，不能写成“错误点识别率 43.1%”，更不能据此宣称地图精度提高 43.1%。删除点是否都是错误点、保留点中还有多少错误点，需要带真值标签的混淆矩阵。379/870 约为 43.6%（本报告计算），描述的只是该示例后处理前落在立面 2 m 邻域内的点占比；它不是整个建筑地图的覆盖率。</p>
+<p>最值得关注的是：地图不只是最后的输出，还被用于检验候选传播路径是否符合环境几何。但其前提是地图初步重建得足够可靠。</p>
+<h2 id="2">2. 详细问题建模：已知量、未知量和测量关系</h2>
+<h3 id="21">2.1 场景与状态变量</h3>
+<p>系统包含多个固定基站 BS 和移动用户 UE。每个 UE 只有一根天线，每个 BS 配备均匀矩形阵列 URA。基站位置和阵列朝向已知；用户位置与环境地标未知。设第 <span class="math-inline">\(p\)</span> 个基站位置为 <span class="math-inline">\(\mathbf b_p\)</span>，姿态为 <span class="math-inline">\(\boldsymbol\psi_p\)</span>；第 <span class="math-inline">\(i\)</span> 个用户在时刻 <span class="math-inline">\(k\)</span> 的位置为 <span class="math-inline">\(\mathbf p_{i,k}\)</span>。</p>
+<div class="equation">\[\mathbf b_p=[b_{p,x},b_{p,y},b_{p,z}]^{\mathsf T},\qquad
+\mathbf p_{i,k}=[x_{i,k},y_{i,k},h_i]^{\mathsf T}.\]</div>
+<p>实验中用户在平地移动，高度 <span class="math-inline">\(h_i\)</span> 已知，所以定位只优化水平坐标 <span class="math-inline">\(x,y\)</span>。环境中的第 <span class="math-inline">\(m\)</span> 个扩展地标记为凸集 <span class="math-inline">\(\mathcal H_m\)</span>。<strong>要估计的对象</strong>是各用户位置以及这些地标的几何边界；“材质”“建筑类别”等语义属性没有在本方法中被识别。</p>
+<figure class="paper-figure"><a href="../../../../assets/papers/pilot-based-radio/fig1-geometry.png" rel="noopener" target="_blank"><img alt="论文图1：多个用户和基站共享传播环境，路径包含直视、单次和双次反射；单次反射点由到达方向与等路程曲线约束。" loading="lazy" src="../../../../assets/papers/pilot-based-radio/fig1-geometry.png"/></a><figcaption>原文图 1：多基站、多用户场景及单次反射几何。图中系统配置用于说明原理，不是后文实验采用的 4 BS、3 UE 配置。来源：Ge 等，arXiv:2505.07402v1，Fig. 1，CC BY-NC-ND 4.0。点击查看原尺寸。</figcaption></figure>
+<h3 id="22-ofdm">2.2 上行 OFDM 接收信号</h3>
+<p>为突出一个 BS–UE 链路，暂时省略 <span class="math-inline">\(p,i\)</span> 索引。令 <span class="math-inline">\(\kappa\)</span> 为子载波索引，<span class="math-inline">\(g\)</span> 为 OFDM 符号索引，<span class="math-inline">\(k\)</span> 为快照时刻；原文式（1）可整理成路径求和形式：</p>
+<div class="equation">\[\mathbf y_{\kappa,g,k}=\sum_{t=1}^{T_k}\rho_k^t\,
+\mathbf a(\boldsymbol\theta_k^t)
+e^{-j2\pi\kappa\Delta f\tau_k^t}s_{\kappa,g}
++\boldsymbol\omega_{\kappa,g,k}.\]</div>
+<p>其中 <span class="math-inline">\(s_{\kappa,g}\)</span> 为已知恒模导频；<span class="math-inline">\(\rho_k^t\)</span> 为第 <span class="math-inline">\(t\)</span> 条路径的复增益；<span class="math-inline">\(\tau_k^t\)</span> 为传播时延；<span class="math-inline">\(\boldsymbol\theta_k^t=[\theta_{\mathrm{az}},\theta_{\mathrm{el}}]^{\mathsf T}\)</span> 为到达角；<span class="math-inline">\(\Delta f\)</span> 为子载波间隔；<span class="math-inline">\(\boldsymbol\omega\)</span> 为加性白高斯噪声。<span class="math-inline">\(T_k\)</span> 包含直达和所有被考虑的多径，不等于建筑数量：一个建筑可以生成多条路径。</p>
+<p>阵列与频率的可分离结构，是后续求解的关键：</p>
+<div class="equation">\[\begin{aligned}
+\mathbf a(\boldsymbol\theta)&amp;=\mathbf a_x(\boldsymbol\theta)\otimes\mathbf a_z(\boldsymbol\theta),\\
+[\mathbf a_x(\boldsymbol\theta)]_n&amp;=e^{j(2\pi/\lambda)d_xn\cos\theta_{\mathrm{el}}\sin\theta_{\mathrm{az}}},\\
+[\mathbf a_z(\boldsymbol\theta)]_n&amp;=e^{j(2\pi/\lambda)d_zn\sin\theta_{\mathrm{el}}},\\
+[\mathbf d(\tau)]_\kappa&amp;=e^{-j2\pi\kappa\Delta f\tau}.
+\end{aligned}\]</div>
+<p><span class="math-inline">\(\otimes\)</span> 为 Kronecker 积，<span class="math-inline">\(d_x,d_z\)</span> 为阵元间距，<span class="math-inline">\(\lambda\)</span> 为波长。直观上，<strong>天线间相位变化提供方向信息，子载波间相位变化提供时延信息</strong>。论文采用短传输区间，忽略多普勒；通过 RTT 协议假定消除用户与基站间时钟偏移。这些都是模型前提，不能默认在实测中自动成立。</p>
+<h3 id="23">2.3 为什么不能直接把所有多径都变成正确地图？</h3>
+<p>一条已解析路径提供一个时延和两个角度，共三个标量观测。已知用户位置后，若它确为单次反射，未知反射点为三维位置，几何上可以求解；若发生两次反射，则至少有两个三维交互点，单条路径提供的信息不足以确定它们。<strong>多次反射问题在当前观测配置下欠定。</strong></p>
+<p>所以论文没有直接恢复多次反射链，而是先把 NLoS 都作为单次反射处理，再利用空间密度和遮挡关系排除不合理解释。这是计算复杂度与建模准确性的取舍，也是错误地图产生的根源。</p>
+<h2 id="3">3. 从原始信号到路径参数：如何转换与求解</h2>
+<h3 id="31">3.1 去导频与三阶张量表示</h3>
+<p>对恒模导频做共轭相乘并归一化，消除已知符号影响；再利用多个 OFDM 符号进行整合。把阵列两维与频率维组织成三阶张量（原文式（2））：</p>
+<div class="equation">\[\mathcal Y_k=\sum_{t=1}^{T_k}\rho_k^t\,
+\mathbf a_z(\boldsymbol\theta_k^t)\circ
+\mathbf a_x(\boldsymbol\theta_k^t)\circ
+\mathbf d(\tau_k^t)+\mathcal N_k,
+\qquad \mathcal Y_k\in\mathbb C^{N_z\times N_x\times S}.\]</div>
+<p><span class="math-inline">\(\circ\)</span> 表示向量外积，<span class="math-inline">\(S\)</span> 为所用子载波数，<span class="math-inline">\(N_x,N_z\)</span> 为阵列两方向的阵元数。<strong>转换后的目标</strong>不再是在每个子载波上单独估计信道，而是把观测分解成若干具有方向和时延结构的路径分量。</p>
+<h3 id="32">3.2 空间增广：利用频率维改善可辨识性</h3>
+<p>直接做 CP 分解可能遇到秩不足和因子相似的问题。论文沿频率维构造带移位结构的增广张量，把频率信息引入两个空间因子（原文式（3）–（4））：</p>
+<div class="equation">\[\begin{aligned}
+\widetilde{\mathcal Y}_k&amp;\in\mathbb C^{N_z(n_z+1)\times N_x(n_x+1)\times V},\quad V=S-n_z-n_x,\\
+\widetilde{\mathbf a}_z(\boldsymbol\theta,\tau)&amp;=\mathbf a_z(\boldsymbol\theta)\otimes[\mathbf d(\tau)]_{1:n_z+1},\\
+\widetilde{\mathbf a}_x(\boldsymbol\theta,\tau)&amp;=\mathbf a_x(\boldsymbol\theta)\otimes[\mathbf d(\tau)]_{1:n_x+1},\\
+\widetilde{\mathbf d}(\tau)&amp;=[\mathbf d(\tau)]_{1:V}.
+\end{aligned}\]</div>
+<p>这里对水平因子采用 <span class="math-inline">\(n_x+1\)</span> 项，使其与声明的维度一致；<strong>原文式（4b）索引写成 <span class="math-inline">\(n_z+1\)</span>，但维度写成 <span class="math-inline">\(N_x(n_x+1)\)</span>，存在需复现者核对的记号不一致</strong>。这不是额外算法创新，而是本文按维度一致性做的整理。空间增广的具体数据重排依赖论文参考文献 [15] 的式（15），本文主文没有展开所有实现细节。</p>
+<p>重要的是，增广利用已有数据的结构，并没有增加物理天线或带宽。它可能改善可辨识性，但不能绕过有限信噪比、路径不可分辨或观测不足等物理限制。</p>
+<h3 id="33-cpd">3.3 CPD 拟合、时延和角度恢复</h3>
+<p>对增广张量求秩 <span class="math-inline">\(T_k\)</span> 的 CP 近似（原文式（5））：</p>
+<div class="equation">\[\min_{\{\mathbf v_z^t,\mathbf v_x^t,\mathbf v_d^t\}}
+\left\|\widetilde{\mathcal Y}_k-
+\sum_{t=1}^{T_k}\mathbf v_z^t\circ\mathbf v_x^t\circ\mathbf v_d^t\right\|_F^2.\]</div>
+<p>这些 <span class="math-inline">\(\mathbf v\)</span> 是分解因子，分解后才用物理结构恢复参数。频率因子满足相邻元素相位差与时延成正比，因此可以用移位不变性得到（原文式（6a））：</p>
+<div class="equation">\[\widehat\tau_k^t=-\frac{
+\arg\!\left[(\mathbf J_1\mathbf v_d^t)^{\mathsf H}(\mathbf J_2\mathbf v_d^t)\right]
+}{2\pi\Delta f}.\]</div>
+<p><span class="math-inline">\(\mathbf J_1,\mathbf J_2\)</span> 分别选择长度为 <span class="math-inline">\(V-1\)</span> 的前后相邻子向量；<span class="math-inline">\(\mathsf H\)</span> 表示共轭转置。这个相位关系具有周期性，时延解释还需处于所选无模糊范围，不能不加检查地使用相位主值。</p>
+<p>随后固定估计时延，对增广阵列导向向量做相关匹配，先恢复俯仰角，再恢复方位角（原文式（6b）–（6c））：</p>
+<div class="equation">\[\begin{aligned}
+\widehat\theta_{\mathrm{el}}^t&amp;=\arg\max_{\theta_{\mathrm{el}}}
+\left|(\mathbf v_z^t)^{\mathsf H}\widetilde{\mathbf a}_z(\theta_{\mathrm{el}},\widehat\tau^t)\right|^2,\\
+\widehat\theta_{\mathrm{az}}^t&amp;=\arg\max_{\theta_{\mathrm{az}}}
+\left|(\mathbf v_x^t)^{\mathsf H}\widetilde{\mathbf a}_x(\theta_{\mathrm{az}},\widehat\theta_{\mathrm{el}}^t,\widehat\tau^t)\right|^2.
+\end{aligned}\]</div>
+<p>有了时延和角度，再组成路径字典 <span class="math-inline">\(\mathbf B\)</span>，用最小二乘恢复复增益（原文式（7）及其前后文字）：</p>
+<div class="equation">\[\widehat{\boldsymbol\rho}=\mathbf B^\dagger\operatorname{vec}(\mathcal Y),\qquad
+\mathbf B_{:,t}=\mathbf d(\widehat\tau^t)\otimes\mathbf a_x(\widehat{\boldsymbol\theta}^t)\otimes\mathbf a_z(\widehat{\boldsymbol\theta}^t).\]</div>
+<p><strong>本阶段输出</strong>是每条可解析路径的时延、两个到达角及增益。注意这时还没有判断路径由哪栋建筑产生，也没有证明某路径一定是单次反射。原文称该前端为 ESPRIT-based estimator，但其具体链路包含张量分解、相位提取与角度匹配，不能简化为“只运行一次 ESPRIT”。路径数估计、CPD 初始化与停止阈值、角度搜索分辨率等仍是复现时需要明确的实现项。</p>
+<h2 id="4">4. 从路径参数到用户位置与反射点</h2>
+<h3 id="41">4.1 用直视路径做用户定位</h3>
+<p>论文选择最短的已解析路径作为 LoS。设其观测为 <span class="math-inline">\(\mathbf z=[\widehat\tau,\widehat\theta_{\mathrm{az}},\widehat\theta_{\mathrm{el}}]^{\mathsf T}\)</span>，协方差为 <span class="math-inline">\(\mathbf R\)</span>。已知用户高度后，最大似然定位写成（原文式（8））：</p>
+<div class="equation">\[(\widehat x,\widehat y)=\arg\min_{x,y}
+\left[\mathbf z-\mathbf h([x,y,h]^{\mathsf T},\mathbf b)\right]^{\mathsf T}
+\mathbf R^{-1}
+\left[\mathbf z-\mathbf h([x,y,h]^{\mathsf T},\mathbf b)\right].\]</div>
+<p>测量函数 <span class="math-inline">\(\mathbf h\)</span> 把候选用户位置映射为预测时延和角度；例如时延分量为 <span class="math-inline">\(\|\mathbf p-\mathbf b\|/c\)</span>，角度由基站局部坐标中的方向确定。<span class="math-inline">\(\mathbf R^{-1}\)</span> 使可靠的观测权重更大；角度残差应注意周期边界。论文采用闭式 LS 初值，再用梯度下降优化。</p>
+<p>这里定位与建图是<strong>串行求解</strong>：先由 LoS 得到用户位置，再用 NLoS 估计环境；并未通过地图反向联合优化用户轨迹。若 LoS 漏检、最短已解析路径其实是反射路径，后续整个地图都可能继承定位偏差。</p>
+<h3 id="42">4.2 单次反射点的几何约束与闭式解</h3>
+<p>给定用户位置 <span class="math-inline">\(\widehat{\mathbf p}\)</span>、基站 <span class="math-inline">\(\mathbf b\)</span>、从 BS 指向候选点的全局单位方向 <span class="math-inline">\(\mathbf u\)</span>，令单程传播距离为 <span class="math-inline">\(L=c\widehat\tau\)</span>。方向转换需使用阵列姿态与一致的坐标轴约定。候选点写成 <span class="math-inline">\(\mathbf q=\mathbf b+r\mathbf u\)</span>，并满足（原文式（9）–（10）的距离几何）：</p>
+<div class="equation">\[\|\mathbf q-\widehat{\mathbf p}\|+\|\mathbf q-\mathbf b\|=L,
+\qquad \mathbf q=\mathbf b+r\mathbf u,\quad r\geq0.\]</div>
+<p>等总路程约束在三维中为椭球面，到达方向给出一条射线；求二者交点即可。论文省略闭式推导，本报告补充如下：令 <span class="math-inline">\(\mathbf d=\widehat{\mathbf p}-\mathbf b\)</span>，则</p>
+<div class="equation">\[\begin{aligned}
+\|r\mathbf u-\mathbf d\|&amp;=L-r,\\
+r^2-2r\mathbf u^{\mathsf T}\mathbf d+\|\mathbf d\|^2&amp;=L^2-2Lr+r^2,\\
+r&amp;=\frac{L^2-\|\mathbf d\|^2}{2(L-\mathbf u^{\mathsf T}\mathbf d)},\qquad
+\widehat{\mathbf q}=\mathbf b+r\mathbf u.
+\end{aligned}\]</div>
+<p>需要检验 <span class="math-inline">\(L\geq\|\mathbf d\|\)</span>、<span class="math-inline">\(0\leq r\leq L\)</span> 及回代残差；分母接近零意味着几何病态，误差会被放大。原文式（9）把距离之和直接写成 <span class="math-inline">\(\tau\)</span>，与前面对时延的定义存在量纲表述需澄清之处；这里显式用 <span class="math-inline">\(L=c\tau\)</span> 保证单位一致。RTT 输入若是往返测距时间，则必须先按协议换算单程距离，不能再机械套用 <span class="math-inline">\(c\tau\)</span>。</p>
+<h3 id="43-ip">4.3 此时得到的是候选 IP，不是真实地图</h3>
+<p>若路径确为单次反射，闭式解有机会落在真实立面附近；若它经历多次反射，同一个公式也可能给出位于建筑后方或空地中的“合法数值解”。因此代数上满足距离与方向，<strong>不等于物理上存在该反射点</strong>。下一阶段就是利用候选点的集体结构和可见性进一步筛选。</p>
+<h2 id="5">5. 从反射点到扩展地标：聚类、凸包与遮挡检验</h2>
+<h3 id="51-dbscan">5.1 融合与 DBSCAN：解决未知点源关联</h3>
+<p>各基站向融合中心发送估计 IP，并形成点集 <span class="math-inline">\(\mathcal D\)</span>。实施遮挡检验时，还需要保留每个点对应的用户和基站位置。物理上来自同一地标的点往往空间邻近，论文用 DBSCAN 建立密度关联：</p>
+<div class="equation">\[\mathcal N_\epsilon(\mathbf q)=\{\mathbf q'\in\mathcal D:\|\mathbf q'-\mathbf q\|\leq\epsilon\},
+\qquad \mathbf q\text{ 为核心点}\iff |\mathcal N_\epsilon(\mathbf q)|\geq N_{\min}.\]</div>
+<p>再用密度可达关系扩展成簇 <span class="math-inline">\(\mathcal L_1,\dots,\mathcal L_C\)</span>，将没有被簇吸收的点视作噪声。它无需预先给定地标个数，但不能保证“一个簇就一定对应一个真实建筑”：相邻表面可能合并，多次反射假点也可能形成高密度簇。实验采用 <span class="math-inline">\(\epsilon=3\,\mathrm m\)</span>、<span class="math-inline">\(N_{\min}=5\)</span>。</p>
+<h3 id="52">5.2 凸包：把离散观测转换成对象边界</h3>
+<p>对每个簇提取最小凸包（原文式（11））：</p>
+<div class="equation">\[\mathcal H_c=\operatorname{CH}(\mathcal L_c)=
+\left\{\sum_{n=1}^{|\mathcal L_c|}\alpha_n\mathbf q_n:\alpha_n\geq0,\ \sum_n\alpha_n=1\right\}.\]</div>
+<p>这一步把“哪些点相邻”转换为“一个有范围与形状的几何对象”，可以估计表面延伸范围，并支持线段相交检验。凸包计算可用 Quickhull，但凸包天然会填平凹陷；其几何边界由观测覆盖决定，不自动等于建筑的完整实体或真实外轮廓。</p>
+<h3 id="53">5.3 遮挡一致性：排除与初始地图冲突的单次反射解释</h3>
+<p>对候选点 <span class="math-inline">\(\mathbf q_n\)</span>，构造从对应 BS 和 UE 出发的开线段（原文式（12）–（14））：</p>
+<div class="equation">\[\begin{aligned}
+\mathcal S_{\mathrm B}^{n}&amp;=\{\mathbf b+\alpha(\mathbf q_n-\mathbf b):0&lt;\alpha&lt;1\},\\
+\mathcal S_{\mathrm U}^{n}&amp;=\{\widehat{\mathbf p}+\alpha(\mathbf q_n-\widehat{\mathbf p}):0&lt;\alpha&lt;1\}.
+\end{aligned}\]</div>
+<p>只有当两段线都不穿过<strong>其他簇</strong>的凸包时，才保留该点：</p>
+<div class="equation">\[\operatorname{keep}(n)=1\iff
+\mathcal S_{\mathrm B}^{n}\cap\mathcal H_c=\varnothing
+\ \land\
+\mathcal S_{\mathrm U}^{n}\cap\mathcal H_c=\varnothing,
+\quad \forall c:\mathbf q_n\notin\mathcal L_c.\]</div>
+<p>排除点所属簇，避免把正常入射到自身表面的行为误判为遮挡。筛选后再由剩余可见点构建凸包。该判据的物理逻辑是：如果假定它是单次反射点，两段直线路径就应可通行；若必然穿过另一个对象，单次反射解释便不可信。</p>
+<p><strong>局限：</strong> 这仍是几何启发式，不能证明保留点都是单次反射，也不能证明删除点都是多次反射。初始凸包错误、稀疏观测、可穿透物体或凹形结构，都可能产生误删或漏删。论文实际完成的是清理多次反射造成的地图污染，而不是重建多次反射传播链。</p>
+<h3 id="54">5.4 各阶段输入、变换和输出</h3>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>输入 → 输出</th>
+<th>解决的子问题</th>
+<th>主要失败来源</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>信号前端</td>
+<td>复数导频观测 → 路径时延、到达角、增益</td>
+<td>从混合波形分离几何观测</td>
+<td>路径不可分辨、低 SNR、模型阶数错误</td>
+</tr>
+<tr>
+<td>用户定位</td>
+<td>LoS 参数 → 水平位置</td>
+<td>给 NLoS 建图提供已知焦点</td>
+<td>LoS 缺失或错误识别、基站校准偏差</td>
+</tr>
+<tr>
+<td>单次反射反演</td>
+<td>用户位置 + 时延角度 → 候选 IP</td>
+<td>恢复每条路径的候选交互位置</td>
+<td>多次反射模型失配、退化几何</td>
+</tr>
+<tr>
+<td>密度聚类</td>
+<td>多站多用户 IP → 点簇</td>
+<td>近似建立观测与地标关联</td>
+<td>稀疏点误删、相邻地标合并</td>
+</tr>
+<tr>
+<td>凸包与可见性</td>
+<td>点簇 → 边界 → 筛选后边界</td>
+<td>表达扩展对象并排除遮挡冲突</td>
+<td>初始地图错误、凹形和穿透假设失配</td>
+</tr>
+</tbody>
+</table>
+<h2 id="6">6. 实验设置、结果原图与对比分析</h2>
+<h3 id="61">6.1 实验条件：这些数字在什么环境下成立</h3>
+<figure class="paper-figure"><a href="../../../../assets/papers/pilot-based-radio/fig2-scenario.png" rel="noopener" target="_blank"><img alt="论文图2：三栋建筑组成T形路口，4个固定基站和3条车辆用户轨迹。" loading="lazy" src="../../../../assets/papers/pilot-based-radio/fig2-scenario.png"/></a><figcaption>原文图 2：射线追踪实验场景。4 个固定基站与 3 个车辆用户提供不同视角。来源：Ge 等，arXiv:2505.07402v1，Fig. 2，CC BY-NC-ND 4.0。点击查看原尺寸。</figcaption></figure>
+<table>
+<thead>
+<tr>
+<th>配置</th>
+<th>论文取值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>环境与验证方式</td>
+<td>三栋砖墙建筑组成的 T 形路口，REMCOM Wireless InSite 射线追踪；非硬件实测</td>
+</tr>
+<tr>
+<td>基站</td>
+<td>4 个；高度 15 m；每站 8×8 阵列；覆盖半径 70 m</td>
+</tr>
+<tr>
+<td>用户与采样</td>
+<td>3 个单天线车辆用户；已知高度 1.5 m；轨迹每 5 m 采样</td>
+</tr>
+<tr>
+<td>链路假设</td>
+<td>所有活跃 BS–UE 对都有 LoS；最短解析路径用于定位；RTT 假定取消时钟偏移</td>
+</tr>
+<tr>
+<td>波形与射频</td>
+<td>27.2 GHz；400 MHz 有效带宽；120 kHz 子载波间隔；12 个 OFDM 导频符号</td>
+</tr>
+<tr>
+<td>功率与噪声</td>
+<td>发射功率 10 dBm；噪声功率谱密度 −174 dBm/Hz；接收机噪声系数 8 dB</td>
+</tr>
+<tr>
+<td>路径组成</td>
+<td>每快照每站保留 50 条传播路径，平均约 9 条单次反射、40 条双次反射</td>
+</tr>
+<tr>
+<td>后处理</td>
+<td>DBSCAN：3 m 邻域、最小点数 5</td>
+</tr>
+<tr>
+<td>统计</td>
+<td>定位指标综合用户、时间与 100 次 MC；地图图 3、4 为单次 MC 示例</td>
+</tr>
+</tbody>
+</table>
+<p>宽带与较大阵列为时延、角度估计创造了有利条件。多次反射在输入路径中很多，因此后处理确实面对较强的模型失配；但该环境仍没有覆盖完全无直视定位、动态遮挡或基站校准误差等复杂情况。</p>
+<h3 id="62-3">6.2 图 3：处理前的点云，正确结构与假点混在一起</h3>
+<figure class="paper-figure result-figure" id="result-before"><a href="../../../../assets/papers/pilot-based-radio/fig3-before.png" rel="noopener" target="_blank"><img alt="原文图3：蓝色估计入射点大量散布于真实黄色建筑立面之外；红色为真实单次反射点，三角形为基站。" height="803" loading="lazy" src="../../../../assets/papers/pilot-based-radio/fig3-before.png" width="786"/></a><figcaption>原文图 3：未做提出的地图后处理，坐标单位为米。保留原坐标、图例与英文图注；来源：Ge 等，arXiv:2505.07402v1，PDF 第 6 页，Fig. 3，CC BY-NC-ND 4.0。点击放大。</figcaption></figure>
+<p><strong>读图方式：</strong> 三角形是 BS；红圈为真实单次反射 IP；蓝圈为估计 IP；黄色线为建筑立面。靠近黄色线的蓝点已经勾勒出 T 形路口，说明前端与单次反射反演能恢复部分正确几何结构；但大量蓝点落在立面之外，表明把所有路径都按单次反射解释会产生严重污染。DBSCAN 的作用是提取密度结构；遮挡检验进一步处理那些可能形成簇的虚假解释。</p>
+<p>原文给出的该示例共 870 个估计 IP，其中 379 个距真实立面不超过 2 m。379/870 ≈ 43.6% 是本报告据原文数量计算的比例，只描述<strong>后处理前这批点的近立面比例</strong>，不是地标覆盖率，也不是全系统定位准确率。</p>
+<h3 id="63-4">6.3 图 4：处理后更贴近立面，但仍有缺口与畸变</h3>
+<figure class="paper-figure result-figure" id="result-after"><a href="../../../../assets/papers/pilot-based-radio/fig4-after.png" rel="noopener" target="_blank"><img alt="原文图4：经过DBSCAN、凸包与遮挡剔除后，蓝色入射点更集中于黄色立面；红线凸包表示恢复边界，但仍有断裂和局部凸起。" height="692" loading="lazy" src="../../../../assets/papers/pilot-based-radio/fig4-after.png" width="786"/></a><figcaption>原文图 4：提出的后处理之后；红色线段为凸包，蓝圈为保留的估计 IP。保留原坐标、图例与英文图注；来源：Ge 等，arXiv:2505.07402v1，PDF 第 6 页，Fig. 4，CC BY-NC-ND 4.0。此图与图 3 均为单次 MC 的可视化，不代表 100 次仿真的平均地图。点击放大。</figcaption></figure>
+<p>与图 3 相比，远离立面的散点明显减少，红色凸包将点集转换为可用的边界段。但横向立面上仍有缺口，纵向立面附近也存在局部凸起，说明方法没有恢复连续、无误差的建筑轮廓。原文指出稀疏 IP 可能被 DBSCAN 当作异常点；某些方位角附近的信道估计误差会造成定位和地图畸变。图示中的二维轮廓也不能被解读为已经验证完整三维建筑重建。</p>
+<h3 id="64">6.4 论文真正提供的比较与缺失的指标</h3>
+<table>
+<thead>
+<tr>
+<th>比较对象/指标</th>
+<th>处理前或配置</th>
+<th>处理后或结果</th>
+<th>能得出的结论</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>用户定位</td>
+<td>LoS 参数 + ML，已知高度与基站状态</td>
+<td>MAE 0.21 m；95.9% 小于 1 m</td>
+<td>支持此仿真条件下较好的定位精度；论文未给出定位算法对照增益</td>
+</tr>
+<tr>
+<td>点云/边界表达</td>
+<td>图 3，所有已解析路径对应的 IP</td>
+<td>图 4，过滤后的 IP 与凸包</td>
+<td>从散点变成更接近立面的边界表达</td>
+</tr>
+<tr>
+<td>点删除比例</td>
+<td>输入估计点</td>
+<td>删除 43.1%</td>
+<td>表明筛选规模，不能等同于错误点检出率或精度提升率</td>
+</tr>
+<tr>
+<td>距立面 ≤ 2 m 的比例</td>
+<td>379/870 ≈ 43.6%，由报告计算</td>
+<td>原文未提供对应处理后比例</td>
+<td>无法从文中计算前后精确率提升</td>
+</tr>
+<tr>
+<td>地图误差/覆盖</td>
+<td>未报告 Chamfer、IoU、覆盖率</td>
+<td>未提供对应统计</td>
+<td>不能量化形状误差下降或完整度提升</td>
+</tr>
+<tr>
+<td>与外部算法比较</td>
+<td>无相同输入下的外部基线实验</td>
+<td>未报告优劣排名</td>
+<td>文中相关工作比较属于能力/设定对比，不是性能胜出证据</td>
+</tr>
+<tr>
+<td>各后处理步骤贡献</td>
+<td>未给仅 DBSCAN、仅遮挡等完整消融</td>
+<td>展示完整后处理结果</td>
+<td>无法把总改善单独归因于某一模块</td>
+</tr>
+</tbody>
+</table>
+<p><strong>不要把删点当作精度。</strong> 论文未提供删除点的真实标签混淆矩阵，因此 43.1% 是“删了多少”，而非“正确识别多少错误点”。同样，0.21 m 是用户定位 MAE，不是地图表面重建误差；两类任务的精度不能互换。</p>
+<h3 id="65">6.5 与相关研究的能力区别，而非定量胜负</h3>
+<p>根据论文引言对参考文献 [12]–[14] 的描述：[12]、[13] 支持用户定位与地标建图，并涉及地标类型或局部散射特征；[13] 仍以带小反射区域的 IP 集合表达地标。[14] 用概率框架考虑扩展对象的大小与形状，但该论文所比较的设定限于单用户、单次反射，未完成这里同样的信号到地图处理链。本工作则把<strong>多 BS/多 UE 融合、完整导频处理链、扩展几何表达和多次反射污染处理</strong>组合起来。</p>
+<p>这些区别说明研究定位，并不能证明其在相同数据、相同资源、相同指标下优于 [12]–[14]。后续复现应补上共同场景下的消融和基线，再讨论精度、复杂度与协作开销之间的取舍。</p>
 <h2 id="7">7. 贡献与局限应如何评价</h2>
 <table>
 <thead>
@@ -142,4 +381,4 @@ q = b + r u
 <li><a href="https://research.chalmers.se/publication/551814/file/551814_Fulltext.pdf">Chalmers 会议版全文</a>，用于核对出版版本及技术内容。</li>
 <li><a href="https://vbn.aau.dk/en/publications/pilot-based-end-to-end-radio-positioning-and-mapping-for-isac-bey-2/">Aalborg 大学正式出版记录</a>，用于核对会议、页码与作者信息。</li>
 </ul>
-<p>本报告为原创解读与评价；未复跑作者算法，未将自拟实验或推导包装为论文结果，未转载原文图表。</p></main><footer class="wrap"><a class="brand" href="../../../../index.html">兴耀未来</a><span>保持好奇。持续记录。</span><a href="https://github.com/lucky-xing/">GitHub ↗</a></footer><script defer="" src="../../../../theme-motion.js"></script></body></html>
+<p>本报告为原创解读与评价，未复跑作者算法，未将自拟实验或推导包装为论文结果。图 1–4 来自作者 arXiv v1（2025-05-12），许可为 <a href="https://creativecommons.org/licenses/by-nc-nd/4.0/">CC BY-NC-ND 4.0</a>。图 3、4 从该版本 PDF 提取，保留完整图像、坐标、图例和原始图注；只调整网页显示尺寸，未修改图中数据与结论。版权归原作者及相应权利人。</p></main><footer class="wrap"><a class="brand" href="../../../../index.html">兴耀未来</a><span>保持好奇。持续记录。</span><a href="https://github.com/lucky-xing/">GitHub ↗</a></footer><script defer="" src="../../../../theme-motion.js"></script></body></html>
