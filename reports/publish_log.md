@@ -56,3 +56,5 @@
 - 2026-10-17：周六休市观察，07:44截止，六股重筛并校准海油正式除息基准；https://lucky-xing.github.io/finance/daily/2026-10-17.html
 
 - 2026-10-18：周报与下周展望，07:47截止，核周收益、官方休市和GTC日程，保存六股数据依据；https://lucky-xing.github.io/finance/daily/2026-10-18.html
+
+- 2026-10-19：周一07:50截止，周末政策/回购与海外冲突交叉核验，七股比较、新增曙光观察，香港休市；https://lucky-xing.github.io/finance/daily/2026-10-19.html
