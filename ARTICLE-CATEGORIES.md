@@ -16,3 +16,6 @@
 - 学习：JavaScript 异步编程指南 — post.html?id=2
 - 学习：VS Code 插件推荐 — post.html?id=3
 - 学习：Docker 入门教程 — post.html?id=4
+
+- 通信 / 通感：从导频到环境地图：Pilot-Based 无线定位与建图调研 — posts/2026/10/18/pilot-based-radio-positioning-mapping.html
+- 通感栏目入口：communication/isac/index.html
