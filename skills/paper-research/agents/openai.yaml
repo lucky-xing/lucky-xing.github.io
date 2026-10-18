@@ -1,0 +1,6 @@
+interface:
+  display_name: "论文精读与调研报告"
+  short_description: "按已确认标准完成论文建模、方法公式、原图结果对比与网站归档发布"
+  default_prompt: "使用 $paper-research，按已确认的标准精读我提供的论文，完成详细中文调研报告并归档到我的网站。"
+policy:
+  allow_implicit_invocation: true
