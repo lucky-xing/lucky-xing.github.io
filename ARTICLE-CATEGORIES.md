@@ -19,3 +19,5 @@
 
 - 通信 / 通感：从导频到环境地图：Pilot-Based 无线定位与建图调研 — posts/2026/10/18/pilot-based-radio-positioning-mapping.html
 - 通感栏目入口：communication/isac/index.html
+
+- AI / 模型结构洞察分析：Looped Transformer 科研调研报告 — posts/2026/10/19/looped-transformer-survey.html

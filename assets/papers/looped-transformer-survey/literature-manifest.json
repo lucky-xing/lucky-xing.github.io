@@ -1,0 +1,86 @@
+[
+  {
+    "key": "coconut",
+    "title": "Training Large Language Models to Reason in a Continuous Latent Space",
+    "version": "arXiv:2412.06769v4 [cs.CL] 23 Aug 2026",
+    "html_sha256": "76b8fc2b5063df546c107112178bbf7a6059f2da6caa422bbc6df77564831ea9",
+    "accessed": "2026-10-19"
+  },
+  {
+    "key": "computer",
+    "title": "Looped Transformers as Programmable Computers",
+    "version": "arXiv:2301.13196v1 [cs.LG] 30 Jan 2023",
+    "html_sha256": "bcc0424f7844b1b4ae6a30f7312db14070e12e98a1d3d4d77917cc14c06b7f09",
+    "accessed": "2026-10-19"
+  },
+  {
+    "key": "huginn",
+    "title": "1Scaling by Thinking in Continuous Space",
+    "version": "arXiv:2502.05171v1 [cs.LG] 07 Feb 2025",
+    "html_sha256": "8eb3978d0c388338b6645a404a6b910fe20910da4087fca14f9d56933027c94e",
+    "accessed": "2026-10-19"
+  },
+  {
+    "key": "latent",
+    "title": "Reasoning with Latent Thoughts: On the Power of Looped Transformers",
+    "version": "arXiv:2502.17416v1 [cs.CL] 24 Feb 2025",
+    "html_sha256": "befbe9810c6dd9b7c2e822468689173669104e3cc94d7912c8b30800e8ec76a3",
+    "accessed": "2026-10-19"
+  },
+  {
+    "key": "loopformer",
+    "title": "LoopFormer: Elastic-Depth Looped Transformers for Latent Reasoning via Shortcut Modulation",
+    "version": "arXiv:2602.11451v1 [cs.CL] 11 Feb 2026",
+    "html_sha256": "431f9e9d21dc69ea29b99b0076399d146d11d703d2b73c3cbbbafe4ac13729d0",
+    "accessed": "2026-10-19"
+  },
+  {
+    "key": "lotus",
+    "title": "Bridging the Gap Between Latent and Explicit Reasoning with Looped Transformers",
+    "version": "arXiv:2606.31779v2 [cs.LG] 13 Jul 2026",
+    "html_sha256": "1b6b20ae2f7fca6a942bb010c89bee4a2c4a84990660e55f9dc8263efde553d5",
+    "accessed": "2026-10-19"
+  },
+  {
+    "key": "melt",
+    "title": "Memory-Efficient Looped Transformer: Decoupling Compute from Memory in Looped Language Models",
+    "version": "arXiv:2605.07721v3 [cs.CL] 28 Sep 2026",
+    "html_sha256": "07def032dee7f1dc776392c89a6f4cf0bd5c73aa5e6e7600b2a69069f7051389",
+    "accessed": "2026-10-19"
+  },
+  {
+    "key": "mor",
+    "title": "Mixture-of-Recursions: Learning Dynamic Recursive Depths for Adaptive Token-Level Computation",
+    "version": "arXiv:2507.10524v3 [cs.CL] 25 Oct 2025",
+    "html_sha256": "395bae2dc0c2e83ba0a34b61884f0287bb855feb6a214376630a5e05b10d4b85",
+    "accessed": "2026-10-19"
+  },
+  {
+    "key": "ouro",
+    "title": "Scaling Latent Reasoning via Looped Language Models",
+    "version": "2510.25741v1",
+    "html_sha256": "55c09b1672ac752e68e2076f980dc518cc40f8be458d4ee92e2def66c574d712",
+    "accessed": "2026-10-19"
+  },
+  {
+    "key": "rltt",
+    "title": "Prioritize the Process, Not Just the Outcome: Rewarding Latent Thought Trajectories Improves Reasoning in Looped Language Models",
+    "version": "arXiv:2602.10520v3 [cs.LG] 28 May 2026",
+    "html_sha256": "ed44fa3d231629eb37b78d69eaf7110ccdc1281a554a54acf783bb852a39b9a4",
+    "accessed": "2026-10-19"
+  },
+  {
+    "key": "rrt",
+    "title": "Relaxed Recursive Transformers: Effective Parameter Sharing with Layer-wise LoRA",
+    "version": "arXiv:2410.20672v3 [cs.CL] 28 Feb 2025",
+    "html_sha256": "ac7e6c1ca25d4cb2fde2c732c19c84aed6472eb89b45d448df3bfcf861e90a97",
+    "accessed": "2026-10-19"
+  },
+  {
+    "key": "ut",
+    "title": "Universal Transformers",
+    "version": "arXiv:1807.03819v3 [cs.CL] 05 Mar 2019",
+    "html_sha256": "012eb6616ed70ed978728af582232088a800eebd6723951278470d608a5b4c16",
+    "accessed": "2026-10-19"
+  }
+]
