@@ -21,3 +21,5 @@
 - 通感栏目入口：communication/isac/index.html
 
 - AI / 模型结构洞察分析：Looped Transformer 科研调研报告 — posts/2026/10/19/looped-transformer-survey.html
+
+- 通信 / 通感：Channel2World：从多条无线信道学习可复用的 RF 环境表示 — posts/2026/10/20/channel2world.html
