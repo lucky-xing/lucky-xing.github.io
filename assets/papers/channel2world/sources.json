@@ -1,0 +1,82 @@
+[
+  {
+    "figure": 1,
+    "file": "fig01.png",
+    "source_url": "https://arxiv.org/html/2608.17544v1/Fig/wfm_fig1.png",
+    "caption": "Fig. 1: Multiple BS-collected MIMO channel-position observations from the same RF environment are encoded into a wireless world embedding, which provides environment-level conditioning for downstream wireless and RF-observable inference tasks.",
+    "license": "CC BY 4.0",
+    "version": "2608.17544v1"
+  },
+  {
+    "figure": 2,
+    "file": "fig02.png",
+    "source_url": "https://arxiv.org/html/2608.17544v1/Fig/main_c2w.png",
+    "caption": "Fig. 2: Channel2World architecture. Path tokens from context channel-position pairs are aggregated through attention into wireless world embedding tokens, which condition query-side position and gain prediction heads.",
+    "license": "CC BY 4.0",
+    "version": "2608.17544v1"
+  },
+  {
+    "figure": 3,
+    "file": "fig03.png",
+    "source_url": "https://arxiv.org/html/2608.17544v1/Fig/protocol.png",
+    "caption": "Fig. 3: Pretraining and downstream protocol. The encoder is pretrained with context-query channel sets and then frozen for task-specific downstream learning.",
+    "license": "CC BY 4.0",
+    "version": "2608.17544v1"
+  },
+  {
+    "figure": 4,
+    "file": "fig04.png",
+    "source_url": "https://arxiv.org/html/2608.17544v1/Fig/rtenv.png",
+    "caption": "Fig. 4: Ray-tracing factory dataset. A one-dimensional BS grid and a dense two-dimensional UE grid generate BS-centered propagation environments for each layout.",
+    "license": "CC BY 4.0",
+    "version": "2608.17544v1"
+  },
+  {
+    "figure": 5,
+    "file": "fig05.png",
+    "source_url": "https://arxiv.org/html/2608.17544v1/Fig/wfm_res03.png",
+    "caption": "Fig. 5: Pretraining validation curves for position GMM loss and relative gain RMSE under error-aware and error-free inputs.",
+    "license": "CC BY 4.0",
+    "version": "2608.17544v1"
+  },
+  {
+    "figure": 6,
+    "file": "fig06.png",
+    "source_url": "https://arxiv.org/html/2608.17544v1/Fig/wfm_res06.png",
+    "caption": "Fig. 6: Per-path UE-position GMMs for a query path in a test environment.",
+    "license": "CC BY 4.0",
+    "version": "2608.17544v1"
+  },
+  {
+    "figure": 7,
+    "file": "fig07.png",
+    "source_url": "https://arxiv.org/html/2608.17544v1/Fig/wfm_res02.png",
+    "caption": "Fig. 7: Cosine similarity between wireless world embeddings obtained from nearby BSs in the same factory layout.",
+    "license": "CC BY 4.0",
+    "version": "2608.17544v1"
+  },
+  {
+    "figure": 8,
+    "file": "fig08.png",
+    "source_url": "https://arxiv.org/html/2608.17544v1/Fig/wfm_res04_04.png",
+    "caption": "Fig. 8: Channel matrix-to-position estimation in test environments. Position RMSE is shown versus the number of downstream-model parameters.",
+    "license": "CC BY 4.0",
+    "version": "2608.17544v1"
+  },
+  {
+    "figure": 9,
+    "file": "fig09.png",
+    "source_url": "https://arxiv.org/html/2608.17544v1/Fig/wfm_res05_04.png",
+    "caption": "Fig. 9: Beam-domain CSI reconstruction RMSE from sparse codebook measurements in test environments.",
+    "license": "CC BY 4.0",
+    "version": "2608.17544v1"
+  },
+  {
+    "figure": 10,
+    "file": "fig10.png",
+    "source_url": "https://arxiv.org/html/2608.17544v1/Fig/wfm_res08.png",
+    "caption": "Fig. 10: RF-observable geometry reconstruction from NLoS path directions. Predicted interaction points are shown using embeddings inferred by the error-aware encoder with 128 128 context channels and by the error-free encoder with 1024 1024 context channels.",
+    "license": "CC BY 4.0",
+    "version": "2608.17544v1"
+  }
+]
