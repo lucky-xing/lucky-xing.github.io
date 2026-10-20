@@ -1,0 +1,78 @@
+{
+  "paper": "Channel2World: A Wireless Foundation Model for RF Environment Representation",
+  "arxiv": "2608.17544v1",
+  "submitted": "2026-08-18",
+  "reviewed": "2026-10-20",
+  "status": "arXiv preprint; no formal venue inferred",
+  "license": "CC BY 4.0",
+  "primary_sources": [
+    "https://arxiv.org/abs/2608.17544",
+    "https://arxiv.org/html/2608.17544v1",
+    "https://arxiv.org/pdf/2608.17544v1"
+  ],
+  "hashes": {
+    "paper.html": "1b1804c806385d28681b4d76e11a0bf9449267c14d504b31927e125db044dfee",
+    "paper.pdf": "e2ec196ca11d543b310d566f511b4d7fd791eb1efe7fc345254460607fde6763"
+  },
+  "dataset": {
+    "source": "Table I and V-A",
+    "layouts": 26,
+    "bs_per_layout": 500,
+    "mirror_multiplier": 2,
+    "bs_centered_environments": 26000,
+    "layout_train_validation_test": [
+      22,
+      2,
+      2
+    ],
+    "valid_channels_per_environment_min_max_mean": [
+      833,
+      9024,
+      4999
+    ],
+    "carrier_GHz": 7.0,
+    "max_paths": 12,
+    "max_reflections": 3,
+    "diffraction": false
+  },
+  "model": {
+    "source": "Table I and V",
+    "latent_tokens": 16,
+    "latent_dimension": 128,
+    "context_channels": 128,
+    "query_channels": 32,
+    "total_pretraining_parameters_approx": 9200000,
+    "encoder_parameter_count_separately_reported": false
+  },
+  "reported_geometry_results": {
+    "source": "V-D3",
+    "error_aware_128": {
+      "RMSE_m": 3.91,
+      "MAE_m": 1.94
+    },
+    "error_free_1024": {
+      "RMSE_m": 3.88,
+      "MAE_m": 1.84
+    },
+    "controlled_context_count_comparison": false
+  },
+  "curve_policy": "Figure 8 and 9 curves are discussed qualitatively; no exact point-value or percentage improvement invented from images.",
+  "derived_calculations": {
+    "latent_fp32_KiB": 8,
+    "approx_total_channel_pairs": 129974000,
+    "geometry_RMSE_difference_m": 0.03,
+    "geometry_MAE_difference_m": 0.1
+  },
+  "independent_training_or_replication_performed": false,
+  "embedded_figures": [
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ]
+}
