@@ -1,0 +1,98 @@
+[
+  {
+    "paper": "latent",
+    "figure": "S1.F1",
+    "file": "latent-S1-F1-1.png",
+    "source": "https://arxiv.org/html/2502.17416v1/Media/looping_illustration2.png",
+    "sha256": "da527b825fc1943d1f2267b4c2085db6f8cbf276bb641603fa88a6a9c348eacf",
+    "license": "CC BY 4.0"
+  },
+  {
+    "paper": "latent",
+    "figure": "S3.F3",
+    "file": "latent-S3-F3-1.png",
+    "source": "https://arxiv.org/html/2502.17416v1/Media/depth_scaling_eval_perplexity.png",
+    "sha256": "9f0719cd94fb6e8b3f49672cedfd2c51811cc5d8d4f7c7c8efb5233382700c65",
+    "license": "CC BY 4.0"
+  },
+  {
+    "paper": "latent",
+    "figure": "S3.F3",
+    "file": "latent-S3-F3-2.png",
+    "source": "https://arxiv.org/html/2502.17416v1/Media/depth_scaling_closedQA.png",
+    "sha256": "811d1e49a14859e178fa1eca611714caf7fa79d9f3a7beb98af3fac5eea50b66",
+    "license": "CC BY 4.0"
+  },
+  {
+    "paper": "latent",
+    "figure": "S3.F3",
+    "file": "latent-S3-F3-3.png",
+    "source": "https://arxiv.org/html/2502.17416v1/Media/depth_scaling_openQA.png",
+    "sha256": "91b85335ce9bb7d559269e9020ae323bc42159c4af563e70b2dc5e6c94a2d3ba",
+    "license": "CC BY 4.0"
+  },
+  {
+    "paper": "latent",
+    "figure": "S3.F3",
+    "file": "latent-S3-F3-4.png",
+    "source": "https://arxiv.org/html/2502.17416v1/Media/depth_scaling_eval_token_acc.png",
+    "sha256": "aeb4e088365860a713013aab5d37c38fb73ed26a85a0cfd0635ee4e8f99acbea",
+    "license": "CC BY 4.0"
+  },
+  {
+    "paper": "latent",
+    "figure": "S3.F3",
+    "file": "latent-S3-F3-5.png",
+    "source": "https://arxiv.org/html/2502.17416v1/Media/depth_scaling_mwp.png",
+    "sha256": "1b9fc2be90e6abddc04cce6c0de9e9b1d67a50b6bc9dc74e235ca5fc238946bf",
+    "license": "CC BY 4.0"
+  },
+  {
+    "paper": "latent",
+    "figure": "S3.F3",
+    "file": "latent-S3-F3-6.png",
+    "source": "https://arxiv.org/html/2502.17416v1/Media/depth_scaling_primitives.png",
+    "sha256": "640a3644a3f42dca4a4c0b8fef9f6d010318e029bbfeeb5456d11f1d8a0a99d3",
+    "license": "CC BY 4.0"
+  },
+  {
+    "paper": "loopformer",
+    "figure": "S4.F5",
+    "file": "loopformer-S4-F5-1.png",
+    "source": "https://arxiv.org/html/2602.11451v1/shortcut_cka.png",
+    "sha256": "c0df01f112978adef66c17049e74184eb392fa2f47649b7ac876ddec0703525a",
+    "license": "CC BY 4.0"
+  },
+  {
+    "paper": "loopformer",
+    "figure": "S4.F5",
+    "file": "loopformer-S4-F5-2.png",
+    "source": "https://arxiv.org/html/2602.11451v1/albert_ee_cka.png",
+    "sha256": "1159c1ea5f26f56a104eccb988bd792495a1190c8152131754732c27d7bade34",
+    "license": "CC BY 4.0"
+  },
+  {
+    "paper": "loopformer",
+    "figure": "S4.F5",
+    "file": "loopformer-S4-F5-3.png",
+    "source": "https://arxiv.org/html/2602.11451v1/tmlt_ee_cka.png",
+    "sha256": "989a50b66ecad6f50482524e17a995d8d1b35391e5eb62b1fb626983cc78c6bd",
+    "license": "CC BY 4.0"
+  },
+  {
+    "paper": "melt",
+    "figure": "S0.F1",
+    "file": "melt-S0-F1-1.png",
+    "source": "https://arxiv.org/html/2605.07721v3/figures/aime26_accuracy_vs_memory.png",
+    "sha256": "00f2c637338bc17293bed8319bc86443051c2e8413540df9b7787af5f08df899",
+    "license": "CC BY-NC-SA 4.0"
+  },
+  {
+    "paper": "melt",
+    "figure": "S0.F1",
+    "file": "melt-S0-F1-2.png",
+    "source": "https://arxiv.org/html/2605.07721v3/figures/melt_kv_refinement_v3.png",
+    "sha256": "ab6bb2cbc00bdcbf49948c44e0b368091071c341a3a12c7432921cef3354b1b7",
+    "license": "CC BY-NC-SA 4.0"
+  }
+]
