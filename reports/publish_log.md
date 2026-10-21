@@ -64,3 +64,5 @@
 - 2026-10-21：07:44截止，八股重筛与超时重试，医药相对强、科技降级，核查恒瑞现金流及原油报价口径；https://lucky-xing.github.io/finance/daily/2026-10-21.html
 
 - 2026-10-21 13:11交易计划修订：补三股30个交易日量价、5日均量倍数与ATR，列买入区间/止损/止盈，复核中值及上沿毛净盈亏比；保留原07:44新闻截止。https://lucky-xing.github.io/finance/daily/2026-10-21.html
+
+- 2026-10-22：07:52截止，五股完整三股缺口；核官方科技政策/GTC，三股量价ATR及两组候选毛净盈亏比，真实压力空间不足维持观察。https://lucky-xing.github.io/finance/daily/2026-10-22.html
