@@ -62,3 +62,5 @@
 - 2026-10-20：07:52截止，八股重筛、科技外部验证改善，曙光/生益/工行条件观察，复盘前期并补人民币/美债/BTC；https://lucky-xing.github.io/finance/daily/2026-10-20.html
 
 - 2026-10-21：07:44截止，八股重筛与超时重试，医药相对强、科技降级，核查恒瑞现金流及原油报价口径；https://lucky-xing.github.io/finance/daily/2026-10-21.html
+
+- 2026-10-21 13:11交易计划修订：补三股30个交易日量价、5日均量倍数与ATR，列买入区间/止损/止盈，复核中值及上沿毛净盈亏比；保留原07:44新闻截止。https://lucky-xing.github.io/finance/daily/2026-10-21.html
