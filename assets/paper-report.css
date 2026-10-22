@@ -15,3 +15,5 @@
 @media(max-width:700px){.paper-report .report{width:calc(100% - 24px);padding:24px 20px 40px;margin-top:24px;font-size:17px;line-height:1.95;letter-spacing:normal}.paper-report .report h2{font-size:24px;scroll-margin-top:150px}.paper-report .report h3{font-size:21px}.paper-report .report .toc{padding:18px}.paper-report .report .toc a{font-size:16px}.paper-report .report table,.paper-report .report th,.paper-report .report pre,.paper-report .report code{font-size:16px}.paper-report .report th,.paper-report .report td{padding:10px 12px}.paper-report .equation{padding:16px 10px;font-size:.94em}.paper-report .paper-figure{margin:24px 0;padding:10px}.paper-report .paper-figure>a{padding:5px}.paper-report .paper-figure figcaption{font-size:13px}}
 /* Long inline expressions scroll within the reading column on narrow screens. */
 .paper-report .math-inline{display:inline-block;max-width:100%;overflow-x:auto;overflow-y:hidden;vertical-align:middle}
+/* Source paths and commit hashes may wrap without widening the page. */
+.paper-report .report :not(pre)>code{overflow-wrap:anywhere;word-break:break-word}
