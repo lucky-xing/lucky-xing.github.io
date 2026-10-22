@@ -1,0 +1,133 @@
+{
+  "project": "DeepSeek-AI / DeepInfer",
+  "commit": "9bd9cf243fc53ef9afbf8f04d391d989117d6ab9",
+  "accessed": "2026-10-22",
+  "method": "Official documentation and static source reading. No GPU/NPU inference, no benchmark reproduction.",
+  "sources": [
+    {
+      "path": "README.md",
+      "url": "https://github.com/deepseek-ai/DeepInfer/blob/9bd9cf243fc53ef9afbf8f04d391d989117d6ab9/README.md",
+      "sha256": "ed01ea63a721cdcdefc8634783e5139fc8d8868c11f924a7c5b89fef1667bc7b"
+    },
+    {
+      "path": "doc/inference_deployment_qa.md",
+      "url": "https://github.com/deepseek-ai/DeepInfer/blob/9bd9cf243fc53ef9afbf8f04d391d989117d6ab9/doc/inference_deployment_qa.md",
+      "sha256": "798c8ed6f5ccc9f1d319aef1cfbfe6ebf1b3bbbab907bf97961d764145fc95a7"
+    },
+    {
+      "path": "examples/README.md",
+      "url": "https://github.com/deepseek-ai/DeepInfer/blob/9bd9cf243fc53ef9afbf8f04d391d989117d6ab9/examples/README.md",
+      "sha256": "64596e69c14ab30a2d3f274eb3cc7c765da26b1efd944afa1102dd095f57304d"
+    },
+    {
+      "path": "examples/benchmark.py",
+      "url": "https://github.com/deepseek-ai/DeepInfer/blob/9bd9cf243fc53ef9afbf8f04d391d989117d6ab9/examples/benchmark.py",
+      "sha256": "de26c6982bef644eb61165109f0a4a3a2ac805c93e34c73c45bc6022b7e62f61"
+    },
+    {
+      "path": "examples/sweep/run_sweep.sh",
+      "url": "https://github.com/deepseek-ai/DeepInfer/blob/9bd9cf243fc53ef9afbf8f04d391d989117d6ab9/examples/sweep/run_sweep.sh",
+      "sha256": "39866148c857f9be246443e9e7ce77e6e3b5e55b782212b997cacd9fa7903ab5"
+    },
+    {
+      "path": "examples/sweep/plot_pareto.py",
+      "url": "https://github.com/deepseek-ai/DeepInfer/blob/9bd9cf243fc53ef9afbf8f04d391d989117d6ab9/examples/sweep/plot_pareto.py",
+      "sha256": "ac200cf33a6c1f23f78112aef35475266b40d019e6bdf52fe768b055fe677e3c"
+    },
+    {
+      "path": "eval/README.md",
+      "url": "https://github.com/deepseek-ai/DeepInfer/blob/9bd9cf243fc53ef9afbf8f04d391d989117d6ab9/eval/README.md",
+      "sha256": "dce6a74cd7f093ba1cbce8b4dd4dc13e1dc17729d61f0ad49a4ab46a9ef659ee"
+    },
+    {
+      "path": "csrc/engine/mtp_varlen.hpp",
+      "url": "https://github.com/deepseek-ai/DeepInfer/blob/9bd9cf243fc53ef9afbf8f04d391d989117d6ab9/csrc/engine/mtp_varlen.hpp",
+      "sha256": "6f50ed06691f0bda6d93b07ab058019ee3021279a1e97902bb94e8708b70e977"
+    },
+    {
+      "path": "deepinfer/model_executor/layers/tilelang_ops/cuda/schedule_mtp_varlen.py",
+      "url": "https://github.com/deepseek-ai/DeepInfer/blob/9bd9cf243fc53ef9afbf8f04d391d989117d6ab9/deepinfer/model_executor/layers/tilelang_ops/cuda/schedule_mtp_varlen.py",
+      "sha256": "d28b1dbdaa4f420581c3eabe4a0cafdad9da7ac5b71bf52476adb51b81341f70"
+    },
+    {
+      "path": "deepinfer/model_executor/eplb/policy.py",
+      "url": "https://github.com/deepseek-ai/DeepInfer/blob/9bd9cf243fc53ef9afbf8f04d391d989117d6ab9/deepinfer/model_executor/eplb/policy.py",
+      "sha256": "fc8353f463e2a7969096c9887bee6d7ba393873c873fb4c9c4a4a479c57a032e"
+    },
+    {
+      "path": "deepinfer/model_executor/models/v4_modules/yoco.py",
+      "url": "https://github.com/deepseek-ai/DeepInfer/blob/9bd9cf243fc53ef9afbf8f04d391d989117d6ab9/deepinfer/model_executor/models/v4_modules/yoco.py",
+      "sha256": "4ed02fdbc6971b7d516cd792035725a136b904180857c8ae71ef012cbd60e29e"
+    },
+    {
+      "path": "deepinfer/engine/llm_engine.py",
+      "url": "https://github.com/deepseek-ai/DeepInfer/blob/9bd9cf243fc53ef9afbf8f04d391d989117d6ab9/deepinfer/engine/llm_engine.py",
+      "sha256": "0813b95b1e53f840a7e6dacf555ef789fa4e3aa02c3e8e7124a5c9ce2f7a4724"
+    },
+    {
+      "path": "examples/yoco/README.md",
+      "url": "https://github.com/deepseek-ai/DeepInfer/blob/9bd9cf243fc53ef9afbf8f04d391d989117d6ab9/examples/yoco/README.md",
+      "sha256": "ef0e0706e082d2b95e92727cabc2f0f3f5ef72b72280361b02e13aa0e3b85e8f"
+    },
+    {
+      "path": "tests/models/test_offline_inference.py",
+      "url": "https://github.com/deepseek-ai/DeepInfer/blob/9bd9cf243fc53ef9afbf8f04d391d989117d6ab9/tests/models/test_offline_inference.py",
+      "sha256": "d10bc8dd71dbfade3f797c2323509af88ac576e66d81101bc2890e575a7610aa"
+    },
+    {
+      "path": "requirements-nvidia.txt",
+      "url": "https://github.com/deepseek-ai/DeepInfer/blob/9bd9cf243fc53ef9afbf8f04d391d989117d6ab9/requirements-nvidia.txt",
+      "sha256": "845c1307b8702a319929d1ddae2e023a02612515e21ffcf56a6e82dc5931da26"
+    },
+    {
+      "path": "requirements-ascend.txt",
+      "url": "https://github.com/deepseek-ai/DeepInfer/blob/9bd9cf243fc53ef9afbf8f04d391d989117d6ab9/requirements-ascend.txt",
+      "sha256": "a28fc43335ad589ca0de7a350ba5827009d26052f161d0c39b7ad1d094ca56c9"
+    },
+    {
+      "path": "build.sh",
+      "url": "https://github.com/deepseek-ai/DeepInfer/blob/9bd9cf243fc53ef9afbf8f04d391d989117d6ab9/build.sh",
+      "sha256": "49424a7fe42b1f08d4a52b19a13b5436095dcb57c0364b499d5334992af2d094"
+    },
+    {
+      "path": "pyproject.toml",
+      "url": "https://github.com/deepseek-ai/DeepInfer/blob/9bd9cf243fc53ef9afbf8f04d391d989117d6ab9/pyproject.toml",
+      "sha256": "05a79a324b30a66f12e6956b61427c4a3da27335ec96cab73507033da1dd2d8a"
+    },
+    {
+      "path": "deepinfer/config.py",
+      "url": "https://github.com/deepseek-ai/DeepInfer/blob/9bd9cf243fc53ef9afbf8f04d391d989117d6ab9/deepinfer/config.py",
+      "sha256": "b21d56199b2f6f7737b1d034361dc2449b9a31eb164b2a002ed5395c109055f1"
+    }
+  ],
+  "images": [
+    {
+      "file": "architecture_overview.png",
+      "url": "https://github.com/deepseek-ai/DeepInfer/blob/9bd9cf243fc53ef9afbf8f04d391d989117d6ab9/doc/images/architecture_overview.png",
+      "sha256": "a04aed83c96ddc4a6ec7e578b961d8a3fdbea16ac72a4f51b3cc2221b858beb5",
+      "license": "Apache-2.0, repository license; retain attribution and license",
+      "modified": false
+    },
+    {
+      "file": "decode_pareto.png",
+      "url": "https://github.com/deepseek-ai/DeepInfer/blob/9bd9cf243fc53ef9afbf8f04d391d989117d6ab9/doc/images/decode_pareto.png",
+      "sha256": "26d9f0f990c236f61f5b86e248062c4436b2fef6f5852961359b15a2d4c5c65f",
+      "license": "Apache-2.0, repository license; retain attribution and license",
+      "modified": false
+    },
+    {
+      "file": "prefill_pareto.png",
+      "url": "https://github.com/deepseek-ai/DeepInfer/blob/9bd9cf243fc53ef9afbf8f04d391d989117d6ab9/doc/images/prefill_pareto.png",
+      "sha256": "ef3c63e857e3340890abe2fb8379f8c8e2564c6a104975b09634875bfdc33741",
+      "license": "Apache-2.0, repository license; retain attribution and license",
+      "modified": false
+    },
+    {
+      "file": "wide_ep_decode_pareto.png",
+      "url": "https://github.com/deepseek-ai/DeepInfer/blob/9bd9cf243fc53ef9afbf8f04d391d989117d6ab9/doc/images/wide_ep_decode_pareto.png",
+      "sha256": "719594a75b14cbb14ddba69872eb44be7a328729716dfb3838ce59dbf898ab7c",
+      "license": "Apache-2.0, repository license; retain attribution and license",
+      "modified": false
+    }
+  ]
+}
