@@ -70,3 +70,5 @@
 - 2026-10-23：07:45截止，八股完整重筛，科技风险降级、茅台/工行重新观察，量价ATR及毛净盈亏比核算；https://lucky-xing.github.io/finance/daily/2026-10-23.html
 
 - 2026-10-24：07:51截止，周六休市，八股重筛，核油气外部映射与国内资金冲突，1只条件观察2只不参与，量能ATR及净盈亏比复核；https://lucky-xing.github.io/finance/daily/2026-10-24.html
+
+- 2026-10-25：07:50截止周报，统一10/16至23周收益、核官方FOMC与周末消息，沿用并标明同一完整交易日原始响应，量化条件复核；https://lucky-xing.github.io/finance/daily/2026-10-25.html
