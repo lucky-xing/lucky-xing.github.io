@@ -74,3 +74,5 @@
 - 2026-10-25：07:50截止周报，统一10/16至23周收益、核官方FOMC与周末消息，沿用并标明同一完整交易日原始响应，量化条件复核；https://lucky-xing.github.io/finance/daily/2026-10-25.html
 
 - 2026-10-26：07:51截止，周一覆盖周五至今，十股重筛、新增德明利现金流与高换手核验，核官方指数修订，复算量能ATR及净比；https://lucky-xing.github.io/finance/daily/2026-10-26.html
+
+- 2026-10-27：07:55截止，十股东方财富失败，腾讯补三股前复权量价、媒体资金分源；茅台退出观察，三股不参与，重算量能ATR及仅纸面净比。https://lucky-xing.github.io/finance/daily/2026-10-27.html

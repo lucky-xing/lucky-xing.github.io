@@ -1,0 +1,77 @@
+{
+  "marketDate": "2026-10-26",
+  "source": "Tencent qfqday, forward adjusted, volume in hands",
+  "stats": [
+    {
+      "name": "贵州茅台",
+      "symbol": "sh600519",
+      "date": "2026-10-26",
+      "volumeHands": 41599,
+      "previous5Average": 41511.2,
+      "volumeMultiple": 1.0021150918306385,
+      "atr14Simple": 26.34785714285715
+    },
+    {
+      "name": "中科曙光",
+      "symbol": "sh603019",
+      "date": "2026-10-26",
+      "volumeHands": 244544,
+      "previous5Average": 328100.8,
+      "volumeMultiple": 0.7453319223848281,
+      "atr14Simple": 3.1642857142857133
+    },
+    {
+      "name": "德明利",
+      "symbol": "sz001309",
+      "date": "2026-10-26",
+      "volumeHands": 280117,
+      "previous5Average": 257987,
+      "volumeMultiple": 1.085779516022125,
+      "atr14Simple": 17.01942857142857
+    }
+  ],
+  "costAssumption": "0.20% of hypothetical buy notional, roundtrip with assumed slippage",
+  "cases": [
+    {
+      "label": "仅纸面中值/不触发",
+      "b": 1328,
+      "stop": 1308,
+      "t1": 1343.88,
+      "t2": 1350,
+      "r": 20,
+      "riskPct": 0.015060240963855422,
+      "g1": 15.88000000000011,
+      "g2": 22,
+      "rr1": 0.7940000000000055,
+      "rr2": 1.1,
+      "weighted": 0.9470000000000027,
+      "c": 2.656,
+      "net1": 0.5836864406779709,
+      "net2": 0.853813559322034,
+      "netWeighted": 0.7187500000000026,
+      "binary1": 0.6314381270902991,
+      "binary2": 0.5394285714285714
+    },
+    {
+      "label": "仅纸面上沿/不触发",
+      "b": 1330,
+      "stop": 1308,
+      "t1": 1343.88,
+      "t2": 1350,
+      "r": 22,
+      "riskPct": 0.016541353383458645,
+      "g1": 13.88000000000011,
+      "g2": 20,
+      "rr1": 0.6309090909090959,
+      "rr2": 0.9090909090909091,
+      "weighted": 0.7700000000000025,
+      "c": 2.66,
+      "net1": 0.4549878345498828,
+      "net2": 0.7031630170316302,
+      "netWeighted": 0.5790754257907564,
+      "binary1": 0.6872909698996634,
+      "binary2": 0.5871428571428571
+    }
+  ],
+  "execution": "All cases paper-only, do not trigger; all three no new participation"
+}
