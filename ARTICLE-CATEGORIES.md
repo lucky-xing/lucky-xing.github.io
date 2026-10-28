@@ -25,3 +25,5 @@
 - 通信 / 通感：Channel2World：从多条无线信道学习可复用的 RF 环境表示 — posts/2026/10/20/channel2world.html
 
 - AI / 模型结构洞察分析：DeepInfer 技术调研 — posts/2026/10/22/deepinfer-research.html
+
+- AI / 模型结构洞察分析：Stronger Normalization-Free Transformers：Derf 深度调研 — posts/2026/10/28/stronger-normalization-free-transformers.html

@@ -1,0 +1,58 @@
+{
+  "paper": "Stronger Normalization-Free Transformers",
+  "arxiv": "2512.10938v2",
+  "verified": "2026-10-28",
+  "paper_license": "arXiv perpetual non-exclusive license; copyright retained, not CC BY",
+  "use": "Selected original illustrations and result tables quoted for critical research commentary with attribution; no relicensing.",
+  "images": [
+    {
+      "file": "activation_properties.svg",
+      "source": "https://arxiv.org/html/2512.10938v2#S2.F2",
+      "caption": "Figure 2 : Key properties of point-wise function. The four properties: zero-centeredness , boundedness , center sensitivity , and monotonicity collectively characterize functional behavior on activations and influence training dynamics. Blue curves represent functions that satisfy each property, while red curves violate them.",
+      "sha256": "9393b41d5a5a713816afc87576ddbbf8ac4a74e0470dd878fc74f8f901ad2083",
+      "method": "original HTML image, unmodified"
+    },
+    {
+      "file": "center_sensitivity_training.png",
+      "source": "https://arxiv.org/html/2512.10938v2#A1.F8",
+      "caption": "Figure 7 : Training loss curve for different center sensitivity (controlled by λ \\lambda ). A larger λ \\lambda leads to higher training loss and poorer fitting ability. Figure 8 : Training loss curve for different monotonicity. Monotonic functions consistently achieve lower training loss than non-monotonic functions.",
+      "sha256": "24f1a815e0942cc9f6b81de61e6bdc966d167dd202e32adcbb26b151f0336471",
+      "method": "original HTML image, unmodified"
+    },
+    {
+      "file": "forward_backward_new.svg",
+      "source": "https://arxiv.org/html/2512.10938v2#A6.F13",
+      "caption": "Figure 13 : Forward and backward wall-clock runtime comparison for DyT, Derf, and LayerNorm. Forward Backward Derf 0.42 0.73 DyT 0.42 0.73 LN 0.42 0.74 Table 27 : Time (ms) for running 15k hidden dimension.",
+      "sha256": "34277fed35659a6bb57434e6f2319e82cf2476b5fc8e6c4675e9e1931ccb6ddd",
+      "method": "original HTML image, unmodified"
+    },
+    {
+      "file": "table08-vit.png",
+      "source": "https://arxiv.org/html/2512.10938v2#S6.T8",
+      "caption": "model LN DyT Derf Δ LN \\Delta_{\\text{LN}} Δ DyT \\Delta_{\\text{DyT}} ViT-B 82.3% 82.5% 82.8 % ↑ 0.5% {\\color[rgb]{0,0.88,0}\\uparrow\\text{0.5\\%}} ↑ 0.3% {\\color[rgb]{0,0.88,0}\\uparrow\\text{0.3\\%}} ViT-L 83.1% 83.6% 83.8 % ↑ 0.7% {\\color[rgb]{0,0.88,0}\\uparrow\\text{0.7\\%}} ↑ 0.2% {\\color[rgb]{0,0.88,0}\\uparrow\\text{0.2\\%}} Table 8 : Supervised classification accuracy on ImageNet-1K. Derf achieves higher top-1 accuracy than both LN and DyT on different model sizes, demonstrating its effectiveness in vision transformer architectures.",
+      "sha256": "572417751c563d33d22125f51c2db34e8843c419c04d736dfea06ff78b10f614",
+      "method": "PDF v2 crop with complete table and caption"
+    },
+    {
+      "file": "table09-dit.png",
+      "source": "https://arxiv.org/html/2512.10938v2#S6.T9",
+      "caption": "model LN DyT Derf Δ LN \\Delta_{\\text{LN}} Δ DyT \\Delta_{\\text{DyT}} DiT-B/4 64.93 63.94 63.23 ↓ 1.70 {\\color[rgb]{0,0.88,0}\\downarrow\\text{1.70}} ↓ 0.71 {\\color[rgb]{0,0.88,0}\\downarrow\\text{0.71}} DiT-L/4 45.91 45.66 43.94 ↓ 1.97 {\\color[rgb]{0,0.88,0}\\downarrow\\text{1.97}} ↓ 1.72 {\\color[rgb]{0,0.88,0}\\downarrow\\text{1.72}} DiT-XL/2 19.94 20.83 18.92 ↓ 1.02 {\\color[rgb]{0,0.88,0}\\downarrow\\text{1.02}} ↓ 1.91 {\\color[rgb]{0,0.88,0}\\downarrow\\text{1.91}} Table 9 : Image generation quality (FID) on ImageNet. Lower FID indicates better image generation quality. Derf achieves lower FID scores than both LN and DyT across all DiT model sizes.",
+      "sha256": "5a67082a5a6fb9bbba521ec2ce6c502b0e1cd0cff753d56d58ab1385f3655fdd",
+      "method": "PDF v2 crop with complete table and caption"
+    },
+    {
+      "file": "table12-language.png",
+      "source": "https://arxiv.org/html/2512.10938v2#S6.T12",
+      "caption": "model LN DyT Derf Δ LN \\Delta_{\\text{LN}} Δ DyT \\Delta_{\\text{DyT}} GPT-2 2.94 2.97 2.94 0.00 ↓ 0.03 {\\color[rgb]{0,0.88,0}\\downarrow\\text{0.03}} Table 12 : GPT-2 validation loss on the OpenWebText dataset. Derf matches the performance of LN while achieving lower validation loss than DyT.",
+      "sha256": "3cbeaa809d5bfe96ef646ddbb3fce7fd26d765ef9fc7e4ae99c08c577952ea90",
+      "method": "PDF v2 crop with complete table and caption"
+    },
+    {
+      "file": "table13-fitting.png",
+      "source": "https://arxiv.org/html/2512.10938v2#S6.T13",
+      "caption": "model Norm Derf DyT ViT-B 0.2623 0.2681 0.2714 ViT-L 0.2034 0.2066 0.2083 DiT-B 0.1531 0.1533 0.1535 DiT-L 0.1501 0.1510 0.1518 DiT-XL 0.1432 0.1436 0.1440 wav2vec 2.0 B 1.8509 1.8821 1.8946 wav2vec 2.0 L 1.8241 1.8563 1.8641 Hyena 1.1297 1.1526 1.1631 Caduceus 0.8917 0.9129 0.9203 GPT-2 2.9478 2.9702 2.9822 Table 13 : Evaluation-mode training loss of normalization layers (Norm), Derf, and DyT after optimization. Bolded indicates the lowest loss, and underlined means the second-lowest loss.\nAcross all model architectures, the training loss follows the relation: Norm < < Derf < DyT \\text{Derf{}}<\\text{DyT} .\nBoth DyT and Derf exhibit higher training loss than normalization layers, while Derf achieves slightly lower loss than DyT.",
+      "sha256": "920259db256a2c19e5bd470535ca6fca305037a0a4741c7a03075d129d5aa506",
+      "method": "PDF v2 crop with complete table and caption"
+    }
+  ]
+}
