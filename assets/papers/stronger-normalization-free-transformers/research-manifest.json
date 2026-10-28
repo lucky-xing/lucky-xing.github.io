@@ -1,0 +1,40 @@
+{
+  "title": "Stronger Normalization-Free Transformers",
+  "authors": [
+    "Mingzhi Chen",
+    "Taiming Lu",
+    "Jiachen Zhu",
+    "Mingjie Sun",
+    "Zhuang Liu"
+  ],
+  "venue": "CVPR 2026",
+  "pages": "27418–27428",
+  "read_version": "arXiv:2512.10938v2",
+  "version_date": "2026-03-31",
+  "pdf_pages": 22,
+  "verified_date": "2026-10-28",
+  "pdf_sha256": "7dcaf5c05b6bd2a8432006a4d3b030a9cd951b581fb7bac90277503777627cbe",
+  "read_scope": [
+    "full main text sections 1–9",
+    "appendices A–F",
+    "official ViT and DiT dynamic_erf.py",
+    "official GPT-2 model_derf.patch",
+    "official README and license"
+  ],
+  "code_sha": "2d068e910da7cd1938b3371f7132c42c6ea24e3d",
+  "code_url": "https://github.com/zlab-princeton/Derf",
+  "retrained": false,
+  "math": {
+    "display": 15,
+    "inline": 80
+  },
+  "figures": 7,
+  "critical_findings": [
+    "GPT2 LN and Derf both validation loss 2.94",
+    "speech input normalization partly retained",
+    "DiT zero initialization differs by method",
+    "GPT2 official patch adds embedding shared_scale for DyT and Derf",
+    "single-operator performance not end-to-end speedup",
+    "tanh fixed scaling can be absorbed into learnable parameters; analysis is report inference"
+  ]
+}
