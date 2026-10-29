@@ -1,0 +1,128 @@
+{
+  "title": "DaMN: Deleting and Migrating Normalization Layers from Transformers",
+  "version": "CVPR 2026 Findings official open-access accepted version and official supplement",
+  "verified": "2026-10-29",
+  "rights": "Copyright retained by authors or other rights holders; selected quotation for critical research commentary; no CC BY or relicensing asserted",
+  "images": [
+    {
+      "file": "fig01-efficiency.png",
+      "label": "Figure 1",
+      "pdf_page": 1,
+      "source": "https://openaccess.thecvf.com/content/CVPR2026F/papers/Ryabykin_DaMN_Deleting_and_Migrating_Normalization_Layers_from_Transformers_CVPRF_2026_paper.pdf#page=1",
+      "crop_points_from_top_left": [
+        312,
+        232,
+        557,
+        440
+      ],
+      "scale": 3,
+      "sha256": "e6d6ce232a139052774c1c0fbe9f1ac6aa836d94b44796bd76d3c6f4a49264c9",
+      "alteration": "crop only; retain complete axes legends data and caption"
+    },
+    {
+      "file": "fig02-pipeline.png",
+      "label": "Figure 2",
+      "pdf_page": 5,
+      "source": "https://openaccess.thecvf.com/content/CVPR2026F/papers/Ryabykin_DaMN_Deleting_and_Migrating_Normalization_Layers_from_Transformers_CVPRF_2026_paper.pdf#page=5",
+      "crop_points_from_top_left": [
+        57,
+        67,
+        557,
+        345
+      ],
+      "scale": 3,
+      "sha256": "48553a692f60c28a8f36122ebb9cf667486650423381cc9af4d6454509bb1a53",
+      "alteration": "crop only; retain complete axes legends data and caption"
+    },
+    {
+      "file": "fig03-surrogate.png",
+      "label": "Figure 3",
+      "pdf_page": 5,
+      "source": "https://openaccess.thecvf.com/content/CVPR2026F/papers/Ryabykin_DaMN_Deleting_and_Migrating_Normalization_Layers_from_Transformers_CVPRF_2026_paper.pdf#page=5",
+      "crop_points_from_top_left": [
+        57,
+        352,
+        299,
+        516
+      ],
+      "scale": 3,
+      "sha256": "1fd4a8b6147899a755694a3e81435c77f5c68ad4f02ad2eada01cfa253844af8",
+      "alteration": "crop only; retain complete axes legends data and caption"
+    },
+    {
+      "file": "fig04-noise.png",
+      "label": "Figure 4",
+      "pdf_page": 5,
+      "source": "https://openaccess.thecvf.com/content/CVPR2026F/papers/Ryabykin_DaMN_Deleting_and_Migrating_Normalization_Layers_from_Transformers_CVPRF_2026_paper.pdf#page=5",
+      "crop_points_from_top_left": [
+        57,
+        568,
+        299,
+        712
+      ],
+      "scale": 3,
+      "sha256": "61326841c7f5f8d8e5448ed6b9025582a7d19502d6d14a8766a238fad3ff4294",
+      "alteration": "crop only; retain complete axes legends data and caption"
+    },
+    {
+      "file": "fig05-sequential.png",
+      "label": "Figure 5",
+      "pdf_page": 5,
+      "source": "https://openaccess.thecvf.com/content/CVPR2026F/papers/Ryabykin_DaMN_Deleting_and_Migrating_Normalization_Layers_from_Transformers_CVPRF_2026_paper.pdf#page=5",
+      "crop_points_from_top_left": [
+        315,
+        352,
+        558,
+        505
+      ],
+      "scale": 3,
+      "sha256": "650bd25b0e7a6eecb0f7aedd81cb4492893d31f43fe90044337aca03fa84ca55",
+      "alteration": "crop only; retain complete axes legends data and caption"
+    },
+    {
+      "file": "table04-super-resolution.png",
+      "label": "Table 4",
+      "pdf_page": 7,
+      "source": "https://openaccess.thecvf.com/content/CVPR2026F/papers/Ryabykin_DaMN_Deleting_and_Migrating_Normalization_Layers_from_Transformers_CVPRF_2026_paper.pdf#page=7",
+      "crop_points_from_top_left": [
+        57,
+        71,
+        557,
+        350
+      ],
+      "scale": 3,
+      "sha256": "484cfbae4ff660bd393a0e3a3e68bd395cf2645a97a5754307be5d0b939a1508",
+      "alteration": "crop only; retain complete axes legends data and caption"
+    },
+    {
+      "file": "table06-classification.png",
+      "label": "Table 6",
+      "pdf_page": 8,
+      "source": "https://openaccess.thecvf.com/content/CVPR2026F/papers/Ryabykin_DaMN_Deleting_and_Migrating_Normalization_Layers_from_Transformers_CVPRF_2026_paper.pdf#page=8",
+      "crop_points_from_top_left": [
+        57,
+        71,
+        299,
+        236
+      ],
+      "scale": 3,
+      "sha256": "416d6ac102337af9e6444d99450b4b54bfa7500d956da3425912bc75f5d539e6",
+      "alteration": "crop only; retain complete axes legends data and caption"
+    },
+    {
+      "file": "tableS08-language.png",
+      "label": "Table S8",
+      "pdf_page": 14,
+      "source": "https://openaccess.thecvf.com/content/CVPR2026F/supplemental/Ryabykin_DaMN_Deleting_and_CVPRF_2026_supplemental.pdf#page=14",
+      "crop_points_from_top_left": [
+        57,
+        123,
+        557,
+        313
+      ],
+      "scale": 3,
+      "sha256": "dd883c966fc193ead8e1149f1bdbcb70bc5b466c4126d6a7ef53507d03e01d0f",
+      "alteration": "crop only; retain complete axes legends data and caption"
+    }
+  ]
+}

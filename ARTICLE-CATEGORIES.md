@@ -27,3 +27,5 @@
 - AI / 模型结构洞察分析：DeepInfer 技术调研 — posts/2026/10/22/deepinfer-research.html
 
 - AI / 模型结构洞察分析：Stronger Normalization-Free Transformers：Derf 深度调研 — posts/2026/10/28/stronger-normalization-free-transformers.html
+
+- AI / 模型结构洞察分析：DaMN：如何从预训练模型中删除并迁移归一化层 — posts/2026/10/29/damn-normalization-removal.html
