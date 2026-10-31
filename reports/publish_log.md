@@ -84,3 +84,5 @@
 - 2026-10-30：08:47实际截止；东财补齐十四股行情资金，科技退出、医药银行油气风险核验，量价ATR及净盈亏比重算，零执行买单。https://lucky-xing.github.io/finance/daily/2026-10-30.html
 
 - 2026-10-31：07:50截止发布周六休市观察版；十四股东财价量资金重筛、300日历史参考点及三股量化复核，海油/工行/茅台观察，零执行买单。https://lucky-xing.github.io/finance/daily/2026-10-31.html
+
+- 2026-11-01：07:47截止发布周报及11/2—11/6展望；补官方PMI、VIX及茅台正式现金流，扩至十七股，海油/工行/茅台仅观察，重算量价ATR及净比。https://lucky-xing.github.io/finance/daily/2026-11-01.html
