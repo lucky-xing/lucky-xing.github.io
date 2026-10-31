@@ -1,0 +1,80 @@
+{
+  "access_date": "2026-10-31",
+  "sources": [
+    {
+      "key": "bbs",
+      "url": "https://arxiv.org/html/2409.05227v1",
+      "file": "bbs.html",
+      "sha256": "58847c61fef39ce9c78c4857dac60291cbf1cee4f2a69c1cadcf478e722cf197",
+      "bytes": 275747
+    },
+    {
+      "key": "bsq",
+      "url": "https://arxiv.org/html/2102.10462v1",
+      "file": "bsq.html",
+      "sha256": "e38a034ba9eda21c49cab5a429a6178cfbd12939aafe947bce79336c4c7ceedf",
+      "bytes": 242839
+    },
+    {
+      "key": "bitwave",
+      "url": "https://arxiv.org/html/2507.12444v1",
+      "file": "bitwave.html",
+      "sha256": "bafdf185f7290e4bd8800dbcbbf9f0df5d2e4268f858952b98b73aa04f4f5b8e",
+      "bytes": 260866
+    },
+    {
+      "key": "balance",
+      "url": "https://arxiv.org/html/2302.00201v1",
+      "file": "balance.html",
+      "sha256": "37e74a636ab6b38e5d6ec1c1ed7f5d16edcc063ff263a65cda4ebfe0c68a652a",
+      "bytes": 244848
+    },
+    {
+      "key": "bitsnet",
+      "url": "https://bpb-us-e1.wpmucdn.com/sites.gatech.edu/dist/e/220/files/2022/05/Karimzadeh2022TCAS1.pdf",
+      "file": "bitsnet.pdf",
+      "sha256": "1bf69dccee460aa2084b73f2f01d2cedab160d0964feb3ffb08ab57e7af1824c",
+      "bytes": 1744337
+    },
+    {
+      "key": "tr",
+      "url": "https://arxiv.org/pdf/2007.06389v1",
+      "file": "tr.pdf",
+      "sha256": "8b0b447b01efc08c5c3bd74a1ca193168683a54aa23d7168b06aa12b1c49de27",
+      "bytes": 4595042
+    },
+    {
+      "key": "bitslice",
+      "url": "https://par.nsf.gov/servlets/purl/10179857",
+      "error": "<urlopen error [SSL: UNEXPECTED_EOF_WHILE_READING] EOF occurred in violation of protocol (_ssl.c:1010)>"
+    },
+    {
+      "key": "sparsecol",
+      "url": "https://arxiv.org/html/2606.16016v1",
+      "file": "sparsecol.html",
+      "sha256": "8404b733a6341d5b5ef5026c8ea7001a8f9730a231bf3c1e311efdb99ee00537",
+      "bytes": 271054
+    },
+    {
+      "key": "bitslice",
+      "url": "https://arxiv.org/html/1909.08496v2",
+      "file": "bitslice.html",
+      "sha256": "429ad1fb36f1b929d4ba34c585a561fca585e415629daf39bcd09563240fbe28",
+      "bytes": 110046
+    },
+    {
+      "key": "hamq-poster",
+      "url": "https://www.sudarshan-sh.com/files/HamQ_2023_CogniSense.pdf",
+      "error": "HTTP Error 404: Not Found"
+    },
+    {
+      "key": "bitprune",
+      "url": "https://openreview.net/pdf?id=YUDiZcZTI8",
+      "error": "HTTP Error 403: Forbidden"
+    }
+  ],
+  "code": {
+    "HamQ": "de86174715186a506670711e31bcffc8f841f2d4",
+    "bitprune": "82f5c8d255cbab375b999bd25137ef13a42e0dcc"
+  }
+}

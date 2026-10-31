@@ -1,0 +1,92 @@
+{
+  "scope": "7-bit unsigned magnitude; separate sign, no zero point. Exhaustive arithmetic only.",
+  "codebooks": [
+    {
+      "K": 1,
+      "magnitude_levels": 8,
+      "signed_levels": 15,
+      "mean_absolute_error_integer_units": 18.4140625,
+      "max_absolute_error": 63,
+      "mean_popcount_projected": 0.9921875
+    },
+    {
+      "K": 2,
+      "magnitude_levels": 29,
+      "signed_levels": 57,
+      "mean_absolute_error_integer_units": 5.4140625,
+      "max_absolute_error": 31,
+      "mean_popcount_projected": 1.8125
+    },
+    {
+      "K": 3,
+      "magnitude_levels": 64,
+      "signed_levels": 127,
+      "mean_absolute_error_integer_units": 1.578125,
+      "max_absolute_error": 15,
+      "mean_popcount_projected": 2.5078125
+    }
+  ],
+  "non_monotone": {
+    "7": 3,
+    "8": 1,
+    "7_nearest_K1": 8
+  },
+  "encoding_examples": [
+    {
+      "value": -1,
+      "two_complement_8": "11111111",
+      "two_complement_h": 8,
+      "sign_magnitude_8": "10000001",
+      "magnitude_h": 1
+    },
+    {
+      "value": -2,
+      "two_complement_8": "11111110",
+      "two_complement_h": 7,
+      "sign_magnitude_8": "10000010",
+      "magnitude_h": 1
+    },
+    {
+      "value": 7,
+      "two_complement_8": "00000111",
+      "two_complement_h": 3,
+      "sign_magnitude_8": "00000111",
+      "magnitude_h": 3
+    },
+    {
+      "value": 8,
+      "two_complement_8": "00001000",
+      "two_complement_h": 1,
+      "sign_magnitude_8": "00001000",
+      "magnitude_h": 1
+    }
+  ],
+  "sequence_examples": {
+    "low_hamming_weight": {
+      "sequence": [
+        1,
+        2,
+        1,
+        2
+      ],
+      "total_H": 4,
+      "transitions": 6
+    },
+    "constant_all_ones": {
+      "sequence": [
+        15,
+        15,
+        15,
+        15
+      ],
+      "total_H": 16,
+      "transitions": 0
+    }
+  },
+  "sparsecol_table_II_accuracy_differences_pp": {
+    "ResNet18": 0.23,
+    "MobileNetV2": 0.58
+  },
+  "bitsnet_reported_table_energy_ratio": 3.8306510227390715,
+  "bitslice_VGG11_nonzero_slice_reduction_fraction": 0.5710881652104844
+}

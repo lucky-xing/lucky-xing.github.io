@@ -1,0 +1,89 @@
+{
+  "title": "Gated Normalization Removal and Scale Anchoring in Pre-Norm Transformers",
+  "version": "arXiv:2602.10408v2 2026-05-19",
+  "authors": [
+    "Andrei Kanavalau",
+    "Carmen Amo Alonso",
+    "Sanjay Lall"
+  ],
+  "license": "CC BY 4.0",
+  "license_url": "https://creativecommons.org/licenses/by/4.0/",
+  "verified": "2026-10-31",
+  "images": [
+    {
+      "file": "embed_512_only_keep_final_train_loss.png",
+      "label": "Figure 1a",
+      "source": "https://arxiv.org/html/2602.10408v2/plots/embed_512_only_keep_final_train_loss.png",
+      "source_section": "https://arxiv.org/html/2602.10408v2#S5.F1",
+      "pdf_page": 6,
+      "crop_points_top_left": null,
+      "method": "original PNG unchanged",
+      "sha256": "1099993c81d2bf91665dc0503caaed74f225b276fd8e276e14e152d6b42b2b12"
+    },
+    {
+      "file": "embed_512_logit_l2_sum.png",
+      "label": "Figure 1b",
+      "source": "https://arxiv.org/html/2602.10408v2/plots/embed_512_logit_l2_sum.png",
+      "source_section": "https://arxiv.org/html/2602.10408v2#S5.F1",
+      "pdf_page": 6,
+      "crop_points_top_left": null,
+      "method": "original PNG unchanged",
+      "sha256": "129c8407fa76bee4d209e4c4b329dee5b1b19ccfb75578b21d29c759f1f652b0"
+    },
+    {
+      "file": "embed_512_gradnorms_groups_grid.png",
+      "label": "Figure 2",
+      "source": "https://arxiv.org/html/2602.10408v2/plots/embed_512_gradnorms_groups_grid.png",
+      "source_section": "https://arxiv.org/html/2602.10408v2#S5.F2",
+      "pdf_page": 7,
+      "crop_points_top_left": null,
+      "method": "original PNG unchanged",
+      "sha256": "c0e349123bf00d37f3d2e3bef63542935d3e6e36cda5e1c9bcd0e4734a60ad94"
+    },
+    {
+      "file": "table01-tinystories.png",
+      "label": "Table 1",
+      "source": "https://arxiv.org/pdf/2602.10408v2#page=7",
+      "source_section": "https://arxiv.org/html/2602.10408v2#S5.T1",
+      "pdf_page": 7,
+      "crop_points_top_left": [
+        106,
+        77,
+        506,
+        171
+      ],
+      "method": "PDF crop at scale 3; complete table and caption",
+      "sha256": "801e2d122e68408c15868c22fc76ac970a3e40d9baa22a761dc580e8b6c0ffda"
+    },
+    {
+      "file": "table02-decoding.png",
+      "label": "Table 2",
+      "source": "https://arxiv.org/pdf/2602.10408v2#page=8",
+      "source_section": "https://arxiv.org/html/2602.10408v2#S5.T2",
+      "pdf_page": 8,
+      "crop_points_top_left": [
+        106,
+        77,
+        506,
+        179
+      ],
+      "method": "PDF crop at scale 3; complete table and caption",
+      "sha256": "21bed9af15919f8767de2ba889bd6e155f259c10df5f784917fcbc02e4ceeafe"
+    },
+    {
+      "file": "table03-gpt2.png",
+      "label": "Table 3",
+      "source": "https://arxiv.org/pdf/2602.10408v2#page=9",
+      "source_section": "https://arxiv.org/html/2602.10408v2#S5.T3",
+      "pdf_page": 9,
+      "crop_points_top_left": [
+        106,
+        77,
+        506,
+        263
+      ],
+      "method": "PDF crop at scale 3; complete table and caption",
+      "sha256": "eda1bba5318352899ebb91d4b1549a022b259e74d1382e9a67b74f56c130cc45"
+    }
+  ]
+}
