@@ -445,7 +445,7 @@ $$
 6. Sun W, Zou Z, Liu D, Sun W, Chen S, Kang Y. **Bit-balance: Model-Hardware Co-design for Accelerating NNs by Exploiting Bit-level Sparsity.** [arXiv:2302.00201v1](https://arxiv.org/html/2302.00201v1)，2023，方法 §III、负载和能效 §VI。
 7. Chen Y, Meng J, Seo J-S, Abdelfattah M S. **BBS: Bi-directional Bit-level Sparsity for Deep Learning Acceleration.** [arXiv:2409.05227v1](https://arxiv.org/html/2409.05227v1)，2024，§III–V，原图 1、16。
 8. Shi M, Jain V, Joseph A, Meijer M, Verhelst M. **BitWave: Exploiting Column-Based Bit-Level Sparsity for Deep Learning Acceleration.** [arXiv:2507.12444v1](https://arxiv.org/html/2507.12444v1)，2025；这是实际阅读版本的日期，不据此断言会议首次发表时间。
-9. Shi M, Jain V, Jiang W, Fang C, Dehaene W, Joseph A, Verhelst M. **SparseCol: A 1320 BTOPS/W Precision-scalable NPU Exploiting Training-free Structured Bit-level Sparsity and Dynamic Dataflow.** [arXiv:2606.16016v1](https://arxiv.org/html/2606.16016v1)，2026；芯片测量 §VI、Tables II–IV。
+9. Shi M, Jain V, Jiang W, Fang C, Joseph A, Dehaene W, Verhelst M. **SparseCol: A 1320 BTOPS/W Precision-scalable NPU Exploiting Training-free Structured Bit-level Sparsity and Dynamic Dataflow.** [arXiv:2606.16016v1](https://arxiv.org/html/2606.16016v1)，2026；芯片测量 §VI、Tables II–IV。
 10. Kung H T, McDanel B, Zhang S Q. **Term Revealing: Furthering Quantization at Run Time on Quantized DNNs.** [arXiv:2007.06389v1](https://arxiv.org/abs/2007.06389v1)，2020；组项预算与 HESE。
 11. Harris D, Weste N. **CMOS VLSI Design, 4th ed., Lecture 7: Power.** [教材作者公开课程讲义](https://pages.hmc.edu/harris/cmosvlsi/4e/lect/lect7.pdf)，用于数字开关功耗的基础模型。
 
