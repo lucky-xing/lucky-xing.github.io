@@ -1,0 +1,22 @@
+{
+  "arxiv": "2602.10408v2",
+  "version_date": "2026-05-19",
+  "read_scope": "all 15 PDF pages and full HTML sections 1–8, appendices A–D",
+  "verified": "2026-10-31",
+  "main_sha256": "7ec415b8911ab4fb265042ded9838a59e26be99f1abda19185df71de801c66c2",
+  "retrained": false,
+  "code_status": "No author-linked runnable implementation located in paper/arXiv entry or focused search; not claiming no code exists",
+  "images": 6,
+  "key_results": {
+    "tinystories_internal_relative_loss_gap": "0.71–1.52 percent",
+    "all_taper_9M": "one high-loss outlier excluded; 5 seeds reported",
+    "H100_cached_decode": "1.15–1.18x fused, 1.10–1.14x unfused",
+    "GPT2_XL_Pile": "Vanilla 2.4673, Internal 2.5303, All 2.6504"
+  },
+  "version_warning": "v1 1.22x uncached last-token logits benchmark must not be mixed with v2 cached decode",
+  "report_derivations": [
+    "finite epsilon radial leakage",
+    "low-rank centering fold",
+    "throughput and CE/PPL conversions"
+  ]
+}

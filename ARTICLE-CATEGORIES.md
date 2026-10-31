@@ -31,3 +31,5 @@
 - AI / 模型结构洞察分析：DaMN：如何从预训练模型中删除并迁移归一化层 — posts/2026/10/29/damn-normalization-removal.html
 
 - AI / 模型结构洞察分析：低汉明重量权重约束与低功耗推理 — posts/2026/10/31/bit-sparse-weight-power.html
+
+- AI / 模型结构洞察分析：TaperNorm：门控移除归一化与尺度锚定 — posts/2026/10/31/tapernorm-scale-anchoring.html
