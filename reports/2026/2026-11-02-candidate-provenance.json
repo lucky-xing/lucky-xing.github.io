@@ -1,0 +1,135 @@
+[
+  {
+    "code": "600519",
+    "quote": "2026-11-02-sh600519-fallback.json",
+    "funds": "2026-11-02-600519-eastmoney-funds.json",
+    "cached": false,
+    "marketDate": "2026-10-30"
+  },
+  {
+    "code": "603019",
+    "quote": "2026-11-02-sh603019-fallback.json",
+    "funds": "2026-11-02-603019-eastmoney-funds.json",
+    "cached": false,
+    "marketDate": "2026-10-30"
+  },
+  {
+    "code": "001309",
+    "quote": "2026-11-02-sz001309-fallback.json",
+    "funds": "2026-11-02-001309-eastmoney-funds.json",
+    "cached": false,
+    "marketDate": "2026-10-30"
+  },
+  {
+    "code": "002463",
+    "quote": "2026-11-02-sz002463-fallback.json",
+    "funds": "2026-11-02-002463-eastmoney-funds.json",
+    "cached": false,
+    "marketDate": "2026-10-30"
+  },
+  {
+    "code": "002636",
+    "quote": "2026-11-02-sz002636-fallback.json",
+    "funds": "2026-11-02-002636-eastmoney-funds.json",
+    "cached": false,
+    "marketDate": "2026-10-30"
+  },
+  {
+    "code": "000823",
+    "quote": "2026-11-02-sz000823-fallback.json",
+    "funds": "2026-11-02-000823-eastmoney-funds.json",
+    "cached": false,
+    "marketDate": "2026-10-30"
+  },
+  {
+    "code": "600276",
+    "quote": "2026-11-02-sh600276-fallback.json",
+    "funds": "2026-11-02-600276-eastmoney-funds.json",
+    "cached": false,
+    "marketDate": "2026-10-30"
+  },
+  {
+    "code": "601398",
+    "quote": "2026-11-02-sh601398-fallback.json",
+    "funds": "2026-11-02-601398-eastmoney-funds.json",
+    "cached": false,
+    "marketDate": "2026-10-30"
+  },
+  {
+    "code": "600938",
+    "quote": "2026-11-02-sh600938-fallback.json",
+    "funds": "2026-11-02-600938-eastmoney-funds.json",
+    "cached": false,
+    "marketDate": "2026-10-30"
+  },
+  {
+    "code": "601857",
+    "quote": "2026-11-02-sh601857-fallback.json",
+    "funds": "2026-11-02-601857-eastmoney-funds.json",
+    "cached": false,
+    "marketDate": "2026-10-30"
+  },
+  {
+    "code": "000858",
+    "quote": "2026-11-02-sz000858-fallback.json",
+    "funds": "2026-11-02-000858-eastmoney-funds.json",
+    "cached": false,
+    "marketDate": "2026-10-30"
+  },
+  {
+    "code": "600487",
+    "quote": "2026-11-02-sh600487-fallback.json",
+    "funds": "2026-11-02-600487-eastmoney-funds.json",
+    "cached": false,
+    "marketDate": "2026-10-30"
+  },
+  {
+    "code": "000636",
+    "quote": "2026-11-02-sz000636-fallback.json",
+    "funds": "2026-11-01-000636-eastmoney-funds.json",
+    "cached": true,
+    "marketDate": "2026-10-30"
+  },
+  {
+    "code": "002050",
+    "quote": "2026-11-02-sz002050-fallback.json",
+    "funds": "2026-10-31-002050-eastmoney-funds.json",
+    "cached": true,
+    "marketDate": "2026-10-30"
+  },
+  {
+    "code": "601288",
+    "quote": "2026-11-02-sh601288-fallback.json",
+    "funds": "2026-11-01-601288-eastmoney-funds.json",
+    "cached": true,
+    "marketDate": "2026-10-30"
+  },
+  {
+    "code": "600036",
+    "quote": "2026-11-02-sh600036-fallback.json",
+    "funds": null,
+    "cached": false,
+    "marketDate": "2026-10-30"
+  },
+  {
+    "code": "600887",
+    "quote": "2026-11-02-sh600887-fallback.json",
+    "funds": null,
+    "cached": false,
+    "marketDate": "2026-10-30"
+  },
+  {
+    "code": "002384",
+    "quote": "2026-11-02-sz002384-fallback.json",
+    "funds": "2026-11-02-002384-eastmoney-funds.json",
+    "cached": false,
+    "marketDate": "2026-10-30"
+  },
+  {
+    "code": "601869",
+    "quote": "2026-11-02-sh601869-fallback.json",
+    "funds": null,
+    "cached": false,
+    "marketDate": "2026-10-30"
+  }
+]
