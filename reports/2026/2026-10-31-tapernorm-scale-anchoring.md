@@ -171,7 +171,7 @@ $$
 
 $$
 PD_{\widetilde\gamma}W=
-D_{\widetilde\gamma}W-rac1d\mathbf1\left(\mathbf1^\top D_{\widetilde\gamma}W\right).
+D_{\widetilde\gamma}W-\frac{1}{d}\mathbf1\left(\mathbf1^\top D_{\widetilde\gamma}W\right).
 $$
 
 注意力 Q/K/V 和 MLP 的所有相关输入投影都要正确处理，残差旁路语义不应被改变。最终层若融合到与 embedding 绑定的输出权重，不能悄悄同时改变输入 embedding：可能需要解除共享或保留等价输出映射，参数和部署代价需单独核查。论文的效率实验保留最终 RMSNorm，没有证明全删输出层的融合与权重共享在任意实现中都无额外成本。

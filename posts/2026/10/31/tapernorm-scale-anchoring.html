@@ -117,7 +117,7 @@ g\frac{h-\mu_h\mathbf1^\top}{\sigma_h}D_\gamma
 b'=\beta W+b.\]</div>
 <p>用投影的低秩结构可避免显式构造密集 <span class="math-inline">\(P\)</span>。下面是本报告等价重写：</p>
 <div class="equation">\[PD_{\widetilde\gamma}W=
-D_{\widetilde\gamma}W-rac1d\mathbf1\left(\mathbf1^\top D_{\widetilde\gamma}W\right).\]</div>
+D_{\widetilde\gamma}W-\frac{1}{d}\mathbf1\left(\mathbf1^\top D_{\widetilde\gamma}W\right).\]</div>
 <p>注意力 Q/K/V 和 MLP 的所有相关输入投影都要正确处理，残差旁路语义不应被改变。最终层若融合到与 embedding 绑定的输出权重，不能悄悄同时改变输入 embedding：可能需要解除共享或保留等价输出映射，参数和部署代价需单独核查。论文的效率实验保留最终 RMSNorm，没有证明全删输出层的融合与权重共享在任意实现中都无额外成本。</p>
 <h2 id="4">4. 为什么最终归一化特殊：三条命题的完整逻辑</h2>
 <h3 id="41">4.1 径向方向是什么意思</h3>
