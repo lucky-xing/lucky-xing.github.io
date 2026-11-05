@@ -1,0 +1,56 @@
+[
+  {
+    "symbol": "sh000001",
+    "baseDate": "2026-10-23",
+    "base": 3690.48,
+    "endDate": "2026-10-30",
+    "close": 3599.02,
+    "weekPercent": -2.4782684095293828
+  },
+  {
+    "symbol": "sz399001",
+    "baseDate": "2026-10-23",
+    "base": 11673.83,
+    "endDate": "2026-10-30",
+    "close": 10833.78,
+    "weekPercent": -7.1960102211527825
+  },
+  {
+    "symbol": "sz399006",
+    "baseDate": "2026-10-23",
+    "base": 2684.1,
+    "endDate": "2026-10-30",
+    "close": 2413.63,
+    "weekPercent": -10.076748258261603
+  },
+  {
+    "symbol": "Nikkei225",
+    "base": 62693.16,
+    "close": 63290.11,
+    "weekPercent": 0.9521772391118954
+  },
+  {
+    "symbol": "KOSPI",
+    "base": 5550.3,
+    "close": 5730.74,
+    "weekPercent": 3.2509954416878317
+  },
+  {
+    "symbol": "DJIA",
+    "base": 52215.159999999996,
+    "close": 51770.31,
+    "weekPercent": -0.8519556389370408
+  },
+  {
+    "symbol": "SP500",
+    "base": 7623.679999999999,
+    "close": 7580.07,
+    "weekPercent": -0.5720334536601701
+  },
+  {
+    "symbol": "Nasdaq",
+    "base": 25955.34,
+    "close": 25437,
+    "weekPercent": -1.9970456946431847
+  }
+]

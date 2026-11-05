@@ -110,6 +110,8 @@ def render_markdown(source: str) -> tuple[BeautifulSoup, int]:
         raise ReportError('Unpaired display-math delimiter $$')
 
     def math_token(tex: str, display: bool):
+        if any(ord(c) < 32 and c not in '\n\r\t' for c in tex):
+            raise ReportError('Control character in formula; check escaped TeX commands')
         key = prefix + 'MATH' + str(len(formulas)) + 'END'
         if display:
             formulas[key] = '<div class="equation">\\[' + html.escape(tex.strip()) + '\\]</div>'

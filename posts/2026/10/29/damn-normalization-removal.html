@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><meta content="分析 DaMN 的矩匹配、顺序校准、渐进微调与融合公式，核对原图、效率收益及质量和语言模型边界。" name="description"/><title>DaMN：如何从预训练模型中删除并迁移归一化层 · Lighting Future</title><link href="../../../../style.css" rel="stylesheet"/><link href="../../../../assets/paper-report.css?v=5acafff8b1bd" rel="stylesheet"/><script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']],processEscapes:true},svg:{fontCache:'local'},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer="" src="../../../../assets/vendor/mathjax/tex-svg-full.js"></script></head><body class="category-page paper-report theme-ai"><a class="skip" href="#main">跳到正文</a><header class="wrap"><a class="brand" href="../../../../index.html"><span class="mark">LF</span>Lighting Future</a><nav aria-label="主导航"><a href="../../../../index.html">首页</a><a aria-current="page" href="../../../../ai.html">AI</a><a href="../../../../finance.html">投资理财</a><a href="../../../../communication.html">通信</a><a href="../../../../learning.html">学习</a><a href="../../../../world.html">看世界</a></nav></header><main class="report" id="main"><div class="breadcrumb"><a href="../../../../ai.html">AI</a><span>/</span><a href="../../../../ai-model-structure.html">模型结构洞察分析</a></div><p class="kicker">PAPER RESEARCH / 2026-10-29</p><h1 id="damn">DaMN：如何从预训练模型中删除并迁移归一化层</h1><p>日期：2026-10-29　｜　AI / 模型结构洞察分析　｜　论文精读与方法分析</p><nav aria-label="文章目录" class="toc"><strong>阅读导航</strong><a href="#1">1. 核心判断：可用的部署改造流程，需要认真评估质量代价</a><a href="#2">2. 问题建模：从输入自适应算子，转为静态、可融合算子</a><a href="#3">3. 方法第一步：为归一化建立矩匹配的仿射替身</a><a href="#4">4. 方法第二步：按拓扑顺序校准，避免后层使用过时统计</a><a href="#5">5. 方法第三步：余弦移除、任务微调与精确参数融合</a><a href="#6">6. 组件消融：哪些证据支持这条流程</a><a href="#7-dyt">7. 任务结果与真实对比：并非所有模型都优于 DyT</a><a href="#8">8. 原始效率图：延迟、吞吐、功率与能量要分开</a><a href="#9-derf">9. 与 Derf 的关系：不是同一条性能排行榜</a><a href="#10">10. 复现路线与值得补做的实验</a><a href="#11">11. 最终评价</a><a href="#_1">参考与原图来源</a></nav>
+<p>DaMN 的准确标题是 <strong>DaMN: Deleting and Migrating Normalization Layers from Transformers</strong>。这项工作研究的不是怎样从零训练一个没有 LayerNorm 的模型，而是：<strong>已经获得一个高质量预训练模型后，能否用校准和追加微调，把依赖当前输入统计量的归一化变换，迁移成可以融合进现有权重的静态变换？</strong></p>
+<p>本文精读 <strong>CVPR 2026 Findings 正式公开版，2883–2892 页，正文 10 页，以及官方补充材料 16 页、附录 A–I</strong>，区分论文结果、公式等价整理和本报告的分析。作者为 Alexey Ryabykin、Irina Zhelavskaya、Egor Shvetsov、Alexey Rukhovich、Nikita Okhotnikov、Artem Khrapov、Evgeny Burnaev、Vladimir Mikhailovich Kryzhanovskiy。核验日期：2026-10-29。<a href="https://openaccess.thecvf.com/content/CVPR2026F/html/Ryabykin_DaMN_Deleting_and_Migrating_Normalization_Layers_from_Transformers_CVPRF_2026_paper.html">官方条目</a> · <a href="https://openaccess.thecvf.com/content/CVPR2026F/papers/Ryabykin_DaMN_Deleting_and_Migrating_Normalization_Layers_from_Transformers_CVPRF_2026_paper.pdf">正式版 PDF</a> · <a href="https://openaccess.thecvf.com/content/CVPR2026F/supplemental/Ryabykin_DaMN_Deleting_and_CVPRF_2026_supplemental.pdf">官方补充材料</a></p>
+<h2 id="1">1. 核心判断：可用的部署改造流程，需要认真评估质量代价</h2>
+<p>DaMN 把三个已有直觉组合成一个可操作流程：<strong>先匹配矩以建立仿射替身，再按网络拓扑顺序校准，最后用渐变系数边微调边移除原归一化，并融合替身。</strong>价值主要在预训练资产的部署改造，而非提出更强的归一化函数。</p>
+<p>应把收益和代价一起阅读：</p>
+<ul>
+<li>图像恢复任务总体质量接近原模型，Restormer 在 SIDD 上为 40.02 → 39.96 dB；但“所有任务损失都小于 0.2 dB”并不成立，主表中 SRFormer 的 Set14 为 34.79 → 34.41 dB，损失 0.38 dB。</li>
+<li>图像分类的代价更明显：Swin-B 为 83.4% → 81.2%，下降 <strong>2.2 个百分点</strong>；ViT-B、ConvNeXt-B 分别下降 0.4 个百分点。</li>
+<li>A100 / FP16 的 Restormer 推理时间减少 17.9%，但 MambaIR、SRFormer 只减少 3.7%、3.9%，并非所有模型都接近上限。</li>
+<li>语言模型只实现<strong>部分删除</strong>：Modded-NanoGPT 删除 45 个归一化中的 30 个，Qwen2.5-1.5B 删除一半。不能据此宣称已让大语言模型完全无归一化。</li>
+<li>需要校准集与额外训练；“30% 微调预算”是一些实验相对原训练的追加预算，不是包括预训练在内的总成本只有 30%。</li>
+</ul>
+<p>本报告建议把它视为<strong>吞吐、能耗与质量之间的部署选项</strong>，而不是对任何预训练模型都能无损应用的自动删除工具。</p>
+<h2 id="2">2. 问题建模：从输入自适应算子，转为静态、可融合算子</h2>
+<h3 id="21">2.1 已知量、输入输出与优化目标</h3>
+<p>设已有预训练网络 <span class="math-inline">\(F_{\theta_0}\)</span>，内部共有 <span class="math-inline">\(L_N\)</span> 个待处理归一化算子 <span class="math-inline">\(N_l\)</span>。隐藏张量可写为 <span class="math-inline">\(X\in\mathbb R^{B\times T\times C}\)</span>，对 token 的通道向量 <span class="math-inline">\(x\in\mathbb R^C\)</span>，标准 LayerNorm 是：</p>
+<div class="equation">\[N(x)_c=\gamma_c\frac{x_c-\mu(x)}{\sqrt{\sigma^2(x)+\epsilon}}+\beta_c,
+\qquad
+\mu(x)=\frac1C\sum_jx_j,\quad
+\sigma^2(x)=\frac1C\sum_j(x_j-\mu(x))^2.\]</div>
+<p>这是本报告为建模补充的标准定义，不是 DaMN 的编号公式。RMSNorm 不减均值，而使用 <span class="math-inline">\(\sqrt{C^{-1}\sum_jx_j^2+\epsilon}\)</span> 缩放。二者都依赖当前 token 的数据统计，不能像推理阶段统计固定的 BatchNorm 那样直接作常数折叠。</p>
+<p>已知量包括预训练权重、归一化位置与结构、校准集 <span class="math-inline">\(\mathcal D_{\rm cal}\)</span> 和用于微调的任务数据。未知量包括替身参数以及微调后的其余网络权重。输出应是性能可以接受、待删归一化不再出现在部署图中的模型。将任务损失和部署意图用本报告的统一表达写成：</p>
+<div class="equation">\[\min_{\theta,\{g_l,b_l\}}\;
+\mathbb E_{(u,v)\sim\mathcal D_{\rm ft}}
+\ell\!\left(F_{\theta,\{g_l,b_l\},\alpha(t)}(u),v\right),
+\qquad \alpha(T)=0.\]</div>
+<p>这不是原文提出的约束优化算法，而是对训练过程的整理。分类使用分类损失，恢复任务使用对应原模型的训练目标，语言模型使用相应预训练或监督微调目标；不要在没有实现依据时额外加上“教师蒸馏损失”。<span class="math-inline">\(\alpha\)</span> 是外部调度变量，不是通过这个目标自由学习的参数。</p>
+<h3 id="22">2.2 为什么不能直接删掉</h3>
+<p>例如 Pre-LN 残差分支为 <span class="math-inline">\(h^+=h+G(N(h))\)</span>。直接改成 <span class="math-inline">\(h+G(h)\)</span> 后，分支输入的均值、幅度和相对通道关系改变，原权重并不保证仍处于适用范围。这与“训练完后无需再稳定梯度”是两回事：<strong>训练后的归一化仍参与模型的实际函数。</strong></p>
+<p>原文第 2.2 节用反复仿射变换说明误差随深度放大。若统一写成 <span class="math-inline">\(z_{l+1}=a z_l+b\)</span>，本报告整理为：</p>
+<div class="equation">\[\mathbb E[z_L]=a^L\mathbb E[z_0]+b\sum_{k=0}^{L-1}a^k,
+\qquad
+\operatorname{Var}(z_L)=a^{2L}\operatorname{Var}(z_0).\]</div>
+<p>原文对应几何和写到 <span class="math-inline">\(\beta^L+\cdots+1\)</span>，与通常 <span class="math-inline">\(L\)</span> 次递推的求和上界有索引差异；其示意目的仍是尺度误差累积。也不能把 <span class="math-inline">\(|a|&gt;1\)</span> 时均值必定趋向正无穷作为一般结论：符号、初值和抵消会影响均值，方差放大才是更稳妥的说明。这只是玩具模型，不是含残差、注意力的真实网络稳定性定理。</p>
+<h2 id="3">3. 方法第一步：为归一化建立矩匹配的仿射替身</h2>
+<h3 id="31">3.1 直接插值只是起点，完整方法插值的是仿射分支</h3>
+<p>原文式（1）先定义简单移除形式：</p>
+<div class="equation">\[y(\alpha)=(1-\alpha)x+\alpha N(x).\]</div>
+<p>当 <span class="math-inline">\(\alpha=1\)</span> 时保持原层，当 <span class="math-inline">\(\alpha=0\)</span> 时为恒等。但如果 <span class="math-inline">\(x\)</span> 与 <span class="math-inline">\(N(x)\)</span> 的尺度差异大，即使逐渐混合也可能不稳定。完整 DaMN 用原文式（3）将恒等分支改为可学习仿射替身：</p>
+<div class="equation">\[A(x)=g\odot x+b,\qquad
+y(\alpha)=(1-\alpha)A(x)+\alpha N(x),\quad g,b\in\mathbb R^C.\]</div>
+<p>这里 <span class="math-inline">\(g,b\)</span> 对应原文的 <span class="math-inline">\(\gamma',\beta'\)</span>，改记号是为了与原 LN 的 <span class="math-inline">\(\gamma,\beta\)</span> 区分。<strong><span class="math-inline">\(\alpha=0\)</span> 时实际留下的是仿射映射，不必满足 <span class="math-inline">\(g=1,b=0\)</span>。</strong>所谓最终“删成恒等”，应结合后续仿射融合理解：部署图里不再单独保留这个算子，而不是它在数学上自然变成了恒等函数。</p>
+<h3 id="32">3.2 校准统计沿哪个轴计算</h3>
+<p>对校准集产生的当前层输入与原层输出，收集每个通道跨样本、token / 空间位置的均值与方差。原文式（4）–（6）为：</p>
+<div class="equation">\[m_x=\mathbb E[x],\quad s_x=\sqrt{\mathbb E[(x-m_x)^2]+\epsilon},
+\qquad
+m_N=\mathbb E[N(x)],\quad s_N=\sqrt{\mathbb E[(N(x)-m_N)^2]+\epsilon},\]</div>
+<div class="equation">\[g=\frac{s_N}{s_x},\qquad b=m_N-g\odot m_x.\]</div>
+<p>向量运算均按通道进行。这里估计的是<strong>跨校准激活的通道统计</strong>，不是把 LN 在每个 token 内算的均值方差原样保存下来。若数据来自经过上游替换后的网络，统计也必须基于那个当前网络。</p>
+<p>忽略稳定项、且某通道方差非零时，可以直接验证：</p>
+<div class="equation">\[\mathbb E[A(x)]=m_N,\qquad
+\operatorname{Var}(A(x))=g^2\operatorname{Var}(x)=\operatorname{Var}(N(x)).\]</div>
+<p>这是本报告的代数推导。加入 <span class="math-inline">\(\epsilon\)</span> 后只能近似匹配原始方差。更重要的是，匹配两阶矩不保证每个样本的输出相同，也不保留所有通道协方差：</p>
+<div class="equation">\[\operatorname{Cov}(A(x))=D_g\operatorname{Cov}(x)D_g,
+\qquad D_g=\operatorname{diag}(g).\]</div>
+<p>它没有足够自由度复制一般的 <span class="math-inline">\(\operatorname{Cov}(N(x))\)</span>，更无法逐点复制输入依赖的 LN。矩匹配只是让替换起点更可用，后续微调仍然必要。</p>
+<h3 id="33-welford">3.3 为什么强调 Welford：数值误差与采样误差是两种问题</h3>
+<p>作者使用 Welford 算法积累均值与方差，避免直接用 <span class="math-inline">\(\mathbb E[x^2]-\mathbb E[x]^2\)</span> 造成浮点抵消。本报告补充其标准递推，解释实现需求：</p>
+<div class="equation">\[\delta=x_n-m_{n-1},\quad m_n=m_{n-1}+\delta/n,
+\qquad M_{2,n}=M_{2,n-1}+\delta(x_n-m_n).\]</div>
+<p>校准总体方差可用 <span class="math-inline">\(M_{2,n}/n\)</span>，若采用无偏样本方差则分母不同；实现需统一。分布式统计还应正确合并 count、mean、<span class="math-inline">\(M_2\)</span>，不能不加权平均各卡方差。</p>
+<p>Welford 改善数值精度，<strong>不会自动解决校准集不代表部署分布的问题</strong>。极少样本、低方差通道或长尾输入仍可能给出不可靠的 <span class="math-inline">\(g,b\)</span>。</p>
+<p>附录 C 还说明：最初 BF16 累加的一阶/二阶矩估计在 LLM 上不稳定；GPT 实验改用 Welford，附录 I 写统计使用 FP64。Qwen 则仍用二阶矩减均值平方，但把两种和的累加提升到 FP64。因此“所有实验必须且都使用 Welford”不是原文的实际协议。</p>
+<h2 id="4">4. 方法第二步：按拓扑顺序校准，避免后层使用过时统计</h2>
+<figure class="paper-figure" id="pipeline">
+<a href="/assets/papers/damn-normalization-removal/fig02-pipeline.png" rel="noopener" target="_blank"><img alt="DaMN原文图2：顺序校准、渐进微调与参数融合流程" height="834" loading="lazy" src="/assets/papers/damn-normalization-removal/fig02-pipeline.png" width="1500"/></a>
+<figcaption>原文图 2，正式版第 2887 页：保留完整流程、残差图例和原图注。来源：<a href="https://openaccess.thecvf.com/content/CVPR2026F/papers/Ryabykin_DaMN_Deleting_and_Migrating_Normalization_Layers_from_Transformers_CVPRF_2026_paper.pdf#page=5">官方 PDF，第 5 页</a>。原图版权归作者或相应权利人，本文为研究评论引用。</figcaption>
+</figure>
+<p>如果先在原网络中一次性采集所有层的统计，然后同时替换，后层实际输入已经被前层改造过，原来的校准参数不再对应真实输入。DaMN 的顺序校准可按如下逻辑理解：</p>
+<ol>
+<li>保留待替换原层副本，并按真实计算图列出归一化的拓扑顺序。</li>
+<li>对当前层收集输入 <span class="math-inline">\(x_l\)</span> 与 <span class="math-inline">\(N_l(x_l)\)</span> 的矩；此时上游已经采用其校准后的仿射替身。</li>
+<li>计算当前层 <span class="math-inline">\(g_l,b_l\)</span>，临时启用该仿射替身，再向后校准下一层。</li>
+<li>完成后进入混合分支微调。校准时的上游替换，与微调时 <span class="math-inline">\(\alpha\)</span> 从 1 到 0 的整体调度，应作为两个阶段区分。</li>
+</ol>
+<p>这里的“顺序”是<strong>顺序估计统计</strong>，不等同于每删一层都完整微调一次。原文第 2.3 节明确没有把成本较高的逐层删除再逐层微调方案纳入主基线；不能声称已经在同预算下战胜所有顺序微调方法。</p>
+<figure class="paper-figure result-figure" id="sequential-results">
+<a href="/assets/papers/damn-normalization-removal/fig05-sequential.png" rel="noopener" target="_blank"><img alt="原文图5：Swin-B不同删除与校准策略的层间输出方差" height="459" loading="lazy" src="/assets/papers/damn-normalization-removal/fig05-sequential.png" width="729"/></a>
+<figcaption>原文图 5，正式版第 2887 页，完整保留坐标、曲线、NaN 标记和原注。蓝：朴素删除，橙：非顺序校准，绿：顺序校准，红：原网络。来源：<a href="https://openaccess.thecvf.com/content/CVPR2026F/papers/Ryabykin_DaMN_Deleting_and_Migrating_Normalization_Layers_from_Transformers_CVPRF_2026_paper.pdf#page=5">官方 PDF，第 5 页</a>。原图版权归原权利人，本文为研究评论引用。</figcaption>
+</figure>
+<p>绿线跟随原网络红线，蓝、橙则在较早深度出现爆炸。这支持“前层改变后需要重新估计后层输入”的解释。但保持的是类似原模型的层间尺度，原模型本来就有明显的方差峰值；不能把顺序校准说成把所有层方差统一压成常数，或形式上保证任意深度稳定。</p>
+<p>顺序处理可能需要多次遍历校准数据，算力成本取决于层数、缓存和是否只执行网络前缀。论文的“轻量校准”不应被解释为总能在一次前向中完成。</p>
+<p>补充材料附录 D、表 S3 的 ×4 / Set14 消融进一步量化了差异：MambaIR 非顺序方案校准和微调后均 NaN，顺序方案从 26.40 恢复到 29.14 dB；SRFormer 非顺序从 27.16 恢复到 29.04，顺序从 28.61 恢复到 29.09 dB。顺序校准对后者的最终差额只有 0.05 dB，但起点和稳定性更好。<strong>附录 I 的 Qwen 实验反而不使用顺序校准，因为作者发现该设置结果更好</strong>；这说明它是重要但并非所有架构都必需的设计选择。</p>
+<h2 id="5">5. 方法第三步：余弦移除、任务微调与精确参数融合</h2>
+<h3 id="51">5.1 调度要给网络足够的适应时间</h3>
+<p>原文式（2）为：</p>
+<div class="equation">\[\alpha_t=\begin{cases}
+\tfrac12(1+\cos(\pi t/T)),&amp;0\le t\le T,\\
+0,&amp;t&gt;T.
+\end{cases}\]</div>
+<p>它连续、单调下降，并在有限步到达零；<span class="math-inline">\(T\)</span> 是调度长度，不一定等于全部追加训练长度。若调度覆盖微调过程的 80%，最后 20% 可以在完全去掉原分支后继续适应。</p>
+<p>平滑不等于保证无漂移。以一个通道为例，本报告推导混合输出方差为：</p>
+<div class="equation">\[\operatorname{Var}(y)=
+(1-\alpha)^2\operatorname{Var}(A)+\alpha^2\operatorname{Var}(N)
++2\alpha(1-\alpha)\operatorname{Cov}(A,N).\]</div>
+<p>即使两个分支分别匹配均值方差，相关性不等于 1 时，中间态方差仍会改变。因此需要任务微调；“只要系数光滑就稳定”不是充分条件。</p>
+<p>原文表 3 给出的是已试验的失败与成功区间：Swin-B 的 0–10 epoch 调度失败、100 epoch 成功；ViT-B 的 0–5 失败、100 成功；GPT-2 的 0–600 iterations 失败、800–1000 成功。它没有证明这就是最小可行长度，也不应把 GPT-2 的 iteration 和视觉模型的 epoch 混算。</p>
+<h3 id="52">5.2 为什么可以融合，什么情况下不能直接融合</h3>
+<p>当 <span class="math-inline">\(\alpha=0\)</span>，若仿射后接线性层 <span class="math-inline">\(z=WA(x)+c\)</span>，则本报告给出等价重参数化：</p>
+<div class="equation">\[z=W D_gx+Wb+c=W'x+c',\qquad
+W'=WD_g,\quad c'=Wb+c.\]</div>
+<p><span class="math-inline">\(W\in\mathbb R^{D\times C}\)</span>，融合只是按输入通道缩放权重列，并修改输出偏置。若仿射在一个线性层之后，则可用 <span class="math-inline">\(W'=D_gW\)</span>、<span class="math-inline">\(c'=D_gc+b\)</span>。这些等式对给定微调后参数成立，<strong>不意味着融合后模型与最初预训练模型完全等价</strong>；后者的质量差异来自前面替换与微调。</p>
+<p>需要逐图核实融合条件：</p>
+<ul>
+<li>同一个仿射输出若分叉到 Q、K、V 等多个投影，相关消费者都要正确处理。</li>
+<li>Pre-LN 的残差旁路应保持原语义；不能把只应作用于注意力分支的缩放错误地施加到整条残差流。</li>
+<li>无偏置投影吸收 <span class="math-inline">\(b\)</span> 可能需要增加偏置；遇到非线性、共享权重或条件调制时，不能直接跨过去折叠。</li>
+<li>通道仿射与点式线性 / 1×1 卷积通常容易融合；在带 padding 的空间卷积前融合平移，边界处未必能用单一常数偏置精确表示。</li>
+</ul>
+<p>因此实现上应验证融合前后最大绝对 / 相对误差、部署图中实际剩余节点和真实时延。浮点融合有舍入误差，跨精度或量化部署需重新检查。</p>
+<h2 id="6">6. 组件消融：哪些证据支持这条流程</h2>
+<h3 id="61">6.1 单层替换：仿射初始化避免立即失效，但不是整网免微调</h3>
+<figure class="paper-figure result-figure" id="surrogate-results">
+<a href="/assets/papers/damn-normalization-removal/fig03-surrogate.png" rel="noopener" target="_blank"><img alt="原文图3：Swin-B第一归一化或第一下采样归一化的移除，比较是否使用仿射替身" height="492" loading="lazy" src="/assets/papers/damn-normalization-removal/fig03-surrogate.png" width="726"/></a>
+<figcaption>原文图 3，正式版第 2887 页：只处理第一归一化或第一下采样归一化，其余层保持不变，且没有微调。保留两幅子图、坐标、图例和原注。来源：<a href="https://openaccess.thecvf.com/content/CVPR2026F/papers/Ryabykin_DaMN_Deleting_and_Migrating_Normalization_Layers_from_Transformers_CVPRF_2026_paper.pdf#page=5">官方 PDF，第 5 页</a>。原图版权归原权利人，本文为研究评论引用。</figcaption>
+</figure>
+<p>横轴 <span class="math-inline">\(\alpha\)</span> 从 1 向 0，红线较稳定，蓝线明显下降。正确结论是矩匹配改善了<strong>特定单层替换</strong>的初始条件；不能据此说整网可以不微调地删完。正文概括蓝线接近 0%，但实际图上的两个端点并非都精确为零，本报告不从曲线估读精确准确率。</p>
+<h3 id="62">6.2 参数噪声：统计误差会让深层网络付出放大代价</h3>
+<figure class="paper-figure result-figure" id="noise-results">
+<a href="/assets/papers/damn-normalization-removal/fig04-noise.png" rel="noopener" target="_blank"><img alt="原文图4：MambaIR仿射替身参数噪声与PSNR、NaN概率关系" height="432" loading="lazy" src="/assets/papers/damn-normalization-removal/fig04-noise.png" width="726"/></a>
+<figcaption>原文图 4，正式版第 2887 页：MambaIR ×2，对仿射参数施加相对高斯噪声，观察 PSNR 与 NaN 失败比例；虚线为原模型。保留阴影、失败标记及原注。来源：<a href="https://openaccess.thecvf.com/content/CVPR2026F/papers/Ryabykin_DaMN_Deleting_and_Migrating_Normalization_Layers_from_Transformers_CVPRF_2026_paper.pdf#page=5">官方 PDF，第 5 页</a>。原图版权归原权利人，本文为研究评论引用。</figcaption>
+</figure>
+<p>图中小扰动已造成明显质量下降；正文举例 25% 噪声时 80% 尝试出现 NaN。这里的“噪声”是人为扰动仿射参数，不是图像输入噪声水平，也不是测得校准算法自然有 25% 误差。零噪声的红点仍明显低于原模型虚线，说明统计匹配并非替代后续训练的质量恢复手段。</p>
+<p>附录 E 明确了噪声口径，按本报告的 <span class="math-inline">\(g,b\)</span> 记号整理为：</p>
+<div class="equation">\[\widetilde g_i=g_i+\sigma\left(C^{-1}\sum_j|g_j|\right)\varepsilon_i^g,
+\qquad
+\widetilde b_i=b_i+\sigma\left(C^{-1}\sum_j|b_j|\right)\varepsilon_i^b,
+\quad \varepsilon_i^g,\varepsilon_i^b\sim\mathcal N(0,1).\]</div>
+<p>这按每层参数向量的平均绝对幅度设置噪声，不是把每个分量都乘同一百分比；原文没有充分报告各噪声点独立试验总次数，失败比例不应被包装成严格概率保证。</p>
+<h3 id="63">6.3 只有平滑仍不够：要区分局部删除实验与主方法</h3>
+<p>原文表 2 仅比较“只平滑、没有仿射和顺序校准”与朴素删除。在 Swin-B 53 个 LN 中删除 24 个，基线 top-1 为 83.418%，平滑后为 83.246%，而朴素方案不到 1 epoch 就 NaN。这支持平滑的作用，但不是全部删除成功的证据。</p>
+<p>该表 epoch 列为原始训练 300、平滑方案 450；若按总 epoch 理解，相当于追加 150，即原训练的 50%。本报告不把这里的实验与图像恢复的“追加 30%”混为同一预算，也不把单个组件消融当作完整 DaMN 的主结果。</p>
+<h2 id="7-dyt">7. 任务结果与真实对比：并非所有模型都优于 DyT</h2>
+<h3 id="71">7.1 超分辨率：相对朴素删除更可靠，但存在不可忽略的损失</h3>
+<figure class="paper-figure result-figure" id="sr-results">
+<a href="/assets/papers/damn-normalization-removal/table04-super-resolution.png" rel="noopener" target="_blank"><img alt="原文表4完整截图：SwinIR、MambaIR和SRFormer在五个超分数据集上的PSNR与SSIM" height="837" loading="lazy" src="/assets/papers/damn-normalization-removal/table04-super-resolution.png" width="1500"/></a>
+<figcaption>原文表 4，正式版第 2889 页：×2 超分，保留全部模型、基线、五个数据集、PSNR/SSIM、发散说明及星号。原表注未在此处完整解释所有星号，正文说明部分星号对应后续训练失稳，不能作为稳定最终结果。来源：<a href="https://openaccess.thecvf.com/content/CVPR2026F/papers/Ryabykin_DaMN_Deleting_and_Migrating_Normalization_Layers_from_Transformers_CVPRF_2026_paper.pdf#page=7">官方 PDF，第 7 页</a>。原图版权归原权利人，本文为研究评论引用。</figcaption>
+</figure>
+<p>原文基于 DF2K 训练与复现 SwinIR、MambaIR、SRFormer，在 Set5、Set14、BSD100、Urban100、Manga109 评估。基线包括原归一化模型、无归一化从头训练 Identity、直接删层再微调 Naive、DyT 和 SLAB 的归一化部分。下面把表 4 的 PSNR 单独整理；顺序均为这五个数据集，单位 dB。</p>
+<table>
+<thead>
+<tr>
+<th>模型</th>
+<th>Original</th>
+<th>DaMN</th>
+<th>DaMN − Original（本报告相减）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SwinIR，74 NL</td>
+<td>38.40 / 34.44 / 32.55 / 33.81 / 39.92</td>
+<td>38.30 / 34.41 / 32.41 / 33.68 / 39.70</td>
+<td>−0.10 / −0.03 / −0.14 / −0.13 / <strong>−0.22</strong></td>
+</tr>
+<tr>
+<td>MambaIR，110 NL</td>
+<td>38.54 / 34.69 / 32.55 / 34.12 / 40.26</td>
+<td>38.49 / 34.52 / 32.55 / 33.93 / 40.12</td>
+<td>−0.05 / −0.17 / 0.00 / −0.19 / −0.14</td>
+</tr>
+<tr>
+<td>SRFormer，74 NL</td>
+<td>38.58 / 34.79 / 32.60 / 34.35 / 40.24</td>
+<td>38.42 / 34.41 / 32.55 / 34.13 / 40.10</td>
+<td>−0.16 / <strong>−0.38</strong> / −0.05 / <strong>−0.22</strong> / −0.14</td>
+</tr>
+</tbody>
+</table>
+<p>这张完整表很重要：摘要“低于 0.2 dB”不能覆盖所有格子，正文称 SRFormer “matches baseline”也比实际表格更乐观。PSNR 的小差值也不能直接等同于人眼无差异；SSIM 同样需要核查，例如 SwinIR 的 Manga109 SSIM 从 0.9797 变成 0.9736。</p>
+<p>相对 DyT，MambaIR 的 Urban100 是 DaMN 33.93、DyT 33.69 dB，DaMN 更好；但 SwinIR 的 Set5 是 38.30 对 38.34、Manga109 是 39.70 对 39.76，DaMN 更低。SRFormer 的 Set14，SLAB 为 34.78、DyT 34.46、DaMN 34.41，DaMN 也不是第一。它的主要优势应结合<strong>后训练可用性与部署开销</strong>评价，而非宣称每个数据集准确率都赢。</p>
+<p>图像恢复实验通常追加原训练 30% 左右的微调，<span class="math-inline">\(\alpha\)</span> 调度覆盖追加阶段的 80%。正文方法总述说校准集占 20–30%，但第 4.2 节超分和去噪实际写约 40%，不应将两者不加区分地合并为统一协议。</p>
+<p>附录 F 说明 SRFormer 复现配置与官方 checkpoint 架构不完全相同；×3、×4 的训练由 ×2 checkpoint 初始化，改动上采样模块并固定特征提取层。附录 G、表 S6 还有更大倍率的损失：MambaIR ×4 在 Manga109 从 32.29 降到 31.94 dB，下降 0.35 dB；SRFormer ×4 在 Urban100 从 27.72 到 27.71，几乎持平。倍率与模型依赖性明显。附录文字称 MambaIR 所有尺度 PSNR/SSIM 都最好，但表 S6 的 ×4 Manga109，DyT SSIM 0.9231 高于 DaMN 0.9219，不能照搬全胜概括。</p>
+<h3 id="72-identity">7.2 真实图像去噪：质量接近，Identity 的中途结果要标明</h3>
+<p>Restormer 在 SIDD 上，表 5 为：</p>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th style="text-align: right;">PSNR dB</th>
+<th style="text-align: right;">SSIM</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Original</td>
+<td style="text-align: right;">40.02</td>
+<td style="text-align: right;">0.9603</td>
+<td>带归一化的复现基线</td>
+</tr>
+<tr>
+<td>Identity</td>
+<td style="text-align: right;">38.26*</td>
+<td style="text-align: right;">0.9513*</td>
+<td>中途结果，后续训练失败</td>
+</tr>
+<tr>
+<td>DyT</td>
+<td style="text-align: right;">39.98</td>
+<td style="text-align: right;">0.9601</td>
+<td>逐元素替代，需从头训练的对照</td>
+</tr>
+<tr>
+<td>DaMN</td>
+<td style="text-align: right;">39.96</td>
+<td style="text-align: right;">0.9601</td>
+<td>追加微调后的部署改造</td>
+</tr>
+</tbody>
+</table>
+<p>DaMN 相对 Original 损失 0.06 dB，相对 DyT 低 0.02 dB，确实接近基线。Identity 在后续迭代变为 NaN，其表中数字不能当成稳定训练完成的模型。正文同时提到约 7000 iterations 后失稳和展示前 4000 iterations 的结果，评估哪个 checkpoint 也应在复现时记录。</p>
+<h3 id="73">7.3 图像分类：速度收益伴随明确准确率下降</h3>
+<figure class="paper-figure result-figure" id="classification-results">
+<a href="/assets/papers/damn-normalization-removal/table06-classification.png" rel="noopener" target="_blank"><img alt="原文表6：ImageNet分类基线与DaMN准确率比较，包含所有方法和失败结果" height="495" loading="lazy" src="/assets/papers/damn-normalization-removal/table06-classification.png" width="726"/></a>
+<figcaption>原文表 6，正式版第 2890 页，完整保留表注、所有基线及失败标记。ConvNeXt-B 是卷积网络，不能因出现在本文而称为标准 Transformer。来源：<a href="https://openaccess.thecvf.com/content/CVPR2026F/papers/Ryabykin_DaMN_Deleting_and_Migrating_Normalization_Layers_from_Transformers_CVPRF_2026_paper.pdf#page=8">官方 PDF，第 8 页</a>。原图版权归原权利人，本文为研究评论引用。</figcaption>
+</figure>
+<table>
+<thead>
+<tr>
+<th>ImageNet top-1</th>
+<th style="text-align: right;">Swin-B</th>
+<th style="text-align: right;">ViT-B</th>
+<th style="text-align: right;">ConvNeXt-B</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Original</td>
+<td style="text-align: right;">83.4%</td>
+<td style="text-align: right;">83.0%</td>
+<td style="text-align: right;">83.1%</td>
+</tr>
+<tr>
+<td>Naive Removal</td>
+<td style="text-align: right;">发散</td>
+<td style="text-align: right;">发散</td>
+<td style="text-align: right;">发散</td>
+</tr>
+<tr>
+<td>SkipInit</td>
+<td style="text-align: right;">72.3%</td>
+<td style="text-align: right;">74.1%</td>
+<td style="text-align: right;">73.1%</td>
+</tr>
+<tr>
+<td>Fixup</td>
+<td style="text-align: right;">77.5%</td>
+<td style="text-align: right;">77.2%</td>
+<td style="text-align: right;">73.7%</td>
+</tr>
+<tr>
+<td>DyT</td>
+<td style="text-align: right;">81.3%</td>
+<td style="text-align: right;">82.5%</td>
+<td style="text-align: right;">82.3%</td>
+</tr>
+<tr>
+<td>SLAB（仅 PBN 部分）</td>
+<td style="text-align: right;">81.6%</td>
+<td style="text-align: right;">82.5%</td>
+<td style="text-align: right;">82.5%</td>
+</tr>
+<tr>
+<td>DaMN</td>
+<td style="text-align: right;"><strong>81.2%</strong></td>
+<td style="text-align: right;"><strong>82.6%</strong></td>
+<td style="text-align: right;"><strong>82.7%</strong></td>
+</tr>
+<tr>
+<td>DaMN 比 Original 下降</td>
+<td style="text-align: right;"><strong>2.2 个百分点</strong></td>
+<td style="text-align: right;">0.4 个百分点</td>
+<td style="text-align: right;">0.4 个百分点</td>
+</tr>
+</tbody>
+</table>
+<p>DaMN 在 ViT-B、ConvNeXt-B 上略高于两个主要替代方案，但 Swin-B 低于 DyT 和 SLAB。所有方法的基线与训练预算需用本论文自己的配置比较，不能把上一篇 Derf 的 ViT-B 82.8% 与这里 82.6% 直接排总榜：两篇原模型基线分别为 82.3% 和 83.0%，配方和实验目标不同。</p>
+<p>SLAB 原法还包括 Simplified Linear Attention，本论文去掉 SLA，只保留 Progressive Batch Normalization。因此此处的“SLAB”是隔离归一化组件后的作者对照，不能解释为原版完整 SLAB 系统的复现性能。表中没有多随机种子误差条，0.1–0.2 个百分点的差距也不等于统计显著胜出。</p>
+<p>附录 H 的分类配置：单节点 8 GPU，校准使用约 20% 训练集，追加微调为原训练 epoch 的 30%，<span class="math-inline">\(\alpha\)</span> 调度覆盖整个追加阶段。ViT 使用 timm 训练策略并加入 RoPE，因此不是不加区分的原版 ViT。补充表 S7 的文献原始 / 复现准确率分别为 Swin-B 83.4 / 83.4、ViT-B 83.6 / 83.0、ConvNeXt 83.8 / 83.1；主表中的 Original 指复现起点。本报告据此计算改造损失。</p>
+<h3 id="74">7.4 语言模型：部分移除的探索性证据</h3>
+<table>
+<thead>
+<tr>
+<th>模型与任务</th>
+<th>删除范围</th>
+<th>原始 → DaMN</th>
+<th>应怎样理解</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Modded-NanoGPT 128M，FineWeb</td>
+<td>45 个 NL 中删除 30 个</td>
+<td>validation loss 3.29 → 3.22；DyT 为 3.27</td>
+<td>作者认为可能原模型尚未收敛，不能单凭此证明删除改善泛化</td>
+</tr>
+<tr>
+<td>Qwen2.5-1.5B，OpenMathInstruct-2 微调，MATH500</td>
+<td>删除一半 NL</td>
+<td>Pass@1 29.6 → 28.8</td>
+<td>下降 0.8 个百分点，非整网全删成功</td>
+</tr>
+</tbody>
+</table>
+<p>原文对 NanoGPT 说保留在最后两个 decoder 层中、继续删除会发散。但 45 个归一化究竟包含哪些位置、与普通 GPT-2 的数量如何对应，必须结合具体 Modded-NanoGPT 版本核查，不能凭标准 GPT-2 结构重建计数。</p>
+<figure class="paper-figure result-figure" id="llm-results">
+<a href="/assets/papers/damn-normalization-removal/tableS08-language.png" rel="noopener" target="_blank"><img alt="补充表S8完整截图：NanoGPT与Qwen的全部语言任务结果，保留明显下降的指标" height="570" loading="lazy" src="/assets/papers/damn-normalization-removal/tableS08-language.png" width="1500"/></a>
+<figcaption>官方补充材料表 S8，第 14 页，保留全部任务、指标及原注。Qwen 的数学微调与 FineWeb-Edu 后训练为两组实验，不应混成一个 checkpoint。来源：<a href="https://openaccess.thecvf.com/content/CVPR2026F/supplemental/Ryabykin_DaMN_Deleting_and_CVPRF_2026_supplemental.pdf#page=14">官方补充 PDF</a>。原图版权归原权利人，本文为研究评论引用。</figcaption>
+</figure>
+<p>附录 I 消除了计数疑问，同时揭示正文概括不够准确：</p>
+<ul>
+<li><strong>NanoGPT 不同于标准 GPT-2。</strong>使用约 <code>45544f533ae9528ce0f94f2416fd9bd59c2ad54c</code> 的 Modded-NanoGPT 变体，含 Q/K Norm；1390 steps 的 speedrun 起点验证 loss 3.285，校准使用 1000 batches，FP64 统计。表 S9 显示 block 0–6 的四种 Norm 全删、block 7 只有 pre-MLP Norm 且删掉、block 8 只删 Q Norm，block 9–11 保留；最终输出归一化等未列在表中的部分不能自行推断。“只保留最后两个 decoder 层”的正文描述与这张逐层表不一致，应以明确节点清单为复现依据。</li>
+<li><strong>额外训练是重要混杂。</strong>作者让 DyT 总步数等于原训练加 DaMN 追加步数；另将未改动的 NanoGPT 训练到 4000 steps，loss 达到 3.145，低于 DaMN 的 3.22。这直接支持“原始 speedrun 尚未收敛”，不能将 3.29 → 3.22 当成删除归一化本身优于继续训练的证明。</li>
+<li><strong>Qwen 删除的是 28 个 block 的 input / pre-attention RMSNorm，保留全部 pre-MLP RMSNorm。</strong>28/56 的分母指这两类 block 内部归一化，不代表整个模型所有归一化都计入。作者尝试删除 pre-MLP 会发散或严重掉点，并在最终 Qwen 设置中使用非顺序统计校准。</li>
+<li>数学设置先用 OpenMathInstruct-2 的 100 万条指令、最大长度 2048 训练一轮，再实施 DaMN，前 25% 数据用于平滑移除、剩余 75% 继续训练。MATH500 是 29.6 → 28.8，但 <strong>GSM8K 为 72.3 → 67.6，下降 4.7 个百分点</strong>，不能只引用较温和的一项。</li>
+<li>基础模型设置在 FineWeb-Edu 上后训练 10 亿 tokens，移除过程最优设置为 1000 iterations、2.62 亿 tokens、之后不继续训练。MMLU 为 58.1 → 54.2，MMLU-Pro 27.3 → 23.6，WinoGrande 66.0 → 62.9；少数指标持平或略升。相同最终训练 loss 不保证下游能力保留。</li>
+</ul>
+<p>这里没有展示 LLM 的 prefill / decode 端到端时延、KV cache 场景或长上下文稳定性。图像模型全部移除的最高加速比例，也不能搬到只删一部分层的 Qwen 上。</p>
+<h2 id="8">8. 原始效率图：延迟、吞吐、功率与能量要分开</h2>
+<figure class="paper-figure result-figure" id="efficiency-results">
+<a href="/assets/papers/damn-normalization-removal/fig01-efficiency.png" rel="noopener" target="_blank"><img alt="原文图1：A100 FP16上六个模型的推理时间与能耗改善，比较DaMN与DyT" height="624" loading="lazy" src="/assets/papers/damn-normalization-removal/fig01-efficiency.png" width="735"/></a>
+<figcaption>原文图 1，正式版第 2883 页：A100 / FP16，红为 DaMN，蓝为 DyT，均相对原始归一化模型。完整保留两幅图、数值与原注；图 b 标题写 Power Consumption，图注和正文称 energy consumption，本报告单独讨论单位与测量口径。来源：<a href="https://openaccess.thecvf.com/content/CVPR2026F/papers/Ryabykin_DaMN_Deleting_and_Migrating_Normalization_Layers_from_Transformers_CVPRF_2026_paper.pdf#page=1">官方 PDF，第 1 页</a>。原图版权归原权利人，本文为研究评论引用。</figcaption>
+</figure>
+<table>
+<thead>
+<tr>
+<th>A100 / FP16，图 1</th>
+<th style="text-align: right;">DaMN 时间减少</th>
+<th style="text-align: right;">DyT 时间减少</th>
+<th style="text-align: right;">DaMN 能耗改善（按正文称谓）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ConvNeXt</td>
+<td style="text-align: right;">13.4%</td>
+<td style="text-align: right;">10.9%</td>
+<td style="text-align: right;">13.6%</td>
+</tr>
+<tr>
+<td>Swin-B</td>
+<td style="text-align: right;">17.0%</td>
+<td style="text-align: right;">15.1%</td>
+<td style="text-align: right;">16.7%</td>
+</tr>
+<tr>
+<td>ViT-B</td>
+<td style="text-align: right;">8.6%</td>
+<td style="text-align: right;">2.5%</td>
+<td style="text-align: right;">7.5%</td>
+</tr>
+<tr>
+<td>Restormer</td>
+<td style="text-align: right;">17.9%</td>
+<td style="text-align: right;">13.7%</td>
+<td style="text-align: right;">16.9%</td>
+</tr>
+<tr>
+<td>MambaIR</td>
+<td style="text-align: right;">3.7%</td>
+<td style="text-align: right;">2.5%</td>
+<td style="text-align: right;">3.8%</td>
+</tr>
+<tr>
+<td>SRFormer</td>
+<td style="text-align: right;">3.9%</td>
+<td style="text-align: right;">1.5%</td>
+<td style="text-align: right;">3.8%</td>
+</tr>
+</tbody>
+</table>
+<p>这些改善是同一图中清楚标出的数字，不能代表所有 GPU、dtype、batch 和输入大小。特别是质量最接近的恢复任务中，也有模型仅得到约 4% 时间收益；分类的高收益应连同其准确率损失一起判断。</p>
+<p><strong>附录 A 的测量条件与反例：</strong>用 PYNVML，50–100 次 inference iterations、5 次重复、重复间冷却 10 秒；没有使用 <code>torch.compile</code>。分类 batch 512、输入 224；MambaIR / SRFormer batch 8、输入 128；表 S1 的 Restormer batch 8、输入 384。RTX 2080 Ti 的个别 FP32 项因显存采用较小 batch，不能作为跨 GPU 同工作量绝对比较。附录文字一度写成不存在于表中的“RTX 2090 Ti”，本报告按图表实际 RTX 2080 Ti 记录。</p>
+<p>补充表 S1 并非全是收益：SRFormer / A100 / BF16 的 identity 路线时间“改善”是 <strong>−8.2%</strong>，即实际变慢；RTX 4090 / FP16 为 −0.5%；H100 / FP32 为 −2.8%。反过来，Restormer / H100 / FP16 时间下降 22.4%，超过摘要强调的 A100 例子。因此“最高 18%”是主文突出设置的概括，不是全部设备测试的数学上限。表 S1 的 MambaIR、SRFormer 个别 A100 FP16 数字也与主图略有差异，本文上表明确采用主图，附录数字另列，不混成同一次测量。</p>
+<p>若 <span class="math-inline">\(r_t=(t_0-t_1)/t_0\)</span> 是时延减少率，则固定工作量下吞吐倍数为本报告换算：</p>
+<div class="equation">\[S=\frac{t_0}{t_1}=\frac1{1-r_t}.\]</div>
+<p>Restormer 的 <span class="math-inline">\(r_t=17.9\%\)</span> 对应约 <span class="math-inline">\(1.218\times\)</span>，即吞吐增加约 21.8%，并非同一个“18%”口径。DyT 时间减少 13.7%、DaMN 减少 17.9%，两者相差 4.2 个百分点；相对 DyT 的时延下降应算 <span class="math-inline">\((0.863-0.821)/0.863\approx4.87\%\)</span>，而不能把 4.2 直接叫相对降幅。</p>
+<p>能量关系是：</p>
+<div class="equation">\[E=\int_0^{t_{\rm run}}P(t)\,dt.\]</div>
+<p>功率单位 W，能量单位 J；如果只有平均功率，必须再乘对应时间才能得到能量。正文和图标题的措辞不一致，应结合补充材料的计量过程，不应把 16.9% 直接说成 GPU 瞬时功率下降 16.9%。没有 CPU / 内存 / 整机功耗测量时，也不能将 GPU 指标等同于整台服务器节能。</p>
+<p>附录仅说明使用 PYNVML 并继续交替使用 Power / energy 字样，未充分给出采样频率、积分或计量 API、空闲功耗扣除、异步计时同步细节和误差条。故报告保留“按作者正文称谓的能耗改善”，不把它升级为已独立验证的单位请求能量降低。这些缺口也限制了跨设备复现。</p>
+<p>部署是否划算还与一次性改造成本有关。本报告提出简单回本估计：</p>
+<div class="equation">\[n_{\rm break-even}=\frac{E_{\rm calibration}+E_{\rm finetune}}{E_{\rm base\,inference}-E_{\rm new\,inference}}.\]</div>
+<p>它仅是决策模型，论文没有给出可直接代入的全部成本数据。调用很少的模型可能难回本，持续高负载服务则更可能受益。</p>
+<h2 id="9-derf">9. 与 Derf 的关系：不是同一条性能排行榜</h2>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>Derf</th>
+<th>DaMN</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>主要研究问题</td>
+<td>选择更好的逐元素归一化替代函数</td>
+<td>改造现有预训练模型，减少部署时归一化开销</td>
+</tr>
+<tr>
+<td>核心操作</td>
+<td><span class="math-inline">\(\gamma\operatorname{erf}(\alpha x+s)+\beta\)</span></td>
+<td>校准静态仿射、平滑微调、融合权重</td>
+</tr>
+<tr>
+<td>通常起点</td>
+<td>从头训练相应模型</td>
+<td>已训练的归一化模型</td>
+</tr>
+<tr>
+<td>部署图</td>
+<td>仍有非线性的 erf 算子</td>
+<td>满足融合条件后不保留独立替身算子</td>
+</tr>
+<tr>
+<td>主要证据</td>
+<td>多任务精度 / 泛化取舍，单算子耗时接近 LN</td>
+<td>一些视觉模型的实际推理时间 / 能耗收益与质量代价</td>
+</tr>
+<tr>
+<td>LLM 边界</td>
+<td>GPT-2 与 LN 持平</td>
+<td>NanoGPT / Qwen 部分删除，全部移除未证实</td>
+</tr>
+</tbody>
+</table>
+<p>从结构上说，erf 不能一般性融合进线性层，而静态仿射可以；从功能上说，DaMN 放弃当前样本自适应统计，依赖微调把所需补偿迁移到其他权重。两种路线都可能在输入尺度漂移、长尾样本或部署精度变化时暴露弱点。报告中的对照是方法与证据范围对照，不是宣称做过同配置 Derf 对 DaMN 的直接性能实验。<a href="/posts/2026/10/28/stronger-normalization-free-transformers.html">上一篇 Derf 调研</a></p>
+<h2 id="10">10. 复现路线与值得补做的实验</h2>
+<p>本报告没有训练 DaMN 模型；完成的是原文精读、结果核对和可复现性审查。复现应先做“小模型能否稳定改造与精确融合”，再扩大到论文配置。</p>
+<p>公开的 <a href="https://github.com/addicted-by/DaMN-Deleting-and-Migrating-Normalizations-from-Transformer-Models">DaMN 关联仓库</a>在核查提交 <code>c19a9246c2348c352b1ca6b4904a99dd2dd55561</code> 下只有论文 PDF、README、MIT LICENSE 和演示动画网页 / JavaScript，未发现模型训练、校准、融合或测量实现。仓库中的 25 页 PDF 与正式版 / 官方补充材料的分页、表号不同，本报告引用正式来源的表 S1–S10，避免混用旧编号。正文脚注声称 implementation available at GitHub，但当前可见仓库不能视为完整可运行复现包；没有实际代码可以证明所有融合细节均已处理。</p>
+<ol>
+<li><strong>固定起点。</strong>保存预训练 checkpoint、归一化节点清单、基线精度和部署时延，记录哪些节点保留。真实计算图中的复用和分支比模块名称更重要。</li>
+<li><strong>校准与融合单元核验。</strong>用代表性数据按通道累计统计；比较一次性与顺序校准的逐层输入分布。先在简单线性消费者上验证融合误差，再处理卷积、共享投影和条件分支。</li>
+<li><strong>逐步恢复任务质量。</strong>对直接删除、只平滑、只仿射、仿射+平滑、完整顺序方案做一致预算消融，记录 NaN 率与失败步数。不能只展示成功种子或最好中途 checkpoint。</li>
+<li><strong>把额外训练的收益扣出来。</strong>给原归一化模型相同追加训练预算作控制；特别是 NanoGPT，只有这样才能区分“多训一段变好”与“删除归一化变好”。</li>
+<li><strong>真正部署后计时。</strong>检查导出图是否仍有残留 reduction、仿射节点或额外偏置开销；相同硬件、输入、batch、精度、编译与融合条件下，分别测延迟分位数、吞吐和 GPU 能量。</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>问题</th>
+<th>建议实验</th>
+<th>主要记录指标</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>校准统计代表性如何？</td>
+<td>1% / 5% / 20% / 40% 数据；类别不均衡、域外图像或文本校准</td>
+<td>校准成本、恢复精度、各层矩偏差与失败率</td>
+</tr>
+<tr>
+<td>哪些层最不该删？</td>
+<td>attention 前、FFN 前、下采样处、最终输出层分组删除</td>
+<td>质量—时延 Pareto 曲线；区分保留比例与实际节点数</td>
+</tr>
+<tr>
+<td>调度和校准各自贡献？</td>
+<td>固定追加预算，改变 <span class="math-inline">\(T\)</span> 与校准策略；多种独立种子</td>
+<td>loss spike、梯度范数、NaN 频率、最终均值与方差</td>
+</tr>
+<tr>
+<td>失去输入自适应统计有何代价？</td>
+<td>输入加偏置、乘尺度、图像动态范围变化、长上下文</td>
+<td>OOD 质量、激活饱和 / 爆炸、最差样本而非仅均值</td>
+</tr>
+<tr>
+<td>部分 LLM 删除是否值得？</td>
+<td>匹配追加 SFT 预算、固定 NL 位置，分别测 prefill / decode</td>
+<td>MATH500 及通用任务、tokens/s、长上下文稳定性</td>
+</tr>
+<tr>
+<td>与量化是否兼容？</td>
+<td>融合前后分别做相同量化；检查权重幅度及偏置</td>
+<td>精度、异常通道、量化误差、端到端能耗</td>
+</tr>
+</tbody>
+</table>
+<h2 id="11">11. 最终评价</h2>
+<p>DaMN 的创新性主要是<strong>面向预训练模型的组合式迁移流程与组件必要性实验</strong>：矩匹配让替换起点可用，顺序校准缓解误差累积，平滑微调让网络适应，最后用代数融合兑现部署收益。这条链比“删掉 LayerNorm 再训一下”具体得多。</p>
+<p>同时，它也清楚暴露出归一化不是可随意删除的冗余：分类会有准确率代价，LLM 仍需保留部分层，校准质量与调度长度都会决定成功或失败。对已有模型的高频部署，这是值得尝试的工程方向；对要求严格无损、校准数据不可得、输入分布变化很大的场景，则需要更强的验证与部分保留策略。</p>
+<h2 id="_1">参考与原图来源</h2>
+<ol>
+<li>Ryabykin 等，<strong>DaMN: Deleting and Migrating Normalization Layers from Transformers</strong>，CVPR 2026 <strong>Findings</strong>，2883–2892。本文没有将 Findings 错记为主会论文。<a href="https://openaccess.thecvf.com/content/CVPR2026F/html/Ryabykin_DaMN_Deleting_and_Migrating_Normalization_Layers_from_Transformers_CVPRF_2026_paper.html">官方条目</a></li>
+<li><a href="https://openaccess.thecvf.com/content/CVPR2026F/papers/Ryabykin_DaMN_Deleting_and_Migrating_Normalization_Layers_from_Transformers_CVPRF_2026_paper.pdf">正文 PDF</a>与<a href="https://openaccess.thecvf.com/content/CVPR2026F/supplemental/Ryabykin_DaMN_Deleting_and_CVPRF_2026_supplemental.pdf">补充 PDF</a>。公式（1）–（6）、图 1–5、表 2–6 均按正式版定位；本报告自行推导与数字相减、换算另有标注。</li>
+<li>本文展示原文图 1–5、表 4、表 6 与补充表 S8 的原始截图，保留关键图例、坐标、原注和不利结果。版权由作者或相应权利人保留；CVF 开放访问不自动等于 CC BY，不对原图作开放再授权。精确裁剪页码与文件哈希归档在对应资源目录。</li>
+</ol></main><footer class="wrap"><a class="brand" href="../../../../index.html">Lighting Future</a><span>保持好奇。持续记录。</span><a href="https://github.com/lucky-xing/">GitHub ↗</a></footer><script defer="" src="../../../../theme-motion.js"></script></body></html>

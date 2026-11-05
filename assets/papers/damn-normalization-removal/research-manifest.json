@@ -1,0 +1,35 @@
+{
+  "title": "DaMN: Deleting and Migrating Normalization Layers from Transformers",
+  "venue": "CVPR 2026 Findings",
+  "pages": "2883–2892",
+  "verified": "2026-10-29",
+  "read_scope": "all 10 main PDF pages and all 16 supplementary pages, appendices A–I",
+  "main_source": "https://openaccess.thecvf.com/content/CVPR2026F/papers/Ryabykin_DaMN_Deleting_and_Migrating_Normalization_Layers_from_Transformers_CVPRF_2026_paper.pdf",
+  "supp_source": "https://openaccess.thecvf.com/content/CVPR2026F/supplemental/Ryabykin_DaMN_Deleting_and_CVPRF_2026_supplemental.pdf",
+  "main_sha256": "69ba0566047f8efd3bd18fd9b8199772fc87cb34b753f799c83e3bd3314cf8f4",
+  "supp_sha256": "f2fd5c9538aea5675030f39c0bf9117b5a41bf7aff23804a85f2f369095df424",
+  "repository": "https://github.com/addicted-by/DaMN-Deleting-and-Migrating-Normalizations-from-Transformer-Models",
+  "repository_sha": "c19a9246c2348c352b1ca6b4904a99dd2dd55561",
+  "repository_scope": "PDF, README, license and animation assets; no training calibration fusion or benchmark implementation found in inspected tree",
+  "model_training_reproduced": false,
+  "figures": 8,
+  "critical_observations": [
+    "Swin-B 83.4 to 81.2",
+    "SRFormer x2 Set14 PSNR drop 0.38 dB",
+    "Qwen GSM8K 72.3 to 67.6",
+    "Qwen only pre-attention norms removed; sequential calibration disabled",
+    "NanoGPT unchanged 4000-step loss 3.145 below DaMN 3.22",
+    "S1 SRFormer A100 bf16 time improvement -8.2 percent",
+    "Power vs energy measurement detail remains incomplete",
+    "official supplement numbering differs from repository 25-page PDF"
+  ],
+  "math": {
+    "display": 17,
+    "inline": 50
+  },
+  "verification": {
+    "static_structure_links_assets": "passed",
+    "figure_visual_inspection": "all original crops checked",
+    "browser_rendering": "unavailable in current session; not claimed"
+  }
+}
