@@ -108,4 +108,26 @@
       [lo,hi].map(e=>fmt(reward(e,t1))+' / '+fmt(reward(e,t2))).join('；'),
       reward(mid,t1)<2?'观察，首目标盈亏比不足2':'等待，当前未触发'];
   }));
+
+  const valuation=window.SEMICONDUCTOR_EQUIPMENT_VALUATION;
+  if (!valuation || valuation.cutoff!==date) return;
+  const metrics=[['pe',1,'等权PE（TTM）'],['pb',2,'等权PB（TTM）']];
+  const valuationRows=[];
+  valuation.windows.forEach((period,index)=>{
+    const sample=valuation.rows.filter(([d])=>d>=period.start && d<=period.end);
+    for (const [key,column,label] of metrics) {
+      const summary=period[key];
+      valuationRows.push([period.label,period.start+' 至 '+period.end,period.count,label,
+        fmt(summary.current),pct(summary.percentile),...summary.levels.map(v=>fmt(v))]);
+      const bands=summary.levels.map((level,i)=>({
+        name:['20分位','历史中位数','80分位'][i]+' '+fmt(level)+'倍',
+        points:sample.map(([d])=>[d,level])
+      }));
+      chart('semi-valuation-'+key+'-'+index,[
+        {name:'931743 '+label,points:sample.map(row=>[row[0],row[column]])},
+        ...bands
+      ],period.label+' · 日频估值，倍','ETF.run等权序列，分位线按各窗口全样本计算');
+    }
+  });
+  table('semi-valuation-percentiles',valuationRows);
 })();

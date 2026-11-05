@@ -9,7 +9,7 @@ const table=(headers,id)=>'<div class="table-scroll"><table><thead><tr>'+headers
 const chart=id=>'<div class="chart" id="'+id+'"></div>';
 const body=`<main class="research"><span class="eyebrow">SEMICONDUCTOR EQUIPMENT · 2026-11-05</span>
 <h1>半导体设备板块深度研究</h1>
-<p class="meta">行情与资金截至2026-11-05收盘，财务截至2026年三季度。覆盖7家A股设备商及2只场内ETF。</p>
+<p class="meta">行情、资金与本次补充的指数估值统一截至2026-11-05收盘，财务截至2026年三季度。覆盖7家A股设备商及2只场内ETF。</p>
 <div class="verdict"><strong>全球前道设备进入扩张期，A股设备板块仍处于下跌后的反弹阶段。</strong>优先研究刻蚀、薄膜沉积与多工艺平台。北方华创的回款与产品组合在样本中更有支撑，中微与拓荆的经营利润增速更高，但现金流和扣非估值提高了入场门槛。交易上保留北方华创及国泰159516的条件方案，当前均未触发。</div>
 <nav class="toc"><a href="#cycle">景气与供需</a><a href="#chain">产业链</a><a href="#companies">公司财报</a><a href="#market">图表与资金</a><a href="#etf">ETF</a><a href="#valuation">估值情景</a><a href="#trade">交易策略</a><a href="#watch">催化与风险</a></nav>
 <section id="cycle"><h2>一、设备需求与利润传导</h2>
@@ -54,11 +54,26 @@ ${chart('semi-flow-stock')}${chart('semi-flow-etf')}
 <p>国泰7月9日完成份额拆分。万家三季度期初5.115亿份，申购38.70亿、赎回30.21亿，净申购8.49亿份，拆分另贡献13.230亿份，期末26.836亿份。报告期末联接基金持有约27.98%，关注集中赎回。份额拆分只改变每份价格和数量。近5/20/60日一级申赎的完整官方流水未取得，交易大单表作独立参考。<a href="https://disc.static.szse.cn/disc/disk03/finalpage/2026-07-10/fae1903d-8470-4dd7-a48b-837ba1d305f6.PDF">国泰拆分公告</a> · <a href="https://www.9fzt.com/detail/szetf_159327_2_3846352345817.html">万家三季报原文转载</a></p>
 </section>
 <section id="valuation"><h2>六、估值、情景与机构观点</h2>
-<p>以下是主观的未来12个月扣非利润与退出倍数，不含股息或费用。悲观、基准、乐观概率为30%、50%、20%。悲观考虑验收推迟、毛利下行及估值收缩，基准考虑当前交付逐步转收入，乐观要求新增客户复购、现金回款改善和估值扩张。历史分位及一致口径EV/EBITDA未取得，现价判断用同行扣非估值和情景结果。</p>
+<h3>板块整体估值与历史分位</h3>
+<p>用国泰159516和万家159327共同跟踪的中证半导体材料设备主题指数931743作板块代理。该指数包含40家材料及设备公司，指数本身按调整后的自由流通市值加权。下图采用数据商发布的成分估值等权序列，反映典型成分股的估值水平。ETF实际持仓权重、指数点位编制权重及本文七股设备样本各有差异。<a href="https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/931743factsheet.pdf">指数说明</a> · <a href="https://www.etf.run/index/CSI/931743">ETF.run指数估值序列</a></p>
+<p>设备与材料组合以滚动PE衡量盈利定价，辅以PB判断市场为净资产支付的溢价。行业处在扩张阶段，利润受设备验收、研发费用与投资损益影响，判断时结合下表个股扣非利润、ROE和现金流。数据商公开页可核验等权字段，亏损成分处理和财报回溯细则未完整披露，因此保留原口径比较。行业扣非PE、自由现金流收益率及EV/EBITDA历史序列尚无可比数据。</p>
+<p>分位按窗口内小于或等于当前估值的交易日占比计算。20、50、80分位参考线按各窗口日数据的最近秩计算，包含截止日。历史最早可验证至2023-07-13，近三年和全样本分别有727和803个交易日。5年和10年窗口均无足够同口径历史。</p>
+${table(['窗口','样本日期','交易日数','指标','当前倍数','当前分位','20分位倍数','中位数倍数','80分位倍数'],'semi-valuation-percentiles')}
+${chart('semi-valuation-pe-0')}${chart('semi-valuation-pb-0')}${chart('semi-valuation-pe-1')}${chart('semi-valuation-pb-1')}
+<p><strong>结论：估值高于历史中位数，尚未进入近三年最贵的20%。</strong>11/05等权PE为98.63倍，近三年第63.27分位，较中位数78.43倍高25.8%。等权PB为6.47倍，处于第75.10分位，较中位数4.53倍高42.7%。全样本得出相近判断。PB更偏高意味着市场对盈利能力改善已有较多预期，仍须核对ROE、扣非利润和回款。若用各成分股同幅增长且股价、样本不变的简化情景，滚动利润需增长约25.8%才能把PE压回近三年中位数。</p>
+<h3>四只代表公司的盈利与估值情景</h3>
+<p>以下是主观的未来12个月扣非利润与退出倍数，不含股息或费用。悲观、基准、乐观概率为30%、50%、20%。悲观考虑验收推迟、毛利下行及估值收缩，基准考虑当前交付逐步转收入，乐观要求新增客户复购、现金回款改善和估值扩张。</p>
 ${table(['公司','悲观30%','基准50%','乐观20%','加权价格收益'],'semi-scenarios')}
 <p>北方华创基准85亿元扣非对应约584元，现价附近的基准上行仅约4%。在四股情景模型中，北方华创加权回报最高，现价安全边际仍有限。中微与拓荆的归母PE约48倍和52倍，扣非PE约106倍和123倍。长川的扣非PE约56倍，在盈利样本中较低，但基准盈利25亿元按40倍对应约154元。中科飞测以市值除TTM营收观察估值，同时跟踪何时达到经营盈亏平衡。任何估值输入变动都需重算。</p>
 <p>东吴证券11/02行业周报看好前道规模效应，指出北方华创、中微、拓荆扣非利润分别增长约4%、83%、103%。该机构的拓荆专项点评强调先进制程产品放量和利润率改善。本文认同经营利润改善的方向，对估值位置更谨慎，重点约束现金流与扣非PE。该样本属于单家机构观点，未核实的目标价与评级不填。<a href="https://data.eastmoney.com/report/zw_industry.jshtml?infocode=AP202611021831299339">东吴行业周报</a> · <a href="https://data.eastmoney.com/report/info/AP202611021831299218.html">拓荆专项点评</a></p></section>
 <section id="trade"><h2>七、个股与ETF交易点位</h2>
+<h3>整体估值如何调整仓位</h3>
+<div class="table-scroll"><table><thead><tr><th>近三年估值位置</th><th>基本面验证</th><th>交易条件</th></tr></thead><tbody>
+<tr><td>PE回到中位数78.43倍附近或以下</td><td>行业扣非利润趋势稳定，前道龙头经营现金流改善，PB与ROE的关系合理</td><td>等待相对强弱和市场宽度止跌后分批。PE至20分位55.36倍附近时，先排查盈利预测是否下修。</td></tr>
+<tr><td>PE在78.43–130.40倍之间，当前98.63倍</td><td>估值已计入增长。对照验收、复购、经营现金与扣非增速</td><td>以观察为主。若在区间内试仓，需要可核实的盈利上修及回款改善，并同时满足下表价格和盈亏比条件。</td></tr>
+<tr><td>PE升至80分位130.40倍或PB升至80分位7.05倍</td><td>盈利和ROE的改善速度低于估值上升速度</td><td>收紧新增仓位，考虑分批降低已有暴露。若盈利继续上修，复核增长情景和仓位上限。</td></tr>
+</tbody></table></div>
+<p>在利润、成分和折溢价近似不变，且ETF与成分价格同比例变化的敏感性假设下，国泰原技术等待区0.460–0.485元约对应86.4–91.1倍PE，万家0.739–0.780元约对应85.9–90.7倍，均高于78.43倍中位数。若只靠价格回落，PE中位数约对应国泰0.417元和万家0.674元，已接近原技术止损。该演算用于说明原等待区的估值约束。若市场回到这些水平，应按届时的净值、成分估值、盈利与技术结构重建交易方案。</p>
 <p>以下为11/05收盘后研究计划。单位为元，止损、止盈均为条件价。按区间中点入场，股票往返成本0.30%、ETF 0.20%，股息按0。目标净收益为目标价除以入场价减1再减成本率，计划损失为1减止损价除以入场价再加成本率。盈亏比为两者相除。</p>
 ${table(['标的','参考收盘','入场区间','止损','止盈一/二','中点净收益一/二','中点计划损失','中点盈亏比一/二','下沿及上沿盈亏比一/二','状态'],'semi-plans')}
 <p>北方华创465–480元围绕60日低点468.34元设置等待区，430元为风险预算价。目标584元来自基准情景，720元需盈利或倍数上修。长川区间围绕154元的估值观察位，154元的首目标空间不足，暂列观察。两只ETF按各自60日低点与高点的区间投射设定第一目标为区间中点附近，第二目标为历史区间高点，止损约低点下方5%。</p>
@@ -72,5 +87,5 @@ ${table(['标的','参考收盘','入场区间','止损','止盈一/二','中点
 <li>利率上升压缩高倍数，人民币贬值提高进口零件成本并影响海外收入折算。油价通过运输与部分化工投入间接影响，地产主要通过内需传导。地方财政支持要跟踪拨款、项目付款和产线利用率。</li>
 <li>重点证伪信号包括新增订单放缓、同产品降价、库存及应收增长快于收入、重复订单减少、亏损扩大和ETF相对强弱再创新低。</li></ul>
 <p class="note">研究使用公开数据与主观情景，交易须复核实际价格、费率与适当性。样本选取偏向公开数据较完整的A股公司，宽度与合计资金仅描述样本。<a href="data/semiconductor-equipment-20261105.js">数据快照</a></p></section>
-</main><footer class="wrap"><a href="index.html">返回行业和板块分析</a><span>Lighting Future · 半导体设备</span></footer><script src="data/semiconductor-equipment-20261105.js"></script><script src="semiconductor-equipment-charts.js"></script><script src="../../theme-motion.js" defer></script></body></html>`;
+</main><footer class="wrap"><a href="index.html">返回行业和板块分析</a><span>Lighting Future · 半导体设备</span></footer><script src="data/semiconductor-equipment-20261105.js"></script><script src="data/semiconductor-equipment-valuation-20261105.js"></script><script src="semiconductor-equipment-charts.js?v=valuation-20261105"></script><script src="../../theme-motion.js" defer></script></body></html>`;
 fs.writeFileSync(path.join(dir,'semiconductor-equipment-2026-11.html'),head+body);
