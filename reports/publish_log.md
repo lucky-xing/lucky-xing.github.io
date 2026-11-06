@@ -96,3 +96,5 @@
 - 2026-11-05：11/4收盘22股重筛；两股条件观察、长飞不参与；量价及首道压力复核。日报页：https://lucky-xing.github.io/finance/daily/2026-11-05.html
 
 - 2026-11-06：北京时间07:50截止，22股重筛，三股纸面量价复核。日报页：https://lucky-xing.github.io/finance/daily/2026-11-06.html
+
+- 2026-11-07：周六休市，按11/6完整日线重筛22只，三只列为观察，无可执行买单。日报页：https://lucky-xing.github.io/finance/daily/2026-11-07.html
