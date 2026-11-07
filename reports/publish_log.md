@@ -98,3 +98,5 @@
 - 2026-11-06：北京时间07:50截止，22股重筛，三股纸面量价复核。日报页：https://lucky-xing.github.io/finance/daily/2026-11-06.html
 
 - 2026-11-07：周六休市，按11/6完整日线重筛22只，三只列为观察，无可执行买单。日报页：https://lucky-xing.github.io/finance/daily/2026-11-07.html
+
+- 2026-11-08：发布11/2—6周报与11/9—13展望，按周强度和周五量价重筛22只。伊利、恒瑞、茅台列观察。https://lucky-xing.github.io/finance/daily/2026-11-08.html
