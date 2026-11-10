@@ -104,3 +104,5 @@
 - 2026-11-09：发布周一盘前日报，覆盖周五零时至截止；重筛22只，恒瑞、伊利、工行列条件观察。https://lucky-xing.github.io/finance/daily/2026-11-09.html
 
 - 2026-11-10：补发盘前日报，11/9完整行情重筛22只，工行、沪电、亨通列条件观察。https://lucky-xing.github.io/finance/daily/2026-11-10.html
+
+- 2026-11-11：盘前24小时日报，按11/10行情和资金重筛22只，沪电、三花、招行条件观察，工行与亨通退出。https://lucky-xing.github.io/finance/daily/2026-11-11.html
