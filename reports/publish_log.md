@@ -102,3 +102,5 @@
 - 2026-11-08：发布11/2—6周报与11/9—13展望，按周强度和周五量价重筛22只。伊利、恒瑞、茅台列观察。https://lucky-xing.github.io/finance/daily/2026-11-08.html
 
 - 2026-11-09：发布周一盘前日报，覆盖周五零时至截止；重筛22只，恒瑞、伊利、工行列条件观察。https://lucky-xing.github.io/finance/daily/2026-11-09.html
+
+- 2026-11-10：补发盘前日报，11/9完整行情重筛22只，工行、沪电、亨通列条件观察。https://lucky-xing.github.io/finance/daily/2026-11-10.html
