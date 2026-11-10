@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><meta content="从蜂窝导频、毫米波扫频到雷达回波，逐篇分析探测与 CSI 的融合方法、实验边界和研究趋势。" name="description"/><title>广义信道探测与 CSI 融合：观测、可辨识性与闭环设计 · Lighting Future</title><link href="../../../../style.css" rel="stylesheet"/><link href="../../../../assets/paper-report.css?v=5acafff8b1bd" rel="stylesheet"/><script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']],processEscapes:true},svg:{fontCache:'local'},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer="" src="../../../../assets/vendor/mathjax/tex-svg-full.js"></script></head><body class="category-page paper-report theme-communication"><a class="skip" href="#main">跳到正文</a><header class="wrap"><a class="brand" href="../../../../index.html"><span class="mark">兴</span>兴耀未来</a><nav aria-label="主导航"><a href="../../../../index.html">首页</a><a href="../../../../ai.html">AI</a><a href="../../../../finance.html">投资理财</a><a aria-current="page" href="../../../../communication.html">通信</a><a href="../../../../learning.html">学习</a><a href="../../../../world.html">看世界</a></nav></header><main class="report" id="main"><div class="breadcrumb"><a href="../../../../communication.html">通信</a></div><p class="kicker">PAPER RESEARCH / 2026-11-10</p><h1 id="csi">广义信道探测与 CSI 融合：观测、可辨识性与闭环设计</h1><p>日期：2026-11-10　｜　通信　｜　论文精读与方法分析</p><nav aria-label="文章目录" class="toc"><strong>阅读导航</strong><a href="#1">1. 先定义两路输入与输出</a><a href="#2">2. 统一模型与两个不可绕过的约束</a><a href="#3-lee-tdd">3. Lee 等：TDD 不对称端口下的空间重建</a><a href="#4-kim-jadd">4. Kim 等与 JADD：在目标频率补相位，在目标时刻补演进</a><a href="#5-ujefnet-merge-for-reconstruction">5. UJEFNet 与 Merge for Reconstruction：学习式融合的证据与缺口</a><a href="#6-yuan">6. Yuan 等：从雷达回波取得稀疏支撑，再用导频估增益</a><a href="#7-luo">7. Luo 等：实测中雷达适合缩小波束候选</a><a href="#8">8. 还有两条常被漏掉的融合路线</a><a href="#9">9. 我的结论、未来趋势与验证计划</a></nav>
+
+<p>这里的 sounding 指<strong>用已知或受控信号探查传播通道</strong>。它可以是蜂窝 SRS/CSI-RS、专用测量仪的扫频与宽带探测、波束扫描、通感系统的雷达波形，也可以是 Wi‑Fi 探测帧。CSI 是由观测推断的状态，形态可以是复数信道矩阵、压缩码字、预编码子空间、波束功率或带不确定度的路径参数。本文讨论的是<strong>探测提供的一路观测，如何和另一时刻、链路、设备或处理链形成的 CSI 一起服务于目标</strong>。</p>
+<p>本报告的判断是：近期最容易验证的价值是用探测缩小搜索范围、用通信观测校正相位与验证候选，再按不确定度决定是否追加探测。TDD 空间补全、FDD 相位反馈、雷达辅助波束和数据辅助跟踪，都可用这一框架理解，但它们估计的是不同对象。车联网实测提供了一个反例：把低分辨率雷达角度直接转成通信波束，可以比维持上一束更差。系统应保留几何先验的置信度和备选方向。对应证据见下文的论文精读。</p>
+<h2 id="1">1. 先定义两路输入与输出</h2>
+<p>设目标为链路 <span class="math-inline">\(\ell_*\)</span> 在使用时刻 <span class="math-inline">\(t_*\)</span> 的 <span class="math-inline">\(H_{\ell_*}(k,t_*)\in\mathbb C^{N_r\times N_t}\)</span>，其中 <span class="math-inline">\(k\)</span> 为子载波。已知探测波形或波束 <span class="math-inline">\(X_s\)</span>，原始接收数据为 <span class="math-inline">\(Y_s\)</span>；现有 CSI 分支 <span class="math-inline">\(C\)</span> 可由另一组导频、码本反馈或历史估计产生。对同链路阵列测量，<span class="math-inline">\(Y_s=W_s^{\mathrm H}H_sX_s+N_s\)</span>，其中 <span class="math-inline">\(W_s\)</span> 是接收合并矩阵。对雷达，<span class="math-inline">\(Y_s\)</span> 对应目标往返或双基地传播，需另写观测算子。带宽、频点、波束、端口、时间戳和校准信息都属于输入。基站 SRS、CSI-RS 和报告量的实例见 <a href="https://www.etsi.org/deliver/etsi_ts/138200_138299/138214/19.01.00_60/ts_138214v190100p.pdf">ETSI TS 38.214，§5.2、§6.2</a>。</p>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>探测分支</th>
+<th>已有 CSI 或第二观测</th>
+<th>合理输出</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>同频、异端口</td>
+<td>单端口或部分端口探测</td>
+<td>另一方向的低维 CSI / PMI</td>
+<td>缺失端口的可用空间子空间，条件好时重建复信道</td>
+</tr>
+<tr>
+<td>异频、异时</td>
+<td>跨频或较早时刻的信道测量</td>
+<td>目标频段的少量相位、码字或短导频</td>
+<td>当前复信道、预编码矩阵或未来时刻的 CSI</td>
+</tr>
+<tr>
+<td>雷达与通信</td>
+<td>角度、距离、速度、目标轨迹</td>
+<td>当前或历史导频、波束功率、波束索引</td>
+<td>候选波束、路径支撑或链路预测</td>
+</tr>
+<tr>
+<td>离线测量与在线 CSI</td>
+<td>专用声测仪扫出的路径簇、宽带角延迟图</td>
+<td>部署设备当前的少量导频或短 CSI 序列</td>
+<td>场景先验与实时修正后的 CSI</td>
+</tr>
+<tr>
+<td>探测与业务数据</td>
+<td>导频初始化和标定</td>
+<td>数据符号的软判决、解码后重构或历史 CSI</td>
+<td>同一链路连续跟踪</td>
+</tr>
+<tr>
+<td>无线感知</td>
+<td>监听设备从探测包估计的双基地 CSI</td>
+<td>客户端上报的波束反馈或另一链路 CSI</td>
+<td>共享散射体或目标的位置、轨迹</td>
+</tr>
+</tbody>
+</table>
+<p>专用信道探测仪是这里的一个数据来源。Guven 等的 NIST 团队用 VNA 和机械臂合成虚拟阵列，在 26.5–40 GHz 对同一环境扫频。先去嵌仪器、线缆和天线影响，再以宽带 SAGE 抽取各路径的角度、时延和频变增益，并将候选路径与实景 CAD 中的入射物体配对。控制实验验证几何估计，真实环境结果见图 6–8。作者在固定有效孔径的比较口径下验证了自由空间 LoS 的频率不变性，同时观察到镜面反射路径的频率变化比某些衍射和漫散射路径更强。该测量直接提示：跨频融合时，可优先把角度与时延当作待验证的候选先验，再用工作频段的少量 CSI 校正各条路径的幅度。文献本身测量跨频特性，在线校正是本文基于结果提出的应用。见 <a href="https://tsapps.nist.gov/publication/get_pdf.cfm?pub_id=934469">Guven 等，IEEE OJAP 2022，§II–IV</a>。</p>
+<figure class="paper-figure"><a href="/assets/papers/srs-csi-fusion/guven-nist-fig6.png"><img alt="NIST 实测控制面板环境、CAD、多径角时延和各路径随频率变化的增益" src="/assets/papers/srs-csi-fusion/guven-nist-fig6.png"/></a><figcaption>Guven 等，IEEE OJAP 2022，<a href="https://tsapps.nist.gov/publication/get_pdf.cfm?pub_id=934469#page=9">图 6，印刷页 469</a>，<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>。保留原图及图注，裁除周边正文。各路径的频率响应曲线形状不同，角度、时延可配对时也需要重新估计目标频段增益。</figcaption></figure>
+<h2 id="2">2. 统一模型与两个不可绕过的约束</h2>
+<p>把传播状态写成 <span class="math-inline">\(x_t=\{\theta_p,\phi_p,\tau_p,\nu_p,\alpha_p,\delta_p\}_{p=1}^L\)</span>，分别表示收发角、时延（秒）、多普勒（Hz）、链路专属复增益和路径存在状态。对一条链路的局部宽带模型可写为</p>
+<div class="equation">\[H_\ell(k,t)=\sum_{p=1}^L\delta_{\ell,p}\alpha_{\ell,p}a_{r,\ell}(\theta_p)a_{t,\ell}^{\mathrm H}(\phi_p)e^{-j2\pi f_k\tau_{\ell,p}}e^{j2\pi\nu_{\ell,p}(t-t_0)}.\]</div>
+<p>不同频段和雷达拓扑可以共享散射体几何，但时延、多普勒、复增益和可见性可能不同。例如单站雷达测往返距离，通信链路测单程或经散射体的双段路径，两者需通过几何方程建立对应。一个纯传播例子是 <span class="math-inline">\(\Delta f=200\,\mathrm{MHz}\)</span>、<span class="math-inline">\(\tau=101\,\mathrm{ns}\)</span> 时，两频点相位相差 <span class="math-inline">\(-72^\circ\)</span>（模 <span class="math-inline">\(360^\circ\)</span>），另有反射系数和硬件相位变化。直接跨频拷贝复数 CSI 需要比“同一条路径”更强的假设。</p>
+<p><strong>约束一是可辨识性。</strong> 对已对齐的简化线性模型 <span class="math-inline">\(y_s=A_s h+n_s\)</span>、<span class="math-inline">\(y_c=A_c h+n_c\)</span>，两路共同的盲区是 <span class="math-inline">\(\ker A_s\cap\ker A_c\)</span>。如果下行只报右奇异子空间，通常无法由此恢复接收侧奇异向量、所有增益或相位。给出一个全尺寸矩阵是算法输出，能否恢复真实矩阵取决于观测秩和先验。若只需要选波束，某些矩阵歧义不会改变最优动作。</p>
+<p><strong>约束二是新增信息。</strong> 令 <span class="math-inline">\(C\)</span> 为基线已可用 CSI。如果基线已拥有 <span class="math-inline">\(Y_s\)</span>，将由同一 <span class="math-inline">\(Y_s\)</span> 确定性算出的码字重复加入无法增加信息。本文用 <span class="math-inline">\(I(H_*;Y_s\mid C,\mathcal M)\)</span> 表达新增信息，其中 <span class="math-inline">\(\mathcal M\)</span> 为测量元数据。几何匹配、时间对齐和源间相关误差决定这部分信息是否能被正确提取。</p>
+<p>在线融合可写成先验预测再修正。在已对齐、独立高斯误差和线性 CSI 观测 <span class="math-inline">\(z=Ah+e\)</span> 下，从 sounding 得到先验均值 <span class="math-inline">\(\mu_s\)</span> 与误差协方差 <span class="math-inline">\(R_s\)</span> 后，有</p>
+<div class="equation">\[\widehat h=\mu_s+R_s A^{\mathrm H}(A R_s A^{\mathrm H}+R_c)^{-1}(z-A\mu_s).\]</div>
+<p>这条公式是本文统一基线。它表达了“只在可观测方向上修正”。如果输入是 PMI，应建码字似然或使用子空间约束。若误差相关，应堆叠观测并使用含非零交叉项的联合噪声协方差。若多个目标可能对应同一回波，还需在更新前或更新中显式处理数据关联。</p>
+<h2 id="3-lee-tdd">3. Lee 等：TDD 不对称端口下的空间重建</h2>
+<p>Hyeongtaek Lee 等来自 KAIST 与三星电子网络业务部门。论文要解决的是 UE 有多个接收端口却只能从少量端口发上行探测时，如何让基站取得可用于空间复用的下行信道。仿真中基站 32 根天线、4 个 CSI-RS 端口、UE 4 根接收天线，考虑 2 或 4 层反馈。研究路线是先利用上行观测确定可利用的出射方向，再利用下行反馈约束接收侧和多层结构。见 <a href="https://arxiv.org/html/2102.05224v1">原文 §II–IV</a>。</p>
+<ol>
+<li>基站用一组低维波束 <span class="math-inline">\(P\in\mathbb C^{N_t\times K}\)</span> 发送 CSI-RS。UE 得到 <span class="math-inline">\(Z=H_dP+N\)</span>，随后在码本中选 <span class="math-inline">\(K\times L\)</span> 的 PMI 矩阵 <span class="math-inline">\(V\)</span>。论文式 (7) 最大化由 <span class="math-inline">\(V^{\mathrm H}Z^{\mathrm H}ZV\)</span> 导出的频谱效率。基站拿到的是索引和可重构码字。</li>
+<li>从 SRS 向量搜索基站端主出射方向，形成字典 <span class="math-inline">\(A_b\)</span>；从反馈构造的有效信道代理搜索接收侧方向，形成 <span class="math-inline">\(A_r\)</span>。将代理记为 <span class="math-inline">\(\widetilde Z\)</span>。按下行矩阵约定，论文式 (37)–(40) 的计算可概括为</li>
+</ol>
+<div class="equation">\[\widehat C=A_r^\dagger\widetilde Z(A_b^{\mathrm H}P)^\dagger,\qquad \widehat H=A_r\widehat C A_b^{\mathrm H}.\]</div>
+<ol>
+<li>论文随后用 SRS 已观测的端口分量替换对应的重建分量。论文还有凸优化式预搜索，以及按方向关系进行的其他重建基线。伪逆把迭代优化换成阵列搜索和矩阵运算，适合做可解释基线。如果 <span class="math-inline">\(A_b^{\mathrm H}P\)</span> 的小奇异值很小，即使形式上存在伪逆，噪声和码字量化误差也会被放大。工程对照可以加入截断 SVD，观察频谱效率与条件数的关系。</li>
+</ol>
+<p><strong>读图。</strong> 图 9 为动态选 CSI-RS 波束、UPA、2 层场景，横轴上行 SNR、纵轴平均频谱效率。预搜索与伪逆可以超过作者定义的 Type 2 对照。这里的 Type 2 是该论文的无量化有效信道对照。它仍然只使用低维下行信道，故胜出说明 SRS 为低维投影补了约束。原文图 10–11 再换 UMa 或扫下行 SNR，所用仍是 SCM 仿真。我的判断是，这项工作支持“用上行观测缩减下行训练维度”，推广前应测多端口切换时延、真实 RF 校准和波束投影条件数。见 <a href="https://arxiv.org/html/2102.05224v1#S4">图 9–11 与实验设置</a>。</p>
+<h2 id="4-kim-jadd">4. Kim 等与 JADD：在目标频率补相位，在目标时刻补演进</h2>
+<p>Jungyeon Kim 等的署名机构包括 POSTECH、KAIST、延世大学、ASU 和高丽大学。论文从近似共享的路径角度与幅度出发，把反馈负载集中到下行相位。对某条已配对路径，基站由上行测量得到 <span class="math-inline">\(\theta_p\)</span> 和 <span class="math-inline">\(\beta_p\)</span>，UE 由下行导频估计该路径相位并量化为中心 <span class="math-inline">\(q_p\)</span>。用 <span class="math-inline">\(B_p\)</span> 个比特时，均匀量化区间半宽为 <span class="math-inline">\(d_p=\pi/2^{B_p}\)</span>。若给定量化区间内的误差均匀分布，条件均值为 <span class="math-inline">\(\mathbb E[e^{j\epsilon_p}]=\sin d_p/d_p\)</span>。于是式 (13)–(14) 可写成</p>
+<div class="equation">\[\widehat h_d=\sum_p\beta_p\frac{\sin d_p}{d_p}e^{jq_p}a_d(\theta_p).\]</div>
+<p>这里 <span class="math-inline">\(a_d\)</span> 必须按下行波长构造。论文接着以总比特约束 <span class="math-inline">\(\sum_p B_p\le B_{\rm tot}\)</span> 最小化误差，强路径在低比特时通常值得优先精化。按高分辨率近似，单路失真随 <span class="math-inline">\(\beta_p^2 2^{-2B_p}\)</span> 缩小，适合解释比特分配，原文求解使用实际误差函数。随后基站把相位量化引起的误差协方差交给稳健预编码。图 8 在 10/12 GHz、16 用户、每用户 3 路径的仿真中显示约 20 bit/用户接近完美 CSIT 的 WMMSE 参考。图 9 用空间平滑 MUSIC 估计几何，图 10 扫路径数。最重要的复现条件是路径配对和目标频段导频；20 bit 指反馈负载，整体空口预算还需加上导频与控制。见 <a href="https://arxiv.org/html/2405.08614v1">Kim 等，式 (13)–(14)、§IV–VI</a>。</p>
+<p><strong>JADD 把这个问题再向时间推一步。</strong> Ziao Qin、Haifan Yin、Yandi Cao、Weidong Li、David Gesbert 的方案先从一串上行样本构造角度、时延和时间基。Matrix Pencil 用移位后的数据结构估计复指数极点，极点相角对应采样间隔内的相位旋转。基站再把上行可迁移的几何及多普勒关系转换到下行，构造宽带探测波束，让 UE 在小维度表示中估计下行复系数。基站收到反馈后，按原文式 (53) 将各模式推进到使用时刻。简化写法为</p>
+<div class="equation">\[\widehat h_d(t+T_d)=\sum_{j,m}\widehat a_{j,m}e^{j2\pi\widehat\nu_{j,m}(t+T_d)}d_j.\]</div>
+<p>其中 <span class="math-inline">\(d_j\)</span> 是角延迟基，<span class="math-inline">\(T_d\)</span> 是 CSI 延迟。多普勒误差 <span class="math-inline">\(\Delta\nu\)</span> 在额外 <span class="math-inline">\(T_d\)</span> 秒上导致相位误差 <span class="math-inline">\(2\pi\Delta\nu T_d\)</span>。例如 20 Hz 的误差持续 10 ms 就产生约 <span class="math-inline">\(72^\circ\)</span> 的相位偏差，此为本文计算。提高模型阶数可以解释更多模式，也可能拟合噪声，因此要一起扫外推跨度和模式数。原文表 I 为 CDL-A、1.92/2.11 GHz、20 MHz。图 3 以 5 ms 延迟和无噪声样本比较 60/350 km/h；图 4 进一步考虑反馈量化并扫时延。频谱效率与预测误差分别读。车速只是仿真设置之一，场景突变和路径生灭时需要重新初始化。见 <a href="https://arxiv.org/pdf/2202.05564#page=9">Qin 等，IEEE TWC 2022，式 (53)、图 3–4</a>。</p>
+<h2 id="5-ujefnet-merge-for-reconstruction">5. UJEFNet 与 Merge for Reconstruction：学习式融合的证据与缺口</h2>
+<p>Yiran Guo、Wei Chen、Bo Ai 的 UJEFNet 由北京交通大学团队提出。它把下行导频选择、反馈与基站重建放到同一个目标下。基站送下行导频，UE 直接编码接收到的导频矩阵为 <span class="math-inline">\(K\)</span> 个复反馈符号；反馈链路损伤进入训练。基站先解码得到粗下行角频域 CSI，再把由稀疏上行导频得到的估计作角域 DFT，作为侧信息反复拼接到 Refine Blocks。上行估计可用 LS 插值或学习式重建。论文式 (16)–(20) 分开定义上行 CE、融合与损失。本文把其最终目标重写为</p>
+<div class="equation">\[\min_{\Theta}\;\mathbb E\left[\|\mathcal D_{\Theta}(\widehat s,\widehat G_u)-G_d\|_F^2\right].\]</div>
+<p><span class="math-inline">\(\widehat s\)</span> 是通过有噪反馈链路到达基站的符号，<span class="math-inline">\(\widehat G_u\)</span> 是有估计误差的上行角频域 CSI。先生成有噪输入再训练，能够让网络见到推理时会发生的估计误差。作者分别控制上行导频间隔、反馈 SNR 和下行导频数。CDL-C/Sionna 仿真采用 5.6/5.4 GHz、32×1 天线、256 子载波，训练/验证/测试是 100k/30k/10k 对。见 <a href="https://arxiv.org/html/2504.10836v1">UJEFNet §III–IV</a>。</p>
+<table>
+<thead>
+<tr>
+<th>图 9 条件</th>
+<th style="text-align: right;">相对 JEFNet，单纯加深 DJEFNet</th>
+<th style="text-align: right;">相对 JEFNet，加入上行 CSI 的 UJEFNet</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>8 个复反馈符号，反馈 SNR −10 dB</td>
+<td style="text-align: right;">0.06 dB</td>
+<td style="text-align: right;">1.10 dB</td>
+</tr>
+<tr>
+<td>8 个复反馈符号，反馈 SNR +10 dB</td>
+<td style="text-align: right;">0.14 dB</td>
+<td style="text-align: right;">1.24 dB</td>
+</tr>
+<tr>
+<td>16 个复反馈符号，反馈 SNR +10 dB</td>
+<td style="text-align: right;">1.44 dB</td>
+<td style="text-align: right;">约 1.14 dB</td>
+</tr>
+</tbody>
+</table>
+<p>表中是 NMSE 改善，使用 16 个下行导频，下行估计 SNR 10 dB。第三行的反转提示评价应扫反馈负载。同深度对照比只和浅网络对比更有解释力。若重做实验，我会进一步用同参数、同延迟和随机错配上行 CSI 来区分侧信息收益与网络容量。数字符号反馈与模拟 DJSCC 应按信道使用次数、功率和解码延迟对齐预算。见 <a href="https://arxiv.org/html/2504.10836v1#S4">原文图 6–11</a>。</p>
+<p><strong>Merge for Reconstruction</strong> 由 Yisheng Zhang、Jingbo Tan、Xu-Dong Zhang、Jintao Wang 和 Yifeng Zhang 署名，涉及清华大学电子工程系与中兴通讯，发表在 2026 年 IEEE Transactions on Broadcasting。公开摘要可确认基站端使用 U-Net 合并 SRS 和 CSI 反馈重建出的不完美信道，上下采样使用残差与自注意力。时变分支有时间步嵌入，静态场景还给出基于 VQ-VAE 潜空间的轻量版本。全文仍未取得，因此无法核对训练损失、两分支时间戳定义、导频与反馈预算和实验幅度。这个架构提出了一个明确可检验的假设：当两路年龄不同，显式编码时间能比按同一时刻拼接取得更稳定的结果。检验需要同容量无时间输入对照，还应单独测 SRS 弱覆盖、反馈变旧和两路同时失效。见 <a href="https://doi.org/10.1109/TBC.2026.3670696">论文 DOI</a> 与 <a href="https://www.researchgate.net/publication/401909398_Merge_for_Reconstruction_Deep_Learning-Based_Channel_Merging_Based_on_SRS_and_CSI_Feedback_in_Massive_MIMO_Systems">公开作者摘要</a>。</p>
+<p><strong>同类方法的演进。</strong> DualNet 把上行幅度放在解码器侧，CAnet 把上行角域幅度同时用于自适应导频设计和反馈解码。CAnet 表 IV 中，24 bit、6 个下行导频时，独立估计再反馈与直接编码导频观测的 NMSE 分别为 −4.59 和 −7.11 dB。16 bit、8 个导频时两者排序反转。Dual-ImRUNet 则把目标收窄为预编码特征向量，采用跨频补偿与样本对齐。其图 5 在 30 个未见地图的射线追踪测试中报告 6 bit、SGCS 0.85。后者衡量方向相似度，和全复矩阵 NMSE 属于不同任务。见 <a href="https://par.nsf.gov/servlets/purl/10149759">DualNet 原文</a>、<a href="https://arxiv.org/html/2101.04377v1#S6">CAnet 表 IV</a> 和 <a href="https://arxiv.org/html/2507.12301v1#S4">Dual-ImRUNet 图 5</a>。</p>
+<h2 id="6-yuan">6. Yuan 等：从雷达回波取得稀疏支撑，再用导频估增益</h2>
+<p>Weijie Yuan、Zhiqiang Wei、Shuangyang Li、Jinhong Yuan、Derrick Wing Kwan Ng 的 UNSW 团队将 OTFS 通信波形同时用于路侧单元的雷达探测。下行回波估计车辆角度、时延和多普勒，再通过车辆运动状态预测下一时刻的几何。下行利用预测方向形成波束并预均衡。上行的关键做法是先从感知预测延迟–多普勒支撑，再用通信导频估计随机的复增益。</p>
+<p>在传统 OTFS 中，单导频周围设置保护区，避免未知业务符号卷入导频观测。该文用预测路径坐标 <span class="math-inline">\(\bar k_p,\bar l_p\)</span> 找到已知导频经第 <span class="math-inline">\(p\)</span> 条路径后的接收格点。以下按 arXiv HTML 版式 (45)–(47) 改写。</p>
+<div class="equation">\[y[k_0+\bar k_p,l_0+\bar l_p]=h_p x_{\rm pl}+I_p,\qquad \widehat h_p=\frac{y[k_0+\bar k_p,l_0+\bar l_p]}{x_{\rm pl}}.\]</div>
+<p>其中 <span class="math-inline">\(I_p\)</span> 含数据引起的干扰与噪声，<span class="math-inline">\(\widehat h_p\)</span> 的误差方差随 <span class="math-inline">\(\mathbb E[|I_p|^2]/|x_{\rm pl}|^2\)</span> 变化。作者把估计方差继续传给因子图上的 sum-product 检测器，式 (62) 在消息方差里显式处理 CSI 不确定性。这是论文里第二次融合：第一步将感知给出的路径支撑与通信导频合起来，第二步把信道估计误差传给数据检测器。</p>
+<p><strong>结果与代价。</strong> 论文仿真为 3 GHz、6 kHz 子载波间隔、四车、车速 10–15 m/s、BPSK、OTFS 128×30 网格。表 II 的保护格由 480/3840（12.5%）降到 0。仍需导频，且图 11 中导频功率高于数据 20 dB。无保护方案的信道 NMSE 约停在 <span class="math-inline">\(10^{-2}\)</span>，传统有保护基线的估计更准确。图 12 显示把不确定性纳入检测比忽略不确定性更好。我的判断是，该论文验证了支撑先验能换取空口资源，但要评估净收益，应同时计入探测、强导频和信道模型失配造成的代价。尤其要测偏一格、漏路径和新散射体进入时的错误率。见 <a href="https://arxiv.org/html/2105.03125v2#S4">Yuan 等，原文 §III-D、图 11–12 和表 II</a>。</p>
+<figure class="paper-figure"><a href="/assets/papers/srs-csi-fusion/yuan-otfs-fig11.png"><img alt="OTFS 上行信道估计 NMSE 随信噪比变化，对照有保护区、无保护区和感知辅助方案" src="/assets/papers/srs-csi-fusion/yuan-otfs-fig11.png"/></a><figcaption>Yuan 等，arXiv:2105.03125v2，<a href="https://arxiv.org/pdf/2105.03125v2#page=11">图 11，第 11 页</a>，<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>。保留原图及图注，裁除周边正文。感知先验将无保护区的估计误差压低，但带保护区的传统方案随 SNR 继续改善。</figcaption></figure>
+<figure class="paper-figure"><a href="/assets/papers/srs-csi-fusion/yuan-otfs-fig12.png"><img alt="OTFS 上行 BER 随信噪比变化，比较考虑和忽略信道估计不确定度的检测方法" src="/assets/papers/srs-csi-fusion/yuan-otfs-fig12.png"/></a><figcaption>Yuan 等，arXiv:2105.03125v2，<a href="https://arxiv.org/pdf/2105.03125v2#page=12">图 12，第 12 页</a>，<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>。保留原图及图注，裁除周边正文。红色方案比忽略估计误差的绿色方案更接近完美 CSI 参考，差距在较高 SNR 区域可见。</figcaption></figure>
+<h2 id="7-luo">7. Luo 等：实测中雷达适合缩小波束候选</h2>
+<p>Hao Luo、Umut Demirhan 和 Ahmed Alkhateeb（ASU）研究的是用<strong>历史通信波束与雷达时间序列</strong>预测未来波束。通信接收机在 60 GHz 对 64 个候选束测功率，最大功率对应标签。雷达为车载 FMCW，起始频率 77 GHz，使用四根接收天线。雷达经 FFT 获得距离、速度和角度相关特征，论文比较两条路线。</p>
+<ul>
+<li><strong>目标识别再映射。</strong> 先提取候选雷达目标，结合历史通信波束识别发射车，再由估计方向选通信波束。角度估计的不确定性经过两次决策传递，在雷达角分辨率比波束间距粗时会造成系统性偏向。</li>
+<li><strong>直接预测波束。</strong> 网络以雷达序列和已知初始束为输入，通过交叉熵预测候选束概率，见原文式 (11)。历史束给出射频链路当前的角度锚，雷达序列用于追踪相对变化。</li>
+</ul>
+<p><strong>读原图。</strong> DeepSense 6G Scenario 38 是实际道路 V2V 测量，每秒 10 样本，保留波束变化窗口后有 3649 条序列，按不重叠时间区间切 70/30。图 4 以维持初始束及其邻居为基线，目标识别路线整体弱于基线；端到端路线的 Top-1 提升有限，作者报告 Top-3 约提高 6–9%、Top-5 约提高 3–6%。图 5 的混淆矩阵显示目标识别方法集中在部分方向格。本文判断是：这支持“先缩到少量候选，再用短导频确认”的闭环假设。原文结果来自一套道路场景且筛选了波束变化样本，系统上线前还需比较波束功率损失、实际扫描次数和跨路线泛化。见 <a href="https://arxiv.org/html/2308.01558v2#S6">Luo 等，原文 §IV–VI，图 4–5</a>。</p>
+<h2 id="8">8. 还有两条常被漏掉的融合路线</h2>
+<p><strong>卫星链路用数据纠正导频老化。</strong> Abdollah Masoud Darya 和 Saeed Abdallah 来自沙迦大学相关团队，研究多用户 LEO 上行残余多普勒。导频先给出 LS 初值，E 步根据当前信道给星座符号分配后验权重，M 步用软符号的加权统计更新复系数，然后投影到低阶离散 Legendre 基。可把更新理解为逐次使用“置信度不同的虚拟导频”。原文图 1 用 5 个 Zadoff–Chu 导频、50 个数据符号，默认 10 次迭代。在 SER 为 0.1 的点，相对结合相同基展开的 MDDLS 约节省 2.5 dB SNR，NMSE 的优势在 SNR 高于 −2 dB 时出现。表 II 的 MATLAB/Xeon 中位耗时为 EM 每次迭代 188.2 微秒，MDDLS 61.7 微秒。整帧处理的算法延迟、等待整帧的时延和错误传播风险都应另报。导频和业务数据在同频同链路上形成反馈环，导频稳定启动，后续数据更新时变 CSI。见 <a href="https://arxiv.org/html/2505.14118v3">原文 §III–IV</a>。</p>
+<p><strong>Wi‑Fi：用客户端反馈约束旁路雷达的定位。</strong> 《Hybrid Fusion for 802.11ax Wi-Fi-based Passive Radars》里的两路分别是旁路雷达从 AP 的 NDP 估计到的反射 CSI，以及客户端测得另一条链路并回报的 BFF。论文式 (14)–(17) 从旁路 CSI 得到样本协方差，从 BFF 的主右奇异方向与流增益近似客户端的协方差，依赖客户端直达路径占优。然后在候选目标间做关联，把雷达 AoD/AoA 和客户端 LoS AoD 的得分加起来，再交替细化目标位置。图 2 仿真设两个客户端目标和一个非客户端目标。融合改善客户端命中率和定位误差，非客户端目标因错误关联略有退化。命中定义为 2 米内，RMSE 仅统计所有方法都命中的样本，故两项指标应一起看。Wi‑Fi 在这里展示的是<strong>异链路证据的关联</strong>，其机制也适用于多站蜂窝或双基地探测。见 <a href="https://arxiv.org/html/2404.14269">原文 §IV–V</a>。</p>
+<h2 id="9">9. 我的结论、未来趋势与验证计划</h2>
+<p><strong>结论一：先按任务定义需要恢复的自由度。</strong> 做定位时优先融合可靠的几何约束，做波束管理时预测 Top-K 后短扫，做多用户零迫或相干联合传输时才需要更严格的复相位和校准。Lee 的伪逆与 Luo 的实测共同提示，一个能在模拟中产出完整矩阵的系统，可能只需要在部署中提供更可信的子空间或候选集。指标也要跟随目标，从 NMSE 到波束功率损失、净频谱效率或定位漏检率分别汇报。</p>
+<p><strong>结论二：可靠性与路径关联是主要失效来源。</strong> JADD 的时间模型可减少老化，OTFS 的支撑先验可节省保护区，Wi‑Fi 的融合则直接暴露关联错误的代价。我的判断是下一代系统会用可计算的时间戳、测量置信度和路径匹配概率控制更新。对多设备和异频链路，软关联或多个候选假设会比硬匹配更值得研究。检验方法是人为施加时间漂移、端口错配、遮挡与路径出生消失，画出负迁移出现的边界。</p>
+<p><strong>趋势一：从固定周期转向按不确定度触发探测。</strong> 保留一个稀疏的周期探测作为底线。当预编码风险、创新残差或候选束熵超过阈值，触发一次定向短扫或请求下行相位更新。可用验证集校准触发阈值，在相同空口预算下对比固定周期。若尾部时延、波束失配概率和 5% 用户净速率没有改善，额外的闭环复杂度就缺少证据。</p>
+<p><strong>趋势二：从全量 CSI 重建转向共享几何与链路专属残差。</strong> 场景测量图或雷达可以提供慢变先验，短导频只估计当前链路的幅度、相位与新路径。物理模型负责频率和阵列映射，轻量学习器预测误差协方差、补漏路径或给出候选。验证时留出整条路线、频段或设备，分别报告匹配路径和未匹配路径。跨站点数据还应记录共同反射体的可见性，避免把一个站的角度直接当成另一个站的角度。</p>
+<p><strong>趋势三：由波束正确率走向端到端收益。</strong> Top-K 只有落实为少扫几个波束、少重传或更快完成链路建立才转化为系统收益。将有效净速率近似写为 <span class="math-inline">\(R_{\rm net}=(1-\rho_{\rm air})R_{\rm payload}\)</span>，其中 <span class="math-inline">\(\rho_{\rm air}\)</span> 应包括探测、反馈和重扫的时间频率资源；另报计算时延和能耗。对不同类型的侧信息分开记录采集功耗与共享开销。这三个方向是基于现有论文对照提出的研究判断。</p>
+<table>
+<thead>
+<tr>
+<th>验证阶段</th>
+<th>要做的实验</th>
+<th>可以推翻的假设</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>仿真机制验证</td>
+<td>固定每帧探测资源、反馈资源和功率。比较探测单源、已有 CSI 单源、伪逆或 MMSE、同容量拼接和可靠性融合。加入打乱配对的控制组。</td>
+<td>打乱后仍有相同增益，说明网络可能主要利用了统计先验或容量。</td>
+</tr>
+<tr>
+<td>回放与实测</td>
+<td>记录真实时间戳、同一地点的稠密探测参考、少量导频、历史 CSI 和波束功率。按路线、日期、设备留出。</td>
+<td>随机切分效果好而整路线留出失败，说明跨场景收益待建立。</td>
+</tr>
+<tr>
+<td>闭环测试</td>
+<td>在相同空口预算下比较固定周期探测、按风险触发、Top-K 短扫及穷举参考；逐步扫缺失、遮挡和时延。</td>
+<td>若新增探测或计算吞掉吞吐收益，表明应重新定义触发与输出任务。</td>
+</tr>
+</tbody>
+</table>
+<p>已有的 5G 论文仍适合作为同链路基线，非蜂窝场景则优先复现 ASU 的道路测量或 UNSW 的 OTFS 支撑实验。前者适合检验跨设备与波束跟踪，后者适合在仿真里分离几何误差、估计方差和导频开销。两条路线共用一个判断标准：第二路观测在目标时刻和固定资源下，是否提高了实际任务表现。</p></main><footer class="wrap"><a class="brand" href="../../../../index.html">兴耀未来</a><span>保持好奇。持续记录。</span><a href="https://github.com/lucky-xing/">GitHub ↗</a></footer><script defer="" src="../../../../theme-motion.js"></script></body></html>

@@ -33,3 +33,5 @@
 - AI / 模型结构洞察分析：低汉明重量权重约束与低功耗推理 — posts/2026/10/31/bit-sparse-weight-power.html
 
 - AI / 模型结构洞察分析：TaperNorm：门控移除归一化与尺度锚定 — posts/2026/10/31/tapernorm-scale-anchoring.html
+
+- 通信：广义信道探测与 CSI 融合：观测、可辨识性与闭环设计 — posts/2026/11/09/srs-csi-fusion.html
