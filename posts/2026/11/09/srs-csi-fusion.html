@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><meta content="比较 TDD 空间维度补全、FDD 路径相位反馈与时变信道预测，梳理融合方法的证据和复现条件。" name="description"/><title>上行 Sounding 与下行 CSI 反馈融合：从信道重建到时效感知 · Lighting Future</title><link href="../../../../style.css" rel="stylesheet"/><link href="../../../../assets/paper-report.css?v=5acafff8b1bd" rel="stylesheet"/><script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']],processEscapes:true},svg:{fontCache:'local'},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer="" src="../../../../assets/vendor/mathjax/tex-svg-full.js"></script></head><body class="category-page paper-report theme-communication"><a class="skip" href="#main">跳到正文</a><header class="wrap"><a class="brand" href="../../../../index.html"><span class="mark">兴</span>兴耀未来</a><nav aria-label="主导航"><a href="../../../../index.html">首页</a><a href="../../../../ai.html">AI</a><a href="../../../../finance.html">投资理财</a><a aria-current="page" href="../../../../communication.html">通信</a><a href="../../../../learning.html">学习</a><a href="../../../../world.html">看世界</a></nav></header><main class="report" id="main"><div class="breadcrumb"><a href="../../../../communication.html">通信</a></div><p class="kicker">PAPER RESEARCH / 2026-11-09</p><h1 id="sounding-csi">上行 Sounding 与下行 CSI 反馈融合：从信道重建到时效感知</h1><p>日期：2026-11-09　｜　通信　｜　论文精读与方法分析</p><nav aria-label="文章目录" class="toc"><strong>阅读导航</strong><a href="#_1">摘要</a><a href="#1">1. 两路数据究竟是什么</a><a href="#2-merge-for-reconstruction2026">2. 最直接的论文：Merge for Reconstruction（2026）</a><a href="#3-tdd-srs">3. TDD：利用 SRS 给低维反馈补空间约束</a><a href="#4-fdd">4. FDD：反馈上行猜不出的信息</a><a href="#5">5. 学习式融合：从解码侧信息到联合训练</a><a href="#6-wifi-sounding">6. 如果你说的是 Wi‑Fi sounding</a><a href="#7">7. 可落地的研究问题：让两路数据按可靠性分工</a></nav>
+<p>文献调研 · 2026-11-09 · 5G/6G Massive MIMO，附 Wi‑Fi 分支</p>
+<h2 id="_1">摘要</h2>
+<p>与问题最直接对应的是 Zhang 等 2026 年的 <strong>Merge for Reconstruction</strong>：在基站端把 SRS 估计和下行 CSI 反馈重建得到的两份不完美信道合并，并考虑观测时差。此前已有三个可复现的技术路线：TDD 用 SRS 补足空间维度、FDD 用上行路径几何压缩下行反馈，以及把上行 CSI 作为学习式解码的侧信息。三者解决的误差不同，论文数字不能横向排名。最有价值的实验是固定导频和反馈开销，检查双源融合在其中一路变差时能否继续有效。</p>
+<h2 id="1">1. 两路数据究竟是什么</h2>
+<p>在蜂窝场景，UE 发上行 SRS，基站估计上行信道；基站发下行 CSI-RS，UE 测量后反馈。下行反馈可以是实验中的量化复数系数，也可以是实际码本报告中的 PMI（预编码矩阵指示）、RI（秩指示）、CQI（信道质量指示）等。CSI-RS 是参考信号，CSI 是信道状态信息，二者要分开。PMI/RI/CQI 也不等于全量复数信道。<a href="https://www.etsi.org/deliver/etsi_ts/138200_138299/138214/19.01.00_60/ts_138214v190100p.pdf">ETSI TS 38.214，§5.2 与 §6.2</a></p>
+<p>统一记号（本文建模）：单个子载波上，<span class="math-inline">\(H_d(t)\in\mathbb C^{N_r\times N_b}\)</span> 为目标下行信道，<span class="math-inline">\(N_r\)</span> 是 UE 下行接收维数，<span class="math-inline">\(N_b\)</span> 是基站天线维数。令 <span class="math-inline">\(H_u(t)\in\mathbb C^{N_b\times N_r}\)</span> 表示对应的全端口上行等效信道，<span class="math-inline">\(S\in\mathbb C^{N_r\times N_s}\)</span> 表示实际发 SRS 的端口选择或映射，<span class="math-inline">\(P\in\mathbb C^{N_b\times K}\)</span> 表示基站的下行导频波束。消去已知导频后，用以下简化模型表示两个观测：</p>
+<div class="equation">\[Z_u=H_u(t_u)S+E_u,\qquad Z_d=H_d(t_d)P+E_d.\]</div>
+<div class="equation">\[b=Q(g(Z_d)),\qquad \widehat H_d(t_*)=F(Z_u,b,\mathcal M).\]</div>
+<p><span class="math-inline">\(t_u,t_d\)</span> 是观测时刻，<span class="math-inline">\(t_*\)</span> 是下行使用时刻；<span class="math-inline">\(E_u,E_d\)</span> 含测量误差；<span class="math-inline">\(b\)</span> 为反馈负载；<span class="math-inline">\(\mathcal M\)</span> 可包含端口映射、噪声估计、时间戳、反馈格式及 RF 校准信息。DJSCC 路线的反馈是经过有噪反馈链路的连续符号，应另建传输模型。即使校准后的 TDD 传播互易，当 <span class="math-inline">\(N_s&lt;N_r\)</span> 时，上行只能照亮部分 UE 维度。FDD 中可以共享角度/时延结构，但不能默认跨频点复系数相等；同一条时延为 <span class="math-inline">\(\tau\)</span> 秒的路径，其传播相位跨越 <span class="math-inline">\(\Delta f\)</span> Hz 时可变化 <span class="math-inline">\(-2\pi\Delta f\tau\)</span>，反射和射频响应也可能随频率变化。</p>
+<h2 id="2-merge-for-reconstruction2026">2. 最直接的论文：Merge for Reconstruction（2026）</h2>
+<p><a href="https://doi.org/10.1109/TBC.2026.3670696">Zhang、Tan、Zhang、Wang、Zhang，IEEE Transactions on Broadcasting 72(2), 449–462</a>；<a href="https://www.researchgate.net/publication/401909398_Merge_for_Reconstruction_Deep_Learning-Based_Channel_Merging_Based_on_SRS_and_CSI_Feedback_in_Massive_MIMO_Systems">公开摘要</a>。署名团队涉及清华大学电子工程系与中兴通讯，论文从广播/组播的分组、资源分配和预编码对下行 CSI 的依赖出发。摘要能核实：SRS 估计与反馈得到的信道共同送入 U-Net；上下采样块加入残差与自注意力；时变场景使用时间步嵌入；时不变场景另有 VQ-VAE 潜空间轻量方案。摘要报告了 CSI 获取和老化补偿改善。<strong>全文和实验图未取得</strong>，不能确认时间步的具体定义、训练目标、信道模型、基线预算、提升幅度和硬件实测情况。</p>
+<h2 id="3-tdd-srs">3. TDD：利用 SRS 给低维反馈补空间约束</h2>
+<p><a href="https://arxiv.org/html/2102.05224v1#S3.SS6">Lee 等，Downlink Channel Reconstruction for Spatial Multiplexing in Massive MIMO Systems，2021 预印本</a>。论文署名来自 KAIST 与 三星电子网络业务部门；问题是 UE 发射端口少于接收端口时，如何支持下行空间复用。</p>
+<p>处理链：从 SRS 提取基站端主出射方向，从 PMI 派生的低维有效信道代理提取接收侧方向；用两个方向字典和已知 CSI-RS 波束解路径系数矩阵，再用 SRS 向量替换其已观测的对应 UE 天线分量。按本文下行矩阵约定整理原文式 (37)–(40)：</p>
+<div class="equation">\[Z\approx A_r C A_b^{\mathrm H}P,\qquad \widehat C=A_r^\dagger Z(A_b^{\mathrm H}P)^\dagger.\]</div>
+<div class="equation">\[\widehat H=A_r\widehat C A_b^{\mathrm H}.\]</div>
+<p><span class="math-inline">\(Z\)</span> 为从反馈构造的有效信道代理（不是 UE 原始矩阵）；<span class="math-inline">\(A_r,A_b\)</span> 列向量对应接收、发送角度原子；<span class="math-inline">\(C\)</span> 为两侧角度之间的复系数矩阵。两个投影需有足够有效秩，且条件数不能太差；字典方向过于接近或 CSI-RS 波束压掉关键路径时，伪逆会放大噪声。可将截断 SVD 或岭回归作为复现对照，区别于论文原法。</p>
+<p>实验为 SCM 仿真，默认 UMi 2.3 GHz、基站 32 根天线/4 个 CSI-RS 端口、UE 4 根接收天线、单发射天线设定，反馈 2 或 4 层；多数图用 20 dB 下行 SNR。原文 <a href="https://arxiv.org/html/2102.05224v1#S4">图 9–11</a> 给出 UPA 下的频谱效率；在图 9 的动态选波束、2 层情形中，预搜索和伪逆可超过只使用低维有效 CSI-RS 信道的基线，包括无量化的 Type 2 对照（这是作者的基线名称，不是 3GPP Enhanced Type II）。它说明 SRS 可以补回有用空间约束，不说明 2 层等效于 4 层。</p>
+<h2 id="4-fdd">4. FDD：反馈上行猜不出的信息</h2>
+<p><strong>路径相位与比特分配。</strong> <a href="https://arxiv.org/html/2405.08614v1#S3">Kim 等，FDD Massive MIMO: How to Optimally Combine UL Pilot and Limited DL CSI Feedback?，2024 预印本</a>。署名单位包括 POSTECH、KAIST、延世大学、亚利桑那州立大学、高丽大学。基站从上行导频抽取角度与路径幅度，UE 利用下行导频估计路径相位并量化；基站按下行波长重建阵列响应。原文式 (13)–(14) 的单用户写法为：</p>
+<div class="equation">\[\widehat h_d=\sum_{\ell=1}^{L}\eta_\ell\beta_\ell e^{j q_\ell}a_d(\theta_\ell),\qquad \eta_\ell=\frac{2^{B_\ell}}{\pi}\sin\left(\frac{\pi}{2^{B_\ell}}\right).\]</div>
+<p><span class="math-inline">\(q_\ell\)</span> 是相位量化中心（弧度），<span class="math-inline">\(\beta_\ell\)</span> 是路径幅度，<span class="math-inline">\(B_\ell\)</span> 是该路径反馈比特数。缩放因子可理解为均匀量化相位误差在单位圆上的条件平均：比特多时趋于 1；强路径的误差贡献更大，因此优先分配比特。作者还用误差协方差设计稳健多用户预编码。<a href="https://arxiv.org/html/2405.08614v1#S6.SS3">图 8</a> 在 10/12 GHz、16 用户、每用户 3 路径仿真中，约 20 bit/用户的路径相位反馈已接近完美 CSIT 的 WMMSE 参考；这是特定模型的反馈负载，不含整个导频、控制与协议开销。图 9–10 检查参数估计误差和路径数；密集多径及上下行路径无法可靠关联时，应重新评估这一结果。</p>
+<p><strong>高移动性。</strong> <a href="https://doi.org/10.1109/TWC.2022.3178499">Qin、Yin、Cao、Li、Gesbert，JADD，IEEE TWC 2022</a>（<a href="https://arxiv.org/pdf/2202.05564">公开全文</a>）。基站用 Matrix Pencil 从一段上行观测提取角度、时延、多普勒；据此构造下行宽带探测波束；UE 反馈少量复系数；基站按式 (53) 把信道预测到发送时刻。表 I 使用 3GPP CDL-A、1.92/2.11 GHz、20 MHz；图 3 在 5 ms 延迟、无噪信道样本设置下比较 60/350 km/h，结果优于文中的延迟 Enhanced Type II、APF-RNS 和 TVAL3 基线；图 4 再看反馈量化和不同时延。350 km/h 与 10 ms 是论文覆盖的仿真条件，不是商用系统保证。路径生灭或多普勒估计失准会破坏时间外推。</p>
+<h2 id="5">5. 学习式融合：从解码侧信息到联合训练</h2>
+<table>
+<thead>
+<tr>
+<th>文献</th>
+<th>上行信息放在哪里</th>
+<th>结果及边界</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://par.nsf.gov/servlets/purl/10149759">Liu、Zhang、Ding，DualNet，IEEE WCL 2019</a></td>
+<td>基站解码用上行幅度（MAG）或实虚部绝对值（ABS）作侧信息</td>
+<td>是建立双分支基线的起点；有<a href="https://github.com/DLinWL/Bi-Directional-Channel-Reciprocity">作者代码</a>。不能把仿真中的幅度相关视为所有 FDD 频段恒定。</td>
+</tr>
+<tr>
+<td><a href="https://arxiv.org/html/2101.04377v1#S6.SS4">Guo、Wen、Jin，CAnet，IEEE TCOM 2022</a></td>
+<td>东南大学与中山大学（台湾）署名团队：上行角域幅度既设计下行导频，也帮助基站解码；CAnet-J 压缩接收导频观测</td>
+<td>SCM UMi，5.1/5.3 GHz、64 基站天线、单 UE 天线。表 IV 在 24 bit、6 个下行导频时，CAnet-S → CAnet-J 的 NMSE 为 −4.59 → −7.11 dB；16 bit、8 个导频时 J 略逊于 S（−4.32 对 −4.52 dB）。</td>
+</tr>
+<tr>
+<td><a href="https://arxiv.org/html/2504.10836v1#S4.SS4">Guo、Chen、Ai，UJEFNet，2025 预印本</a></td>
+<td>北京交通大学团队：DJSCC 编码下行导频观测，基站角频域解码并融合有估计误差的上行 CSI，按式 (20) 端到端最小化下行信道平方误差</td>
+<td>CDL-C/Sionna，5.6/5.4 GHz、32×1 天线、256 子载波；训练/验证/测试 100k/30k/10k 对。图 9 中 <span class="math-inline">\(K=8\)</span>（反馈符号数）、16 个下行导频、下行估计 SNR 10 dB，反馈链路 SNR −10/+10 dB 时，融合相对 JEFNet 改善 NMSE 1.10/1.24 dB；只加深的 DJEFNet 改善 0.06/0.14 dB。在 <span class="math-inline">\(K=16\)</span>、反馈链路 SNR 10 dB 时，仅加深约改善 1.44 dB，超过融合的约 1.14 dB，说明收益依条件而变。连续反馈符号数不能直接换算为数字反馈比特。</td>
+</tr>
+<tr>
+<td><a href="https://arxiv.org/html/2507.12301v1#S4">Liu、Ma、Tafazolli、Ding，Dual-ImRUNet，2025 预印本</a></td>
+<td>萨里大学 6GIC 与加州大学戴维斯分校团队：对齐上下行特征、补偿频段差异，用 Transformer 恢复下行预编码相关的特征向量</td>
+<td>2.48/2.60 GHz、32×4、30 个未见城市地图射线追踪测试。图 5 在 SGCS 0.85 处报告仅 6 bit，相对作者比较的 Ubi-ImCsiNet 少约 85%；SGCS 衡量子空间方向相似度，不等于复数信道 NMSE 或吞吐率。</td>
+</tr>
+</tbody>
+</table>
+<p>原文结果索引：以上链接定位到相应图表章节；JADD 见公开 PDF 第 9 页。开放可读不等于开放再版，本稿未确认上述结果图的可再发布许可，保留原图入口。下方复现实验是建议，不是论文已报告结果。</p>
+<h2 id="6-wifi-sounding">6. 如果你说的是 Wi‑Fi sounding</h2>
+<p>Wi‑Fi 的显式波束成形探测中，接收端可由 NDP 估计 CSI，再将其中的波束成形信息编码为 BFI/BFM 反馈。用简化模型说明：若 <span class="math-inline">\(H=U\Sigma V^{\mathrm H}\)</span>，压缩反馈可近似写为 <span class="math-inline">\(q=Q(V_{1:r})\)</span>（还有依帧格式而定的 SNR 信息）。两条具有不同 <span class="math-inline">\(U\)</span> 或奇异值、但相同 <span class="math-inline">\(V_{1:r}\)</span> 的信道可能有相同角度反馈，因此不能把 BFI 一般性地逆变换成原始 CSI。若两路来自同一帧同一 CSI，BFI 是其派生量；若来自不同链路、端口或时刻，才可能带来新的观测。</p>
+<p><a href="https://arxiv.org/abs/2303.09687">BeamSense 原文</a> 与 <a href="https://www.usenix.org/conference/nsdi24/presentation/yi">BFMSense（USENIX NSDI 2024）</a> 主要验证 BFI/BFM 作为感知输入的价值，不能当成双源融合收益的证据。Haque、Meneghello、Restuccia 的 <a href="https://mentis.info/publications/datasets-for-human-activity-recognition-with-integrated-sensing-and-communications-in-wi-fi/">CSI-BFI-HAR</a> 用商用 802.11ac 做 LoS/NLoS 采集，覆盖 20 类活动、6 名参与者、6 种布设；<a href="https://github.com/kfoysalhaque/BeamSense">作者代码和同步采集说明</a>可用于建立真正的 CSI-only、BFI-only 和融合对照。做窗口对齐时检查链路方向、子载波组、包时间戳和缺包；按人、房间、采集日切分，避免相邻窗口跨训练和测试。</p>
+<h2 id="7">7. 可落地的研究问题：让两路数据按可靠性分工</h2>
+<p>先实现 TDD 伪逆或 FDD 路径相位作为强基线，再做「物理先验 + 可学习残差」。一种建模方式是把下行目标写成 <span class="math-inline">\(h\)</span>（全信道向量或降维系数），由上行生成均值 <span class="math-inline">\(\mu_u\)</span> 和不确定度 <span class="math-inline">\(R_u\)</span>，用下行有效观测 <span class="math-inline">\(z\)</span> 修正。在独立复高斯误差、已对齐、线性反馈代理 <span class="math-inline">\(z=Ah+e\)</span>、<span class="math-inline">\(e\sim\mathcal{CN}(0,R_d)\)</span> 的条件下：</p>
+<div class="equation">\[\widehat h=\mu_u+R_u A^{\mathrm H}(A R_u A^{\mathrm H}+R_d)^{-1}(z-A\mu_u).\]</div>
+<p>这是一条本文建议的可解释基线。上行越可靠，修正通常越小；下行越可靠，在可观测子空间内越能纠正上行先验。若输入是 PMI 或其他非线性码本反馈，应使用码字似然/预编码子空间损失，不能把 PMI 索引当作线性观测。若两路共享估计误差，应建联合协方差，避免重复计数。学习式版本可让门控读取 SRS SNR、观测龄期、端口覆盖、校准残差和反馈位数，训练时随机丢失一路，并用错配 SRS 检查模型是否真的利用同一用户的上行信息。</p>
+<table>
+<thead>
+<tr>
+<th>实验环节</th>
+<th>对照与评估</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>固定预算</td>
+<td>比较 SRS-only、反馈-only、朴素拼接、伪逆/MMSE、同参数量双分支。固定 SRS 与 CSI-RS 资源、反馈比特或信道使用次数，另报重建/调度时延。</td>
+</tr>
+<tr>
+<td>压力测试</td>
+<td>改变 UE 发射端口数、SRS SNR、上下行频差、观测龄期和校准误差；整小区或整轨迹留出；测试缺失/延迟/错配 CSI。</td>
+</tr>
+<tr>
+<td>指标</td>
+<td>复信道报 NMSE；预编码方向报 SGCS；面向部署报净频谱效率、5% 用户速率和反馈/导频开销。固定调度与预编码算法并报告统计区间。</td>
+</tr>
+<tr>
+<td>成功标准</td>
+<td>同预算超越最强单源与物理融合基线；任一路恶化时，可靠性门控可退化至另一条可用分支；收益能在未见小区或设备上复现。</td>
+</tr>
+</tbody>
+</table>
+<p>推荐阅读顺序：<strong>Merge for Reconstruction → Lee 的 TDD 伪逆 → Kim 的 FDD 相位反馈 → UJEFNet 的上行侧信息消融</strong>。若研究重点是信道老化，在第三步加入 JADD；若做 Wi‑Fi 感知，则从 CSI-BFI-HAR 的数据定义与分割协议开始。</p></main><footer class="wrap"><a class="brand" href="../../../../index.html">兴耀未来</a><span>保持好奇。持续记录。</span><a href="https://github.com/lucky-xing/">GitHub ↗</a></footer><script defer="" src="../../../../theme-motion.js"></script></body></html>
