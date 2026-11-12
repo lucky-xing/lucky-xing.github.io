@@ -94,3 +94,17 @@
 - 2026-11-04：生成每日财经报告，截止08:36；22股行情及资金重筛，亨通退出、伊利新增观察，量化计算复核，零可执行买单。发布页： https://lucky-xing.github.io/finance/daily/2026-11-04.html
 
 - 2026-11-05：11/4收盘22股重筛；两股条件观察、长飞不参与；量价及首道压力复核。日报页：https://lucky-xing.github.io/finance/daily/2026-11-05.html
+
+- 2026-11-06：北京时间07:50截止，22股重筛，三股纸面量价复核。日报页：https://lucky-xing.github.io/finance/daily/2026-11-06.html
+
+- 2026-11-07：周六休市，按11/6完整日线重筛22只，三只列为观察，无可执行买单。日报页：https://lucky-xing.github.io/finance/daily/2026-11-07.html
+
+- 2026-11-08：发布11/2—6周报与11/9—13展望，按周强度和周五量价重筛22只。伊利、恒瑞、茅台列观察。https://lucky-xing.github.io/finance/daily/2026-11-08.html
+
+- 2026-11-09：发布周一盘前日报，覆盖周五零时至截止；重筛22只，恒瑞、伊利、工行列条件观察。https://lucky-xing.github.io/finance/daily/2026-11-09.html
+
+- 2026-11-10：补发盘前日报，11/9完整行情重筛22只，工行、沪电、亨通列条件观察。https://lucky-xing.github.io/finance/daily/2026-11-10.html
+
+- 2026-11-11：盘前24小时日报，按11/10行情和资金重筛22只，沪电、三花、招行条件观察，工行与亨通退出。https://lucky-xing.github.io/finance/daily/2026-11-11.html
+
+- 2026-11-12：11/12盘前补刊；11/11收盘重筛22只，亨通、三花、海油观察。https://lucky-xing.github.io/finance/daily/2026-11-12.html
