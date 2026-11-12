@@ -197,7 +197,7 @@
 <figure class="paper-figure"><a href="/assets/papers/srs-csi-fusion/leo-estimator-time.png"><img alt="P-LS、MDDLS、EM 单次迭代的中位运行时间" src="/assets/papers/srs-csi-fusion/leo-estimator-time.png"/></a><figcaption>根据 <a href="https://arxiv.org/html/2505.14118v3#S4">Darya 与 Abdallah 表 II</a> 绘制。188.2 μs 是单次迭代耗时。</figcaption></figure>
 <p><strong>Wi‑Fi：用客户端反馈约束旁路雷达的定位。</strong> 《Hybrid Fusion for 802.11ax Wi-Fi-based Passive Radars》里的两路分别是旁路雷达从 AP 的 NDP 估计到的反射 CSI，以及客户端测得另一条链路并回报的 BFF。论文式 (14)–(17) 从旁路 CSI 得到样本协方差，从 BFF 的主右奇异方向与流增益近似客户端的协方差，依赖客户端直达路径占优。然后在候选目标间做关联，把雷达 AoD/AoA 和客户端 LoS AoD 的得分加起来，再交替细化目标位置。图 2 仿真设两个客户端目标和一个非客户端目标。融合改善客户端命中率和定位误差，非客户端目标因错误关联略有退化。命中定义为 2 米内，RMSE 仅统计所有方法都命中的样本，故两项指标应一起看。Wi‑Fi 在这里展示的是<strong>异链路证据的关联</strong>，其机制也适用于多站蜂窝或双基地探测。见 <a href="https://arxiv.org/html/2404.14269">原文 §IV–V</a>。</p>
 <p>Wi‑Fi 融合采用的两个协方差按原文式 (14)、(17) 简化为</p>
-<div class="equation">\[\widehat R_{\rm rad}=\frac1N\sum_{k=1}^{N}h_{{\rm rad},k}h_{{\rm rad},k}^{\mathrm H},\qquad \widehat R_{{\rm cli},u}\approx\frac1N\sum_{k=1}^{N}\widehat\sigma_{u,k}^2\widehat v_{u,k}\widehat v_{u,k}^{\mathrm H}.\]</div>
+<div class="equation">\[\widehat R_{\rm rad}=\frac1N\sum_{k=1}^{N}h_{\mathrm{rad},k}h_{\mathrm{rad},k}^{\mathrm H},\qquad \widehat R_{\mathrm{cli},u}\approx\frac1N\sum_{k=1}^{N}\widehat\sigma_{u,k}^2\widehat v_{u,k}\widehat v_{u,k}^{\mathrm H}.\]</div>
 <p>前式对旁路接收端向量化后的 CSI 作频域平均。后式用客户端 <span class="math-inline">\(u\)</span> 的反馈恢复主右奇异向量 <span class="math-inline">\(\widehat v_{u,k}\)</span> 和主奇异值 <span class="math-inline">\(\widehat\sigma_{u,k}\)</span>，保留主模态的功率与方向。在直达占优条件下，该方向可辅助定位客户端。对应结果按目标类型列在下表。</p>
 <table>
 <thead>

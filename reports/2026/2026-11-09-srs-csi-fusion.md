@@ -170,7 +170,7 @@ $$q_s^{(i+1)}=\frac{\sum_n w_{s,n}^{(i)}\widetilde y_s\xi_n^*}{\sum_n w_{s,n}^{(
 
 Wi‑Fi 融合采用的两个协方差按原文式 (14)、(17) 简化为
 
-$$\widehat R_{\rm rad}=\frac1N\sum_{k=1}^{N}h_{{\rm rad},k}h_{{\rm rad},k}^{\mathrm H},\qquad \widehat R_{{\rm cli},u}\approx\frac1N\sum_{k=1}^{N}\widehat\sigma_{u,k}^2\widehat v_{u,k}\widehat v_{u,k}^{\mathrm H}.$$
+$$\widehat R_{\rm rad}=\frac1N\sum_{k=1}^{N}h_{\mathrm{rad},k}h_{\mathrm{rad},k}^{\mathrm H},\qquad \widehat R_{\mathrm{cli},u}\approx\frac1N\sum_{k=1}^{N}\widehat\sigma_{u,k}^2\widehat v_{u,k}\widehat v_{u,k}^{\mathrm H}.$$
 
 前式对旁路接收端向量化后的 CSI 作频域平均。后式用客户端 $u$ 的反馈恢复主右奇异向量 $\widehat v_{u,k}$ 和主奇异值 $\widehat\sigma_{u,k}$，保留主模态的功率与方向。在直达占优条件下，该方向可辅助定位客户端。对应结果按目标类型列在下表。
 
