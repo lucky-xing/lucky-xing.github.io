@@ -8,6 +8,7 @@ const head=template.slice(0,template.indexOf('<main class="research">'))
 const table=(labels,id)=>'<div class="table-scroll"><table><thead><tr>'+labels.map(l=>'<th>'+l+'</th>').join('')+'</tr></thead><tbody id="'+id+'"></tbody></table></div>';
 const chart=id=>'<div class="chart" id="'+id+'"></div>';
 const businessModel=fs.readFileSync(path.join(__dirname,'hk-nonbank-business-model.html'),'utf8');
+const valuationMethod=fs.readFileSync(path.join(__dirname,'hk-valuation-method.html'),'utf8').replace('<!-- CORRELATION_TABLE -->',fs.readFileSync(path.join(__dirname,'hk-valuation-test-table.html'),'utf8'));
 const report=`<main class="research"><span class="eyebrow">HK CONNECT FINANCIALS EX BANKS</span>
 <h1>港股通非银板块深度研究</h1>
 <p class="meta">2026-11-12发布。行情、估值与ETF资金截至11-11完整收盘，指数权重截至10-30。财务指标按各公司披露期标注。</p>
@@ -38,6 +39,7 @@ ${chart('hk-pb-0')}${chart('hk-pb-1')}${chart('hk-pb-2')}
 <p><strong>低估主要出现在部分成分，板块整体缺少一致的低位信号。</strong>11/11接口值18.97倍，近三年49.32分位、五年63.34分位、全部79.08分位。六股PB约0.736倍，近三年31.15分位、五年42.44分位。后者低于近三年0.832倍中位数，但距离0.605倍的20分位仍有约18%空间。全指数PE参考与六股PB指向不同，保险投资收益下降会抬高PE，而头部公司经营质量、资本占用和股息能力决定PB是否应修复。</p>
 <p>寿险用P/EV、营运ROE、NBV和偿付能力交叉验证。EV对风险贴现率、长期投资回报、退保及费用假设敏感，估值应做折扣。财险、券商用PB对比可持续ROE，港交所用正常化EPS乘目标PE。用简化稳态 PB＝(ROE−g)/(资本成本−g)，当资本成本12%、长期增长2%时，ROE从10%降到8%，合理PB从0.8降到0.6。价格低于账面值需要盈利验证。</p></section>
 
+${valuationMethod}
 <section id="companies"><h2>核心公司与A/H定价</h2>
 <p>A股人民币、H股港元。H价隐含总市值以H收盘乘合并总股本，再按11/11的HKD/CNY 0.85025折算为亿元人民币。该指标反映H股价格所对应的全公司定价。PE以2025年报＋2026前三季度−2025前三季度的归母净利润为分母。PB采用已披露的最新每股净资产，ROE为前三季度未年化数。</p>
 ${table(['公司','A/H代码','A收盘','H收盘','H价隐含市值亿元','A/H PE(TTM)','A/H PB','H较A折价','前三季度归母亿元/同比','前三季度ROE'],'hk-ah')}
@@ -77,4 +79,4 @@ ${table(['标的','参考收盘','入场观察区','止损','两档止盈','中�
 <ul><li>11–12月跟踪港交所月度成交、IPO实际募资和南向成交。成交若持续恢复，再上修交易所和券商的基准盈利。</li><li>未来一至两季观察寿险开门红NBV、价值率、渠道成本和持续率。首年规模增长若伴随价值率下降，保守处理估值。</li><li>长端利率继续下降、信用减值扩大、偿付能力恶化、财险综合成本率重回100%以上，均削弱保险估值修复逻辑。</li><li>券商自营亏损扩大、融资余额收缩或净佣金率持续下降，需下调PB与ROE假设。</li><li>港元兑人民币变动影响人民币ETF回报。若港股资产价格不动且港元兑人民币下跌3%，忽略摩擦及其他影响时，人民币计价回报约下降3%。</li></ul>
 <p class="note">数据快照保留指数估值、报价、资金及分位。H股个股收益为港元收盘价变化，未计分红。ETF和沪深300取前复权价格，实际账户回报受费用与汇率影响。<a href="data/hk-connect-nonbank-20261111.js">数据快照</a></p></section>
 </main><footer class="wrap"><a href="index.html">返回行业和板块分析</a><span>Lighting Future · 港股通非银</span></footer><script src="data/hk-connect-nonbank-20261111.js"></script><script src="hk-connect-nonbank-charts.js"></script><script src="../../theme-motion.js" defer></script></body></html>`;
-fs.writeFileSync(path.join(sector,'hk-connect-nonbank-2026-11.html'),head+report);
+fs.writeFileSync(path.join(sector,'hk-connect-nonbank-2026-11.html'),head+report.replace('<a href="#valuation">历史估值</a>','<a href="#valuation">历史估值</a><a href="#valuation-method">PE与PB实证比较</a>'));
