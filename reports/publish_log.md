@@ -108,3 +108,15 @@
 - 2026-11-11：盘前24小时日报，按11/10行情和资金重筛22只，沪电、三花、招行条件观察，工行与亨通退出。https://lucky-xing.github.io/finance/daily/2026-11-11.html
 
 - 2026-11-12：11/12盘前补刊；11/11收盘重筛22只，亨通、三花、海油观察。https://lucky-xing.github.io/finance/daily/2026-11-12.html
+
+- 2026-11-13：盘前补刊，三股条件观察，零主动交易。https://lucky-xing.github.io/finance/daily/2026-11-13.html
+
+- 2026-11-14：周六日报，三股条件观察，零主动交易。https://lucky-xing.github.io/finance/daily/2026-11-14.html
+
+- 2026-11-15：周日日报，三股条件观察，零主动交易。https://lucky-xing.github.io/finance/daily/2026-11-15.html
+
+- 2026-11-16：周日日报，三股条件观察，零主动交易。https://lucky-xing.github.io/finance/daily/2026-11-16.html
+
+- 2026-11-17：盘前日报，个股数据待核。 https://lucky-xing.github.io/finance/daily/2026-11-17.html
+
+- 2026-11-18：盘前补刊，三股条件观察，零主动交易。https://lucky-xing.github.io/finance/daily/2026-11-18.html
