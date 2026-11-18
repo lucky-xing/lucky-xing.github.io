@@ -7,11 +7,13 @@ const head=template.slice(0,template.indexOf('<main class="research">'))
   .replace(/<meta name="description" content="[^"]*">/,'<meta name="description" content="港股通非银指数、保险与券商、港交所、历史估值及ETF交易研究">');
 const table=(labels,id)=>'<div class="table-scroll"><table><thead><tr>'+labels.map(l=>'<th>'+l+'</th>').join('')+'</tr></thead><tbody id="'+id+'"></tbody></table></div>';
 const chart=id=>'<div class="chart" id="'+id+'"></div>';
+const businessModel=fs.readFileSync(path.join(__dirname,'hk-nonbank-business-model.html'),'utf8');
+const valuationMethod=fs.readFileSync(path.join(__dirname,'hk-valuation-method.html'),'utf8').replace('<!-- CORRELATION_TABLE -->',fs.readFileSync(path.join(__dirname,'hk-valuation-test-table.html'),'utf8'));
 const report=`<main class="research"><span class="eyebrow">HK CONNECT FINANCIALS EX BANKS</span>
 <h1>港股通非银板块深度研究</h1>
 <p class="meta">2026-11-12发布。行情、估值与ETF资金截至11-11完整收盘，指数权重截至10-30。财务指标按各公司披露期标注。</p>
 <div class="verdict"><strong>板块以保险为主，港交所是第二大单一成分。当前更适合有条件等待。</strong>六只A/H成分股的H股PB低于近三年中位数，931024接口估值处于近三年中部、全可得历史较高位置。友邦与中国财险较抗跌，券商H股中期偏弱，广发513750近20日和60日仍净赎回。风险收益优先观察中国太保H，A股通道重点看中国太保A，华泰H作为券商修复备选。ETF直接表达工具为513750。</div>
-<nav class="toc"><a href="#scope">指数与产业链</a><a href="#cycle">景气与盈利</a><a href="#valuation">历史估值</a><a href="#companies">公司与A/H</a><a href="#market">行情与资金</a><a href="#etf">ETF</a><a href="#trade">交易策略</a><a href="#risks">催化与风险</a></nav>
+<nav class="toc"><a href="#scope">指数与产业链</a><a href="#business-model">保险与港交所的生意</a><a href="#cycle">景气与盈利</a><a href="#valuation">历史估值</a><a href="#companies">公司与A/H</a><a href="#market">行情与资金</a><a href="#etf">ETF</a><a href="#trade">交易策略</a><a href="#risks">催化与风险</a></nav>
 
 <section id="scope"><h2>指数范围与盈利来源</h2>
 <p>931024是港元价格指数，931028是人民币版本，513750跟踪后者。指数从港股通范围选取最多50家非银行金融公司。10/30官方文件有35只成分。按公司主要业务归类，保险约68.47%，港交所15.24%，其余约16.29%为券商及多元金融。友邦、港交所、平安合计45.92%，前十大82.63%。调样与盘中相对涨跌会改变权重。<a href="https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/indices/detail/files/zh_CN/931024_Index_Methodology_cn.pdf">中证编制方案</a> · <a href="https://oss-ch.csindex.com.cn/static/html/csindex/public/uploads/file/autofile/closeweight/931024closeweight.xls">中证指数成分权重</a></p>
@@ -19,6 +21,7 @@ ${table(['代码','成分','10/30权重'],'hk-weights')}
 <div class="chain"><div><strong>寿险</strong><br>保费与渠道 → NBV及CSM → 营运利润和资本释放</div><div><strong>财险</strong><br>保费 → 赔付与费用 → 承保利润及投资收益</div><div><strong>券商</strong><br>成交、两融与发行 → 手续费及利差 → ROE</div><div><strong>交易所</strong><br>成交、上市及清算 → 费用及投资收入 → 股东利润</div></div>
 <p>护城河优先看港交所的交易、清算、市场接入与网络效应，再看友邦长期代理体系和头部财险的定价、理赔数据与规模。投资顺序还要考虑价格。当前优先选择低PB且负债端可验证的中国太保，其次华泰证券的估值修复，港交所等待更高赔率。保险权重占主导，券商政策利好通常只能解释指数的一部分。</p></section>
 
+${businessModel}
 <section id="cycle"><h2>景气与利润传导</h2>
 <p><strong>寿险。</strong>寿险负债端看年化新保费、NBV率、13/25个月继续率和渠道费用。资产端看净投资收益率、长端利率、股债配置和信用减值。三季度多家内险净利润下降，但利源拆解显示投资波动较大，需看营运利润能否守住。平安前三季度归母966.45亿元，同比下降27.3%，NBV同比下降约13.3%。中国人寿归母下降46.7%，但NBV增长约13.1%。太保归母下降20.3%，NBV下降约6.5%，产险综合成本率约96.2%，同比改善约1.4个百分点。<a href="https://static.cninfo.com.cn/finalpage/2026-10-29/1225637017.PDF">平安三季报</a> · <a href="https://reportify.cn/reports/1314275955866472448">三季报跨公司汇总</a></p>
 <p><strong>友邦与财险。</strong>友邦前三季VONB 46.27亿美元，固定汇率增5%，Q3为14.15亿美元，同比下降5%。Q3新业务价值率由58.2%提高到63.5%，年化新保费同比下降13%。若保费收缩持续，改善的价值率可能仍难抵消规模下降。财险用综合成本率和再保险成本观察承保盈利，例如保费100亿元且其他条件不变时，综合成本率从96%降到95%约增加1亿元承保利润。巨灾和车险赔付率会让单季利润明显偏离趋势。<a href="https://www.aia.com/en/media-centre/press-releases/2026/aia-group-press-release-20261030">友邦三季度新业务公告</a></p>
@@ -36,6 +39,7 @@ ${chart('hk-pb-0')}${chart('hk-pb-1')}${chart('hk-pb-2')}
 <p><strong>低估主要出现在部分成分，板块整体缺少一致的低位信号。</strong>11/11接口值18.97倍，近三年49.32分位、五年63.34分位、全部79.08分位。六股PB约0.736倍，近三年31.15分位、五年42.44分位。后者低于近三年0.832倍中位数，但距离0.605倍的20分位仍有约18%空间。全指数PE参考与六股PB指向不同，保险投资收益下降会抬高PE，而头部公司经营质量、资本占用和股息能力决定PB是否应修复。</p>
 <p>寿险用P/EV、营运ROE、NBV和偿付能力交叉验证。EV对风险贴现率、长期投资回报、退保及费用假设敏感，估值应做折扣。财险、券商用PB对比可持续ROE，港交所用正常化EPS乘目标PE。用简化稳态 PB＝(ROE−g)/(资本成本−g)，当资本成本12%、长期增长2%时，ROE从10%降到8%，合理PB从0.8降到0.6。价格低于账面值需要盈利验证。</p></section>
 
+${valuationMethod}
 <section id="companies"><h2>核心公司与A/H定价</h2>
 <p>A股人民币、H股港元。H价隐含总市值以H收盘乘合并总股本，再按11/11的HKD/CNY 0.85025折算为亿元人民币。该指标反映H股价格所对应的全公司定价。PE以2025年报＋2026前三季度−2025前三季度的归母净利润为分母。PB采用已披露的最新每股净资产，ROE为前三季度未年化数。</p>
 ${table(['公司','A/H代码','A收盘','H收盘','H价隐含市值亿元','A/H PE(TTM)','A/H PB','H较A折价','前三季度归母亿元/同比','前三季度ROE'],'hk-ah')}
@@ -75,4 +79,4 @@ ${table(['标的','参考收盘','入场观察区','止损','两档止盈','中�
 <ul><li>11–12月跟踪港交所月度成交、IPO实际募资和南向成交。成交若持续恢复，再上修交易所和券商的基准盈利。</li><li>未来一至两季观察寿险开门红NBV、价值率、渠道成本和持续率。首年规模增长若伴随价值率下降，保守处理估值。</li><li>长端利率继续下降、信用减值扩大、偿付能力恶化、财险综合成本率重回100%以上，均削弱保险估值修复逻辑。</li><li>券商自营亏损扩大、融资余额收缩或净佣金率持续下降，需下调PB与ROE假设。</li><li>港元兑人民币变动影响人民币ETF回报。若港股资产价格不动且港元兑人民币下跌3%，忽略摩擦及其他影响时，人民币计价回报约下降3%。</li></ul>
 <p class="note">数据快照保留指数估值、报价、资金及分位。H股个股收益为港元收盘价变化，未计分红。ETF和沪深300取前复权价格，实际账户回报受费用与汇率影响。<a href="data/hk-connect-nonbank-20261111.js">数据快照</a></p></section>
 </main><footer class="wrap"><a href="index.html">返回行业和板块分析</a><span>Lighting Future · 港股通非银</span></footer><script src="data/hk-connect-nonbank-20261111.js"></script><script src="hk-connect-nonbank-charts.js"></script><script src="../../theme-motion.js" defer></script></body></html>`;
-fs.writeFileSync(path.join(sector,'hk-connect-nonbank-2026-11.html'),head+report);
+fs.writeFileSync(path.join(sector,'hk-connect-nonbank-2026-11.html'),head+report.replace('<a href="#valuation">历史估值</a>','<a href="#valuation">历史估值</a><a href="#valuation-method">PE与PB实证比较</a>'));

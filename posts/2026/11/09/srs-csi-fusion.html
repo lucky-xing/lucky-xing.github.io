@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><meta content="从蜂窝导频、毫米波扫频到雷达回波，逐篇分析探测与 CSI 的融合方法、实验边界和研究趋势。" name="description"/><title>广义信道探测与 CSI 融合：观测、可辨识性与闭环设计 · Lighting Future</title><link href="../../../../style.css" rel="stylesheet"/><link href="../../../../assets/paper-report.css?v=5acafff8b1bd" rel="stylesheet"/><script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']],processEscapes:true},svg:{fontCache:'local'},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer="" src="../../../../assets/vendor/mathjax/tex-svg-full.js"></script></head><body class="category-page paper-report theme-communication"><a class="skip" href="#main">跳到正文</a><header class="wrap"><a class="brand" href="../../../../index.html"><span class="mark">兴</span>兴耀未来</a><nav aria-label="主导航"><a href="../../../../index.html">首页</a><a href="../../../../ai.html">AI</a><a href="../../../../finance.html">投资理财</a><a aria-current="page" href="../../../../communication.html">通信</a><a href="../../../../learning.html">学习</a><a href="../../../../world.html">看世界</a></nav></header><main class="report" id="main"><div class="breadcrumb"><a href="../../../../communication.html">通信</a></div><p class="kicker">PAPER RESEARCH / 2026-11-10</p><h1 id="csi">广义信道探测与 CSI 融合：观测、可辨识性与闭环设计</h1><p>日期：2026-11-10　｜　通信　｜　论文精读与方法分析</p><nav aria-label="文章目录" class="toc"><strong>阅读导航</strong><a href="#1">1. 先定义两路输入与输出</a><a href="#2">2. 统一观测模型、可辨识性与新增信息</a><a href="#3-lee-tdd">3. Lee 等：TDD 不对称端口下的空间重建</a><a href="#4-kim-jadd">4. Kim 等与 JADD：在目标频率补相位，在目标时刻补演进</a><a href="#5-ujefnet-merge-for-reconstruction">5. UJEFNet 与 Merge for Reconstruction：学习式融合的证据与缺口</a><a href="#6-yuan">6. Yuan 等：从雷达回波取得稀疏支撑，再用导频估增益</a><a href="#7-luo">7. Luo 等：实测中雷达适合缩小波束候选</a><a href="#8-wifi">8. 补充案例：卫星链路跟踪与 Wi‑Fi 异链路定位</a><a href="#9">9. 调研结论、研究趋势与验证计划</a></nav>
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><meta content="从蜂窝导频、毫米波扫频到雷达回波，逐篇分析探测与 CSI 的融合方法、实验边界和研究趋势。" name="description"/><title>广义信道探测与 CSI 融合：观测、可辨识性与闭环设计 · Lighting Future</title><link href="../../../../style.css" rel="stylesheet"/><link href="../../../../assets/paper-report.css?v=5acafff8b1bd" rel="stylesheet"/><script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']],processEscapes:true},svg:{fontCache:'local'},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer="" src="../../../../assets/vendor/mathjax/tex-svg-full.js"></script></head><body class="category-page paper-report theme-communication"><a class="skip" href="#main">跳到正文</a><header class="wrap"><a class="brand" href="../../../../index.html"><span class="mark">兴</span>兴耀未来</a><nav aria-label="主导航"><a href="../../../../index.html">首页</a><a href="../../../../ai.html">AI</a><a href="../../../../finance.html">投资理财</a><a aria-current="page" href="../../../../communication.html">通信</a><a href="../../../../learning.html">学习</a><a href="../../../../world.html">看世界</a></nav></header><main class="report" id="main"><div class="breadcrumb"><a href="../../../../communication.html">通信</a></div><p class="kicker">PAPER RESEARCH / 2026-11-10</p><h1 id="csi">广义信道探测与 CSI 融合：观测、可辨识性与闭环设计</h1><p>日期：2026-11-10　｜　通信　｜　论文精读与方法分析</p><nav aria-label="文章目录" class="toc"><strong>阅读导航</strong><a href="#1">1. 先定义两路输入与输出</a><a href="#2">2. 统一观测模型、可辨识性与新增信息</a><a href="#3-lee-tdd">3. Lee 等：TDD 不对称端口下的空间重建</a><a href="#4-kim-jadd">4. Kim 等与 JADD：在目标频率补相位，在目标时刻补演进</a><a href="#5-ujefnet-merge-for-reconstruction">5. UJEFNet 与 Merge for Reconstruction：学习式融合的证据与缺口</a><a href="#6-yuan">6. Yuan 等：从雷达回波取得稀疏支撑，再用导频估增益</a><a href="#7-luo">7. Luo 等：实测中雷达适合缩小波束候选</a><a href="#8-wifi">8. 补充案例：卫星链路跟踪与 Wi‑Fi 异链路定位</a><a href="#9">9. 调研结论、研究趋势与验证计划</a><a href="#10">10. 参考文献</a></nav>
 
 <p>这里的 sounding 指<strong>用已知或受控信号探查传播通道</strong>。它可以是蜂窝 SRS/CSI-RS、专用测量仪的扫频与宽带探测、波束扫描、通感系统的雷达波形，也可以是 Wi‑Fi 探测帧。CSI 是由观测推断的状态，形态可以是复数信道矩阵、压缩码字、预编码子空间、波束功率或带不确定度的路径参数。本文讨论的是<strong>探测提供的一路观测，如何和另一时刻、链路、设备或处理链形成的 CSI 一起服务于目标</strong>。</p>
 <p>所调研文献显示，探测可提供候选路径或波束，通信观测可用于估计复系数或验证候选。按不确定度追加探测是基于这些结果提出的待验证方案。TDD 空间补全、FDD 相位反馈、雷达辅助波束和数据辅助跟踪，都可用这一框架理解，但它们估计的是不同对象。在所引 V2V 道路实测中，直接由低分辨率雷达角度选束的准确率低于维持上一束的基线。该结果支持进一步评估保留候选方向和置信度的方案。</p>
@@ -253,4 +253,49 @@
 </tr>
 </tbody>
 </table>
-<p>复现可按任务选择对照。蜂窝同链路重建可采用上行探测和下行反馈的单源基线。非蜂窝场景中，ASU 道路数据适合检验波束跟踪，UNSW 的 OTFS 仿真适合分离路径几何误差、估计方差和导频开销。两类实验均可在固定资源预算下评估第二路观测对目标任务的增益。</p></main><footer class="wrap"><a class="brand" href="../../../../index.html">兴耀未来</a><span>保持好奇。持续记录。</span><a href="https://github.com/lucky-xing/">GitHub ↗</a></footer><script defer="" src="../../../../theme-motion.js"></script></body></html>
+<p>复现可按任务选择对照。蜂窝同链路重建可采用上行探测和下行反馈的单源基线。非蜂窝场景中，ASU 道路数据适合检验波束跟踪，UNSW 的 OTFS 仿真适合分离路径几何误差、估计方差和导频开销。两类实验均可在固定资源预算下评估第二路观测对目标任务的增益。</p>
+<h2 id="10">10. 参考文献</h2>
+<ol>
+<li>
+<p>3GPP / ETSI. <em>NR; Physical Layer Procedures for Data</em>. TS 38.214 V19.1.0, 2025. 本报告采用该版本的 CSI 报告及 SRS 过程定义。<a href="https://www.etsi.org/deliver/etsi_ts/138200_138299/138214/19.01.00_60/ts_138214v190100p.pdf">标准全文</a></p>
+</li>
+<li>
+<p>Guven D., Jamroz B. F., Chuang J., Gentile C., Horansky R. D., Remley K. A., Williams D. F., Quimby J. T., Weiss A. J., Leonhardt R. <em>Methodology for Measuring the Frequency Dependence of Multipath Channels Across the Millimeter-Wave Spectrum</em>. IEEE Open Journal of Antennas and Propagation, 2022. DOI 10.1109/OJAP.2022.3168401。<a href="https://doi.org/10.1109/OJAP.2022.3168401">DOI</a> · <a href="https://tsapps.nist.gov/publication/get_pdf.cfm?pub_id=934469">公开全文</a></p>
+</li>
+<li>
+<p>Lee H., Choi H., Kim H., Kim S., Jang C., Choi Y., Choi J. <em>Downlink Channel Reconstruction for Spatial Multiplexing in Massive MIMO Systems</em>. 2021. 本报告采用 arXiv:2102.05224v1。<a href="https://arxiv.org/abs/2102.05224">论文页面</a> · <a href="https://arxiv.org/pdf/2102.05224v1">全文</a></p>
+</li>
+<li>
+<p>Kim J., Choi J., Park J., Alkhateeb A., Lee N. <em>FDD Massive MIMO: How to Optimally Combine UL Pilot and Limited DL CSI Feedback?</em> 2024. 本报告采用 arXiv:2405.08614v1。<a href="https://arxiv.org/abs/2405.08614">论文页面</a> · <a href="https://arxiv.org/pdf/2405.08614v1">全文</a></p>
+</li>
+<li>
+<p>Qin Z., Yin H., Cao Y., Li W., Gesbert D. <em>A Partial Reciprocity-Based Channel Prediction Framework for FDD Massive MIMO With High Mobility</em>. IEEE Transactions on Wireless Communications, 21(11), 9638–9652, 2022. DOI 10.1109/TWC.2022.3178499。<a href="https://doi.org/10.1109/TWC.2022.3178499">DOI</a> · <a href="https://arxiv.org/pdf/2202.05564">公开全文</a></p>
+</li>
+<li>
+<p>Guo Y., Chen W., Ai B. <em>Uplink Assisted Joint Channel Estimation and CSI Feedback: An Approach Based on Deep Joint Source-Channel Coding</em>. 2025. 本报告采用 arXiv:2504.10836v1。<a href="https://arxiv.org/abs/2504.10836">论文页面</a> · <a href="https://arxiv.org/pdf/2504.10836v1">全文</a></p>
+</li>
+<li>
+<p>Zhang Y., Tan J., Zhang X.-D., Wang J., Zhang Y. <em>Merge for Reconstruction: Deep Learning-Based Channel Merging Based on SRS and CSI Feedback in Massive MIMO Systems</em>. IEEE Transactions on Broadcasting, 72(2), 449–462, 2026. DOI 10.1109/TBC.2026.3670696。本报告仅取得公开摘要。<a href="https://doi.org/10.1109/TBC.2026.3670696">DOI</a> · <a href="https://www.researchgate.net/publication/401909398_Merge_for_Reconstruction_Deep_Learning-Based_Channel_Merging_Based_on_SRS_and_CSI_Feedback_in_Massive_MIMO_Systems">摘要页面</a></p>
+</li>
+<li>
+<p>Liu Z., Zhang L., Ding Z. <em>Exploiting Bi-Directional Channel Reciprocity in Deep Learning for Low Rate Massive MIMO CSI Feedback</em>. IEEE Wireless Communications Letters, 8(3), 2019。<a href="https://par.nsf.gov/servlets/purl/10149759">公开全文</a> · <a href="https://github.com/DLinWL/Bi-Directional-Channel-Reciprocity">作者代码</a></p>
+</li>
+<li>
+<p>Guo J., Wen C.-K., Jin S. <em>CAnet: Uplink-Aided Downlink Channel Acquisition in FDD Massive MIMO Using Deep Learning</em>. IEEE Transactions on Communications, 70(1), 199–214, 2022. DOI 10.1109/TCOMM.2021.3120294。本报告分析 arXiv:2101.04377v1。<a href="https://doi.org/10.1109/TCOMM.2021.3120294">DOI</a> · <a href="https://arxiv.org/pdf/2101.04377v1">公开全文</a></p>
+</li>
+<li>
+<p>Liu Z., Ma Y., Tafazolli R., Ding Z. <em>Leveraging Bi-Directional Channel Reciprocity for Robust Ultra-Low-Rate Implicit CSI Feedback with Deep Learning</em>. 2025. 本报告采用 arXiv:2507.12301v1。<a href="https://arxiv.org/abs/2507.12301">论文页面</a> · <a href="https://arxiv.org/pdf/2507.12301v1">全文</a></p>
+</li>
+<li>
+<p>Yuan W., Wei Z., Li S., Yuan J., Ng D. W. K. <em>Integrated Sensing and Communication-assisted Orthogonal Time Frequency Space Transmission for Vehicular Networks</em>. 2021. 本报告采用 arXiv:2105.03125v2，公式编号以对应 HTML 版为准。<a href="https://arxiv.org/abs/2105.03125">论文页面</a> · <a href="https://arxiv.org/pdf/2105.03125v2">全文</a></p>
+</li>
+<li>
+<p>Luo H., Demirhan U., Alkhateeb A. <em>Millimeter Wave V2V Beam Tracking using Radar: Algorithms and Real-World Demonstration</em>. EUSIPCO, 2023. 本报告采用 arXiv:2308.01558v2。<a href="https://arxiv.org/abs/2308.01558">论文页面</a> · <a href="https://arxiv.org/pdf/2308.01558v2">全文</a></p>
+</li>
+<li>
+<p>Darya A. M., Abdallah S. <em>EM-Based Channel Estimation for mMIMO LEO SATCOM Under Imperfect Doppler Compensation</em>. 2025. 本报告采用 arXiv:2505.14118v3。<a href="https://arxiv.org/abs/2505.14118">论文页面</a> · <a href="https://arxiv.org/pdf/2505.14118v3">全文</a> · <a href="https://ieeexplore.ieee.org/document/11202394">出版方页面</a></p>
+</li>
+<li>
+<p>Willame M., Yildirim H. C., Storrer L., Horlin F., Louveaux J. <em>Hybrid Fusion for 802.11ax Wi-Fi-based Passive Radars Exploiting Beamforming Feedbacks</em>. 2024. arXiv:2404.14269。<a href="https://arxiv.org/abs/2404.14269">论文页面</a> · <a href="https://arxiv.org/pdf/2404.14269">全文</a></p>
+</li>
+</ol></main><footer class="wrap"><a class="brand" href="../../../../index.html">兴耀未来</a><span>保持好奇。持续记录。</span><a href="https://github.com/lucky-xing/">GitHub ↗</a></footer><script defer="" src="../../../../theme-motion.js"></script></body></html>
