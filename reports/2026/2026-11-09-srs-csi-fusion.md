@@ -200,3 +200,33 @@ $$\widehat R_{\rm rad}=\frac1N\sum_{k=1}^{N}h_{\mathrm{rad},k}h_{\mathrm{rad},k}
 | 闭环测试 | 在相同空口预算下比较固定周期探测、按风险触发、Top-K 短扫及穷举参考；逐步扫缺失、遮挡和时延。 | 若新增探测或计算吞掉吞吐收益，表明应重新定义触发与输出任务。 |
 
 复现可按任务选择对照。蜂窝同链路重建可采用上行探测和下行反馈的单源基线。非蜂窝场景中，ASU 道路数据适合检验波束跟踪，UNSW 的 OTFS 仿真适合分离路径几何误差、估计方差和导频开销。两类实验均可在固定资源预算下评估第二路观测对目标任务的增益。
+
+## 10. 参考文献
+
+1. 3GPP / ETSI. *NR; Physical Layer Procedures for Data*. TS 38.214 V19.1.0, 2025. 本报告采用该版本的 CSI 报告及 SRS 过程定义。[标准全文](https://www.etsi.org/deliver/etsi_ts/138200_138299/138214/19.01.00_60/ts_138214v190100p.pdf)
+
+2. Guven D., Jamroz B. F., Chuang J., Gentile C., Horansky R. D., Remley K. A., Williams D. F., Quimby J. T., Weiss A. J., Leonhardt R. *Methodology for Measuring the Frequency Dependence of Multipath Channels Across the Millimeter-Wave Spectrum*. IEEE Open Journal of Antennas and Propagation, 2022. DOI 10.1109/OJAP.2022.3168401。[DOI](https://doi.org/10.1109/OJAP.2022.3168401) · [公开全文](https://tsapps.nist.gov/publication/get_pdf.cfm?pub_id=934469)
+
+3. Lee H., Choi H., Kim H., Kim S., Jang C., Choi Y., Choi J. *Downlink Channel Reconstruction for Spatial Multiplexing in Massive MIMO Systems*. 2021. 本报告采用 arXiv:2102.05224v1。[论文页面](https://arxiv.org/abs/2102.05224) · [全文](https://arxiv.org/pdf/2102.05224v1)
+
+4. Kim J., Choi J., Park J., Alkhateeb A., Lee N. *FDD Massive MIMO: How to Optimally Combine UL Pilot and Limited DL CSI Feedback?* 2024. 本报告采用 arXiv:2405.08614v1。[论文页面](https://arxiv.org/abs/2405.08614) · [全文](https://arxiv.org/pdf/2405.08614v1)
+
+5. Qin Z., Yin H., Cao Y., Li W., Gesbert D. *A Partial Reciprocity-Based Channel Prediction Framework for FDD Massive MIMO With High Mobility*. IEEE Transactions on Wireless Communications, 21(11), 9638–9652, 2022. DOI 10.1109/TWC.2022.3178499。[DOI](https://doi.org/10.1109/TWC.2022.3178499) · [公开全文](https://arxiv.org/pdf/2202.05564)
+
+6. Guo Y., Chen W., Ai B. *Uplink Assisted Joint Channel Estimation and CSI Feedback: An Approach Based on Deep Joint Source-Channel Coding*. 2025. 本报告采用 arXiv:2504.10836v1。[论文页面](https://arxiv.org/abs/2504.10836) · [全文](https://arxiv.org/pdf/2504.10836v1)
+
+7. Zhang Y., Tan J., Zhang X.-D., Wang J., Zhang Y. *Merge for Reconstruction: Deep Learning-Based Channel Merging Based on SRS and CSI Feedback in Massive MIMO Systems*. IEEE Transactions on Broadcasting, 72(2), 449–462, 2026. DOI 10.1109/TBC.2026.3670696。本报告仅取得公开摘要。[DOI](https://doi.org/10.1109/TBC.2026.3670696) · [摘要页面](https://www.researchgate.net/publication/401909398_Merge_for_Reconstruction_Deep_Learning-Based_Channel_Merging_Based_on_SRS_and_CSI_Feedback_in_Massive_MIMO_Systems)
+
+8. Liu Z., Zhang L., Ding Z. *Exploiting Bi-Directional Channel Reciprocity in Deep Learning for Low Rate Massive MIMO CSI Feedback*. IEEE Wireless Communications Letters, 8(3), 2019。[公开全文](https://par.nsf.gov/servlets/purl/10149759) · [作者代码](https://github.com/DLinWL/Bi-Directional-Channel-Reciprocity)
+
+9. Guo J., Wen C.-K., Jin S. *CAnet: Uplink-Aided Downlink Channel Acquisition in FDD Massive MIMO Using Deep Learning*. IEEE Transactions on Communications, 70(1), 199–214, 2022. DOI 10.1109/TCOMM.2021.3120294。本报告分析 arXiv:2101.04377v1。[DOI](https://doi.org/10.1109/TCOMM.2021.3120294) · [公开全文](https://arxiv.org/pdf/2101.04377v1)
+
+10. Liu Z., Ma Y., Tafazolli R., Ding Z. *Leveraging Bi-Directional Channel Reciprocity for Robust Ultra-Low-Rate Implicit CSI Feedback with Deep Learning*. 2025. 本报告采用 arXiv:2507.12301v1。[论文页面](https://arxiv.org/abs/2507.12301) · [全文](https://arxiv.org/pdf/2507.12301v1)
+
+11. Yuan W., Wei Z., Li S., Yuan J., Ng D. W. K. *Integrated Sensing and Communication-assisted Orthogonal Time Frequency Space Transmission for Vehicular Networks*. 2021. 本报告采用 arXiv:2105.03125v2，公式编号以对应 HTML 版为准。[论文页面](https://arxiv.org/abs/2105.03125) · [全文](https://arxiv.org/pdf/2105.03125v2)
+
+12. Luo H., Demirhan U., Alkhateeb A. *Millimeter Wave V2V Beam Tracking using Radar: Algorithms and Real-World Demonstration*. EUSIPCO, 2023. 本报告采用 arXiv:2308.01558v2。[论文页面](https://arxiv.org/abs/2308.01558) · [全文](https://arxiv.org/pdf/2308.01558v2)
+
+13. Darya A. M., Abdallah S. *EM-Based Channel Estimation for mMIMO LEO SATCOM Under Imperfect Doppler Compensation*. 2025. 本报告采用 arXiv:2505.14118v3。[论文页面](https://arxiv.org/abs/2505.14118) · [全文](https://arxiv.org/pdf/2505.14118v3) · [出版方页面](https://ieeexplore.ieee.org/document/11202394)
+
+14. Willame M., Yildirim H. C., Storrer L., Horlin F., Louveaux J. *Hybrid Fusion for 802.11ax Wi-Fi-based Passive Radars Exploiting Beamforming Feedbacks*. 2024. arXiv:2404.14269。[论文页面](https://arxiv.org/abs/2404.14269) · [全文](https://arxiv.org/pdf/2404.14269)
