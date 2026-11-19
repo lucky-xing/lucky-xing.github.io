@@ -1,5 +1,7 @@
 # 行业和板块分析
 
+- [医药行业、细分估值与ETF投资策略](healthcare-etf-2026-11.html) — 2026-11-19，v0.2审阅稿
+
 - [港股通非银板块深度研究](hk-connect-nonbank-2026-11.html) — 2026-11-12
 
 - [半导体设备板块深度研究](semiconductor-equipment-2026-11.html) — 2026-11-05
