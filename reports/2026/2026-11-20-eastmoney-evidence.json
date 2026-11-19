@@ -1,0 +1,310 @@
+[
+  {
+    "code": "600519",
+    "kind": "kline",
+    "source": "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=1.600519&klt=101&fqt=0&lmt=80&end=20261119&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61",
+    "latest": "2026-11-19,1442.00,1460.21,1464.99,1432.10,42692,6192213063.00,2.28,1.22,17.55,0.34",
+    "rows": 80
+  },
+  {
+    "code": "600519",
+    "kind": "funds",
+    "source": "https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get?secid=1.600519&lmt=10&klt=101&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63",
+    "latest": "2026-11-19,26182688.0,-718320.0,-25464352.0,3193104.0,22989584.0,0.42,-0.01,-0.41,0.05,0.37,1460.21,1.22",
+    "rows": 10
+  },
+  {
+    "code": "603019",
+    "kind": "kline",
+    "source": "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=1.603019&klt=101&fqt=0&lmt=80&end=20261119&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61",
+    "latest": "2026-11-19,82.65,78.33,82.65,74.50,540474,4157560901.00,9.86,-5.23,-4.32,3.70",
+    "rows": 80
+  },
+  {
+    "code": "603019",
+    "kind": "funds",
+    "source": "https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get?secid=1.603019&lmt=10&klt=101&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63",
+    "latest": "2026-11-19,-292350176.0,262587168.0,29763008.0,-114463936.0,-177886240.0,-7.03,6.32,0.72,-2.75,-4.28,78.33,-5.23",
+    "rows": 10
+  },
+  {
+    "code": "001309",
+    "kind": "kline",
+    "source": "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=0.001309&klt=101&fqt=0&lmt=80&end=20261119&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61",
+    "latest": "2026-11-19,183.59,181.60,186.50,180.50,121891,2225702406.94,3.20,-3.14,-5.89,5.24",
+    "rows": 80
+  },
+  {
+    "code": "001309",
+    "kind": "funds",
+    "source": "https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get?secid=0.001309&lmt=10&klt=101&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63",
+    "latest": "2026-11-19,-162351774.0,139276144.0,23075648.0,-56058800.0,-106292974.0,-7.29,6.26,1.04,-2.52,-4.78,181.60,-3.14",
+    "rows": 10
+  },
+  {
+    "code": "002463",
+    "kind": "kline",
+    "source": "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=0.002463&klt=101&fqt=0&lmt=80&end=20261119&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61",
+    "latest": "2026-11-19,77.21,81.10,81.86,77.00,793128,6339863271.57,6.06,1.13,0.91,4.10",
+    "rows": 80
+  },
+  {
+    "code": "002463",
+    "kind": "funds",
+    "source": "https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get?secid=0.002463&lmt=10&klt=101&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63",
+    "latest": "2026-11-19,297201664.0,-369719168.0,72517504.0,51129952.0,246071712.0,4.69,-5.83,1.14,0.81,3.88,81.10,1.13",
+    "rows": 10
+  },
+  {
+    "code": "002636",
+    "kind": "kline",
+    "source": "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=0.002636&klt=101&fqt=0&lmt=80&end=20261119&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61",
+    "latest": "2026-11-19,51.01,50.38,52.08,49.85,316699,1607876155.84,4.23,-4.40,-2.32,4.37",
+    "rows": 80
+  },
+  {
+    "code": "002636",
+    "kind": "funds",
+    "source": "https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get?secid=0.002636&lmt=10&klt=101&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63",
+    "latest": "2026-11-19,-112994440.0,142456896.0,-29462464.0,-86131552.0,-26862888.0,-7.03,8.86,-1.83,-5.36,-1.67,50.38,-4.40",
+    "rows": 10
+  },
+  {
+    "code": "000823",
+    "kind": "kline",
+    "source": "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=0.000823&klt=101&fqt=0&lmt=80&end=20261119&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61",
+    "latest": "2026-11-19,17.02,16.83,17.40,16.61,757471,1285701989.23,4.48,-4.65,-0.82,12.73",
+    "rows": 80
+  },
+  {
+    "code": "000823",
+    "kind": "funds",
+    "source": "https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get?secid=0.000823&lmt=10&klt=101&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63",
+    "latest": "2026-11-19,-108551752.0,131698032.0,-23146272.0,-52569119.0,-55982633.0,-8.44,10.24,-1.80,-4.09,-4.35,16.83,-4.65",
+    "rows": 10
+  },
+  {
+    "code": "600276",
+    "kind": "kline",
+    "source": "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=1.600276&klt=101&fqt=0&lmt=80&end=20261119&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61",
+    "latest": "2026-11-19,47.13,46.88,47.20,46.30,339746,1587169985.00,1.92,-0.04,-0.02,0.53",
+    "rows": 80
+  },
+  {
+    "code": "600276",
+    "kind": "funds",
+    "source": "https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get?secid=1.600276&lmt=10&klt=101&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63",
+    "latest": "2026-11-19,-102845301.0,133218512.0,-30373200.0,-142810768.0,39965467.0,-6.48,8.39,-1.91,-9.00,2.52,46.88,-0.04",
+    "rows": 10
+  },
+  {
+    "code": "601398",
+    "kind": "kline",
+    "source": "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=1.601398&klt=101&fqt=0&lmt=80&end=20261119&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61",
+    "latest": "2026-11-19,9.07,9.10,9.10,9.00,2418648,2189854788.00,1.10,0.44,0.04,0.09",
+    "rows": 80
+  },
+  {
+    "code": "601398",
+    "kind": "funds",
+    "source": "https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get?secid=1.601398&lmt=10&klt=101&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63",
+    "latest": "2026-11-19,-101998752.0,-18018752.0,120017520.0,-65007248.0,-36991504.0,-4.66,-0.82,5.48,-2.97,-1.69,9.10,0.44",
+    "rows": 10
+  },
+  {
+    "code": "600938",
+    "kind": "kline",
+    "source": "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=1.600938&klt=101&fqt=0&lmt=80&end=20261119&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61",
+    "latest": "2026-11-19,30.32,30.25,30.50,29.96,334693,1008548894.00,1.77,-0.92,-0.28,1.12",
+    "rows": 80
+  },
+  {
+    "code": "600938",
+    "kind": "funds",
+    "source": "https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get?secid=1.600938&lmt=10&klt=101&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63",
+    "latest": "2026-11-19,-174302988.0,159090000.0,15212993.0,2831577.0,-177134565.0,-17.28,15.77,1.51,0.28,-17.56,30.25,-0.92",
+    "rows": 10
+  },
+  {
+    "code": "601857",
+    "kind": "kline",
+    "source": "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=1.601857&klt=101&fqt=0&lmt=80&end=20261119&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61",
+    "latest": "2026-11-19,12.54,12.63,12.68,12.37,1095576,1369648627.00,2.47,0.48,0.06,0.07",
+    "rows": 80
+  },
+  {
+    "code": "601857",
+    "kind": "funds",
+    "source": "https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get?secid=1.601857&lmt=10&klt=101&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63",
+    "latest": "2026-11-19,-96956557.0,104401440.0,-7444896.0,-86948464.0,-10008093.0,-7.08,7.62,-0.54,-6.35,-0.73,12.63,0.48",
+    "rows": 10
+  },
+  {
+    "code": "000858",
+    "kind": "kline",
+    "source": "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=0.000858&klt=101&fqt=0&lmt=80&end=20261119&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61",
+    "latest": "2026-11-19,73.25,73.40,73.91,72.80,156821,1148664472.15,1.51,0.05,0.04,0.40",
+    "rows": 80
+  },
+  {
+    "code": "000858",
+    "kind": "funds",
+    "source": "https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get?secid=0.000858&lmt=10&klt=101&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63",
+    "latest": "2026-11-19,-101265678.0,88433136.0,12832528.0,-46370782.0,-54894896.0,-8.82,7.70,1.12,-4.04,-4.78,73.40,0.05",
+    "rows": 10
+  },
+  {
+    "code": "600487",
+    "kind": "kline",
+    "source": "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=1.600487&klt=101&fqt=0&lmt=80&end=20261119&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61",
+    "latest": "2026-11-19,38.00,38.10,38.61,37.43,766047,2903438698.00,3.06,-1.27,-0.49,3.12",
+    "rows": 80
+  },
+  {
+    "code": "600487",
+    "kind": "funds",
+    "source": "https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get?secid=1.600487&lmt=10&klt=101&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63",
+    "latest": "2026-11-19,-217766416.0,284729152.0,-66962752.0,-134178064.0,-83588352.0,-7.50,9.81,-2.31,-4.62,-2.88,38.10,-1.27",
+    "rows": 10
+  },
+  {
+    "code": "000636",
+    "kind": "kline",
+    "source": "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=0.000636&klt=101&fqt=0&lmt=80&end=20261119&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61",
+    "latest": "2026-11-19,27.91,27.69,28.25,27.36,386029,1070677425.49,3.17,-1.53,-0.43,3.36",
+    "rows": 80
+  },
+  {
+    "code": "000636",
+    "kind": "funds",
+    "source": "https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get?secid=0.000636&lmt=10&klt=101&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63",
+    "latest": "2026-11-19,-51572582.0,96881312.0,-45308736.0,-33996316.0,-17576266.0,-4.82,9.05,-4.23,-3.18,-1.64,27.69,-1.53",
+    "rows": 10
+  },
+  {
+    "code": "002050",
+    "kind": "kline",
+    "source": "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=0.002050&klt=101&fqt=0&lmt=80&end=20261119&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61",
+    "latest": "2026-11-19,32.30,32.54,33.34,31.96,447147,1460142325.29,4.27,0.77,0.25,1.21",
+    "rows": 80
+  },
+  {
+    "code": "002050",
+    "kind": "funds",
+    "source": "https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get?secid=0.002050&lmt=10&klt=101&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63",
+    "latest": "2026-11-19,10335352.0,-10128064.0,-207296.0,-29149328.0,39484680.0,0.71,-0.69,-0.01,-2.00,2.70,32.54,0.77",
+    "rows": 10
+  },
+  {
+    "code": "601288",
+    "kind": "kline",
+    "source": "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=1.601288&klt=101&fqt=0&lmt=80&end=20261119&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61",
+    "latest": "2026-11-19,7.67,7.65,7.67,7.56,2577271,1963840200.00,1.44,0.00,0.00,0.08",
+    "rows": 80
+  },
+  {
+    "code": "601288",
+    "kind": "funds",
+    "source": "https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get?secid=1.601288&lmt=10&klt=101&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63",
+    "latest": "2026-11-19,-179602512.0,128248080.0,51354432.0,-117932896.0,-61669616.0,-9.15,6.53,2.62,-6.01,-3.14,7.65,0.00",
+    "rows": 10
+  },
+  {
+    "code": "600036",
+    "kind": "kline",
+    "source": "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=1.600036&klt=101&fqt=0&lmt=80&end=20261119&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61",
+    "latest": "2026-11-19,43.36,43.32,43.45,42.92,930913,4025689838.00,1.23,0.46,0.20,0.45",
+    "rows": 80
+  },
+  {
+    "code": "600036",
+    "kind": "funds",
+    "source": "https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get?secid=1.600036&lmt=10&klt=101&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63",
+    "latest": "2026-11-19,-311345488.0,186784320.0,124561184.0,74640288.0,-385985776.0,-7.73,4.64,3.09,1.85,-9.59,43.32,0.46",
+    "rows": 10
+  },
+  {
+    "code": "600887",
+    "kind": "kline",
+    "source": "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=1.600887&klt=101&fqt=0&lmt=80&end=20261119&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61",
+    "latest": "2026-11-19,32.54,32.91,33.10,32.25,792593,2598919412.00,2.62,1.61,0.52,1.26",
+    "rows": 80
+  },
+  {
+    "code": "600887",
+    "kind": "funds",
+    "source": "https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get?secid=1.600887&lmt=10&klt=101&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63",
+    "latest": "2026-11-19,-205396976.0,166339152.0,39057840.0,-175030048.0,-30366928.0,-7.90,6.40,1.50,-6.73,-1.17,32.91,1.61",
+    "rows": 10
+  },
+  {
+    "code": "002384",
+    "kind": "kline",
+    "source": "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=0.002384&klt=101&fqt=0&lmt=80&end=20261119&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61",
+    "latest": "2026-11-19,69.96,71.70,73.00,68.89,1092063,7736680956.10,5.72,-0.14,-0.10,7.88",
+    "rows": 80
+  },
+  {
+    "code": "002384",
+    "kind": "funds",
+    "source": "https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get?secid=0.002384&lmt=10&klt=101&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63",
+    "latest": "2026-11-19,41102608.0,98844288.0,-139946896.0,122297552.0,-81194944.0,0.53,1.28,-1.81,1.58,-1.05,71.70,-0.14",
+    "rows": 10
+  },
+  {
+    "code": "601869",
+    "kind": "kline",
+    "source": "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=1.601869&klt=101&fqt=0&lmt=80&end=20261119&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61",
+    "latest": "2026-11-19,217.77,217.90,221.00,212.53,69988,1511791368.00,3.83,-1.49,-3.29,1.72",
+    "rows": 80
+  },
+  {
+    "code": "601869",
+    "kind": "funds",
+    "source": "https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get?secid=1.601869&lmt=10&klt=101&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63",
+    "latest": "2026-11-19,-100529558.0,152372144.0,-51842592.0,-69712208.0,-30817350.0,-6.65,10.08,-3.43,-4.61,-2.04,217.90,-1.49",
+    "rows": 10
+  },
+  {
+    "code": "000776",
+    "kind": "kline",
+    "source": "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=0.000776&klt=101&fqt=0&lmt=80&end=20261119&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61",
+    "latest": "2026-11-19,18.77,18.88,18.96,18.65,364898,686649713.00,1.65,0.59,0.11,0.62",
+    "rows": 80
+  },
+  {
+    "code": "000776",
+    "kind": "funds",
+    "source": "https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get?secid=0.000776&lmt=10&klt=101&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63",
+    "latest": "2026-11-19,12041415.0,-48771574.0,36730158.0,13786619.0,-1745204.0,1.75,-7.10,5.35,2.01,-0.25,18.88,0.59",
+    "rows": 10
+  },
+  {
+    "code": "600030",
+    "kind": "kline",
+    "source": "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=1.600030&klt=101&fqt=0&lmt=80&end=20261119&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61",
+    "latest": "2026-11-19,25.09,25.19,25.28,24.92,718325,1803633194.00,1.44,0.56,0.14,0.59",
+    "rows": 80
+  },
+  {
+    "code": "600030",
+    "kind": "funds",
+    "source": "https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get?secid=1.600030&lmt=10&klt=101&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63",
+    "latest": "2026-11-19,-150988672.0,12635568.0,138353088.0,-140009776.0,-10978896.0,-8.37,0.70,7.67,-7.76,-0.61,25.19,0.56",
+    "rows": 10
+  },
+  {
+    "code": "601995",
+    "kind": "kline",
+    "source": "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=1.601995&klt=101&fqt=0&lmt=80&end=20261119&fields1=f1,f2,f3,f4,f5,f6&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61",
+    "latest": "2026-11-19,27.30,27.29,27.36,27.00,195731,531967522.00,1.32,0.07,0.02,0.48",
+    "rows": 80
+  },
+  {
+    "code": "601995",
+    "kind": "funds",
+    "source": "https://push2his.eastmoney.com/api/qt/stock/fflow/daykline/get?secid=1.601995&lmt=10&klt=101&fields1=f1,f2,f3,f7&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63",
+    "latest": "2026-11-19,-14029327.0,38636780.0,-24607453.0,-14238154.0,208827.0,-2.64,7.26,-4.63,-2.68,0.04,27.29,0.07",
+    "rows": 10
+  }
+]

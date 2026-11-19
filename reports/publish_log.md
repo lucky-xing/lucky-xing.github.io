@@ -122,3 +122,5 @@
 - 2026-11-18：盘前补刊，三股条件观察，零主动交易。https://lucky-xing.github.io/finance/daily/2026-11-18.html
 
 - 2026-11-19：盘前补刊，三股条件观察，零主动交易。https://lucky-xing.github.io/finance/daily/2026-11-19.html
+
+- 2026-11-20：盘前补刊，三股条件观察，零主动交易。https://lucky-xing.github.io/finance/daily/2026-11-20.html
