@@ -29,7 +29,8 @@ for code,name in [('600519','贵州茅台'),('002050','三花智控'),('000776',
     low,high=float(x[4]),float(x[3])
     lo=round(low+0.40*(high-low),2)
     hi=round(low+0.55*(high-low),2)
-    levels=sorted({(float(j[3]),j[0]) for j in a[-20:] if float(j[3])>hi},key=lambda j:j[0])[:2]
+    unique_levels={float(j[3]):j[0] for j in a[-20:] if float(j[3])>hi}
+    levels=sorted(unique_levels.items())[:2]
     assert len(levels)==2
     targets=[round(v-0.01,2) for v,_ in levels]
     plan_rows.append(f'**{name}**，11/19纸面区间{lo:.2f}–{hi:.2f}，参考失效{low:.2f}。首档{targets[0]:.2f}（{levels[0][1]}高{levels[0][0]:.2f}前），二档{targets[1]:.2f}（{levels[1][1]}高{levels[1][0]:.2f}前）。')
