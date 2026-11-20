@@ -1,0 +1,688 @@
+{
+  "date": "2026-11-21",
+  "valuationDate": "2026-10-31",
+  "ftseAnnual": [
+    {
+      "date": "2016-12-31",
+      "pe": 54.78,
+      "fpe": 14.69,
+      "cape": 18.01
+    },
+    {
+      "date": "2017-12-31",
+      "pe": 22.44,
+      "fpe": 14.8,
+      "cape": 20.7
+    },
+    {
+      "date": "2018-12-31",
+      "pe": 15.18,
+      "fpe": 11.39,
+      "cape": 18.31
+    },
+    {
+      "date": "2019-12-31",
+      "pe": 18.75,
+      "fpe": 12.96,
+      "cape": 18.84
+    },
+    {
+      "date": "2020-12-31",
+      "pe": 169.52,
+      "fpe": 14.09,
+      "cape": 17.09
+    },
+    {
+      "date": "2021-12-31",
+      "pe": 17.1,
+      "fpe": 11.71,
+      "cape": 20.4
+    },
+    {
+      "date": "2022-12-31",
+      "pe": 13.88,
+      "fpe": 9.99,
+      "cape": 19.28
+    },
+    {
+      "date": "2023-12-31",
+      "pe": 10.51,
+      "fpe": 10.65,
+      "cape": 18.33
+    },
+    {
+      "date": "2024-12-31",
+      "pe": 12.85,
+      "fpe": 11.24,
+      "cape": 18.2
+    },
+    {
+      "date": "2025-12-31",
+      "pe": 14.87,
+      "fpe": 13.35,
+      "cape": 20.19
+    },
+    {
+      "date": "2026-10-31",
+      "pe": 14.87,
+      "fpe": 11.97,
+      "cape": 19.58
+    }
+  ],
+  "ndxAnnual": [
+    {
+      "date": "2016-12-31",
+      "pe": 23.08
+    },
+    {
+      "date": "2017-12-31",
+      "pe": 25.84
+    },
+    {
+      "date": "2018-12-31",
+      "pe": 20.75
+    },
+    {
+      "date": "2019-12-31",
+      "pe": 26.47
+    },
+    {
+      "date": "2020-12-31",
+      "pe": 39.72
+    },
+    {
+      "date": "2021-12-31",
+      "pe": 38.0
+    },
+    {
+      "date": "2022-12-31",
+      "pe": 23.72
+    },
+    {
+      "date": "2023-12-31",
+      "pe": 30.25
+    },
+    {
+      "date": "2024-12-31",
+      "pe": 32.36
+    },
+    {
+      "date": "2025-12-31",
+      "pe": 32.32
+    },
+    {
+      "date": "2026-10-31",
+      "pe": 32.76
+    }
+  ],
+  "annualStats": {
+    "ftse-pe": [
+      {
+        "window": 3,
+        "start": "2023-10-31",
+        "end": "2026-10-31",
+        "N": 3,
+        "current": 14.87,
+        "percentile": 100.0,
+        "p20": 11.446,
+        "median": 12.85,
+        "p80": 14.062
+      },
+      {
+        "window": 5,
+        "start": "2021-10-31",
+        "end": "2026-10-31",
+        "N": 5,
+        "current": 14.87,
+        "percentile": 80.0,
+        "p20": 12.382,
+        "median": 13.88,
+        "p80": 15.316
+      },
+      {
+        "window": 10,
+        "start": "2016-10-31",
+        "end": "2026-10-31",
+        "N": 10,
+        "current": 14.87,
+        "percentile": 40.0,
+        "p20": 13.674000000000001,
+        "median": 16.14,
+        "p80": 28.90800000000001
+      }
+    ],
+    "ftse-fpe": [
+      {
+        "window": 3,
+        "start": "2023-10-31",
+        "end": "2026-10-31",
+        "N": 3,
+        "current": 11.97,
+        "percentile": 66.66666666666667,
+        "p20": 10.886000000000001,
+        "median": 11.24,
+        "p80": 12.506
+      },
+      {
+        "window": 5,
+        "start": "2021-10-31",
+        "end": "2026-10-31",
+        "N": 5,
+        "current": 11.97,
+        "percentile": 80.0,
+        "p20": 10.518,
+        "median": 11.24,
+        "p80": 12.038
+      },
+      {
+        "window": 10,
+        "start": "2016-10-31",
+        "end": "2026-10-31",
+        "N": 10,
+        "current": 11.97,
+        "percentile": 50.0,
+        "p20": 11.122,
+        "median": 12.335,
+        "p80": 14.209999999999999
+      }
+    ],
+    "ftse-cape": [
+      {
+        "window": 3,
+        "start": "2023-10-31",
+        "end": "2026-10-31",
+        "N": 3,
+        "current": 19.58,
+        "percentile": 66.66666666666667,
+        "p20": 18.252,
+        "median": 18.33,
+        "p80": 19.446
+      },
+      {
+        "window": 5,
+        "start": "2021-10-31",
+        "end": "2026-10-31",
+        "N": 5,
+        "current": 19.58,
+        "percentile": 60.0,
+        "p20": 18.304,
+        "median": 19.28,
+        "p80": 20.232
+      },
+      {
+        "window": 10,
+        "start": "2016-10-31",
+        "end": "2026-10-31",
+        "N": 10,
+        "current": 19.58,
+        "percentile": 70.0,
+        "p20": 18.162,
+        "median": 18.585,
+        "p80": 20.232
+      }
+    ],
+    "ndx-pe": [
+      {
+        "window": 3,
+        "start": "2023-10-31",
+        "end": "2026-10-31",
+        "N": 3,
+        "current": 32.76,
+        "percentile": 100.0,
+        "p20": 31.078,
+        "median": 32.32,
+        "p80": 32.344
+      },
+      {
+        "window": 5,
+        "start": "2021-10-31",
+        "end": "2026-10-31",
+        "N": 5,
+        "current": 32.76,
+        "percentile": 80.0,
+        "p20": 28.944,
+        "median": 32.32,
+        "p80": 33.488
+      },
+      {
+        "window": 10,
+        "start": "2016-10-31",
+        "end": "2026-10-31",
+        "N": 10,
+        "current": 32.76,
+        "percentile": 80.0,
+        "p20": 23.592,
+        "median": 28.36,
+        "p80": 33.488
+      }
+    ]
+  },
+  "ndxForwardHistoricalOnly": [
+    {
+      "window": 3,
+      "start": "2023-08-05",
+      "end": "2026-08-05",
+      "N": 36,
+      "current": 22.37,
+      "percentile": 8.333333333333334,
+      "p20": 23.64,
+      "median": 25.445,
+      "p80": 26.24
+    },
+    {
+      "window": 5,
+      "start": "2021-08-05",
+      "end": "2026-08-05",
+      "N": 60,
+      "current": 22.37,
+      "percentile": 21.666666666666668,
+      "p20": 22.296,
+      "median": 24.9,
+      "p80": 26.356
+    },
+    {
+      "window": 10,
+      "start": "2016-08-05",
+      "end": "2026-08-05",
+      "N": 120,
+      "current": 22.37,
+      "percentile": 47.5,
+      "p20": 19.598000000000003,
+      "median": 23.11,
+      "p80": 26.268
+    }
+  ],
+  "ndxForwardDaily": {
+    "last": {
+      "date": "2026-11-19",
+      "value": 17.86
+    },
+    "first": {
+      "date": "2026-08-05",
+      "value": 22.41
+    },
+    "N": 71,
+    "pct": 2.8169014084507045,
+    "warning": "daily begins 2026-08-05; not comparable long-run percentiles"
+  },
+  "holdings": {
+    "oef": {
+      "N": 101,
+      "equityWeight": 99.82999999999997,
+      "top10": 50.57999999999999,
+      "effectiveN": 25.99067692138375,
+      "top": [
+        [
+          "AAPL",
+          11.28
+        ],
+        [
+          "MSFT",
+          8.19
+        ],
+        [
+          "NVDA",
+          7.82
+        ],
+        [
+          "AMZN",
+          5.59
+        ],
+        [
+          "AVGO",
+          3.65
+        ],
+        [
+          "GOOGL",
+          3.54
+        ],
+        [
+          "META",
+          2.91
+        ],
+        [
+          "GOOG",
+          2.85
+        ],
+        [
+          "LLY",
+          2.39
+        ],
+        [
+          "BRK B",
+          2.36
+        ]
+      ]
+    },
+    "iqq": {
+      "N": 101,
+      "equityWeight": 99.91999999999999,
+      "top10": 46.16999999999999,
+      "effectiveN": 32.17879849136196,
+      "top": [
+        [
+          "AAPL",
+          8.87
+        ],
+        [
+          "MSFT",
+          6.44
+        ],
+        [
+          "NVDA",
+          6.12
+        ],
+        [
+          "AMZN",
+          4.83
+        ],
+        [
+          "AMD",
+          3.84
+        ],
+        [
+          "MU",
+          3.75
+        ],
+        [
+          "TSLA",
+          3.43
+        ],
+        [
+          "META",
+          3.08
+        ],
+        [
+          "WMT",
+          2.94
+        ],
+        [
+          "AVGO",
+          2.87
+        ]
+      ]
+    },
+    "isf": {
+      "N": 101,
+      "equityWeight": 99.5,
+      "top10": 48.370000000000005,
+      "effectiveN": 28.230065229764136,
+      "top": [
+        [
+          "HSBA",
+          8.8
+        ],
+        [
+          "SHEL",
+          8.37
+        ],
+        [
+          "AZN",
+          8.0
+        ],
+        [
+          "RR.",
+          4.46
+        ],
+        [
+          "ULVR",
+          3.99
+        ],
+        [
+          "BATS",
+          3.54
+        ],
+        [
+          "BP.",
+          3.46
+        ],
+        [
+          "GSK",
+          2.92
+        ],
+        [
+          "NG.",
+          2.44
+        ],
+        [
+          "RIO",
+          2.39
+        ]
+      ]
+    }
+  },
+  "overlap": {
+    "N": 35,
+    "minimumWeights": 55.05000000000001,
+    "oefCovered": 63.44999999999999,
+    "ndxCovered": 74.93999999999998
+  },
+  "companies": [
+    {
+      "ticker": "AAPL",
+      "cap": 5074021300000.0,
+      "pe": 38.89,
+      "pb": 45.27,
+      "roe": 142.26,
+      "ocf": 145100000000.0,
+      "capex": 9040000000.0,
+      "fcf": 136060000000.0,
+      "fcfYield": 2.6815023421364037,
+      "pageQuoteTime": "Nov 19, 2026, 4:00 PM EST",
+      "rawPageCap": 5070000000000.0,
+      "approxTotalShares": 14530000000.0,
+      "close19": 349.21,
+      "valuationNote": "19 Nov official ETF constituent closing price x rounded current total company shares; approximate cap, no index aggregation"
+    },
+    {
+      "ticker": "MSFT",
+      "cap": 3702369000000.0,
+      "pe": 26.02,
+      "pb": 7.87,
+      "roe": 34.22,
+      "ocf": 195880000000.0,
+      "capex": 135919999999.99998,
+      "fcf": 59960000000.0,
+      "fcfYield": 1.6195036205197266,
+      "pageQuoteTime": "Nov 19, 2026, 4:00 PM EST",
+      "rawPageCap": 3700000000000.0,
+      "approxTotalShares": 7430000000.0,
+      "close19": 498.3,
+      "valuationNote": "19 Nov official ETF constituent closing price x rounded current total company shares; approximate cap, no index aggregation"
+    },
+    {
+      "ticker": "NVDA",
+      "cap": 3525416999999.9995,
+      "pe": 14.67,
+      "pb": 13.2,
+      "roe": 117.36,
+      "ocf": 158860000000.0,
+      "capex": 10140000000.0,
+      "fcf": 148720000000.0,
+      "fcfYield": 4.218508051671618,
+      "pageQuoteTime": "Nov 20, 2026, 10:45 AM EST",
+      "rawPageCap": 3300000000000.0,
+      "approxTotalShares": 24150000000.0,
+      "close19": 145.98,
+      "valuationNote": "19 Nov official ETF constituent closing price x rounded current total company shares; approximate cap, no index aggregation"
+    },
+    {
+      "ticker": "AMZN",
+      "cap": 2782169700000.0,
+      "pe": 20.8,
+      "pb": 4.53,
+      "roe": 27.42,
+      "ocf": 168300000000.0,
+      "capex": 215190000000.0,
+      "fcf": -46890000000.0,
+      "fcfYield": -1.6853752666489035,
+      "pageQuoteTime": "Nov 19, 2026, 4:00 PM EST",
+      "rawPageCap": 2780000000000.0,
+      "approxTotalShares": 10810000000.0,
+      "close19": 257.37,
+      "valuationNote": "19 Nov official ETF constituent closing price x rounded current total company shares; approximate cap, no index aggregation"
+    },
+    {
+      "ticker": "GOOGL",
+      "cap": 3350991400000.0005,
+      "pe": 14.23,
+      "pb": 5.08,
+      "roe": 44.29,
+      "ocf": 179550000000.0,
+      "capex": 159800000000.0,
+      "fcf": 19750000000.0,
+      "fcfYield": 0.5893778181585305,
+      "pageQuoteTime": "Nov 19, 2026, 4:00 PM EST",
+      "rawPageCap": 3350000000000.0,
+      "approxTotalShares": 12290000000.0,
+      "close19": 272.66,
+      "valuationNote": "19 Nov official ETF constituent closing price x rounded current total company shares; approximate cap, no index aggregation"
+    },
+    {
+      "ticker": "META",
+      "cap": 1526323200000.0,
+      "pe": 20.33,
+      "pb": 5.59,
+      "roe": 32.26,
+      "ocf": 133090000000.0,
+      "capex": 104440000000.0,
+      "fcf": 28650000000.0,
+      "fcfYield": 1.8770598520680286,
+      "pageQuoteTime": "Nov 19, 2026, 4:00 PM EST",
+      "rawPageCap": 1520000000000.0,
+      "approxTotalShares": 2560000000.0,
+      "close19": 596.22,
+      "valuationNote": "19 Nov official ETF constituent closing price x rounded current total company shares; approximate cap, no index aggregation"
+    },
+    {
+      "ticker": "AZN",
+      "cap": 271630000000.0,
+      "pe": 25.28,
+      "pb": 5.23,
+      "roe": 22.57,
+      "ocf": 13230000000.0,
+      "capex": 3020000000.0,
+      "fcf": 10210000000.0,
+      "fcfYield": 3.758789529875198,
+      "pageQuoteTime": "Nov 20, 2026, 10:59 AM EST"
+    },
+    {
+      "ticker": "SHEL",
+      "cap": 266029999999.99997,
+      "pe": 8.29,
+      "pb": 1.34,
+      "roe": 17.43,
+      "ocf": 57980000000.0,
+      "capex": 20620000000.0,
+      "fcf": 37360000000.0,
+      "fcfYield": 14.043528925309177,
+      "pageQuoteTime": "Nov 19, 2026, 4:00 PM EST"
+    },
+    {
+      "ticker": "UL",
+      "cap": 135009999999.99998,
+      "pe": 13.28,
+      "pb": 7.3,
+      "roe": 31.87,
+      "ocf": 9480000000.0,
+      "capex": 1560000000.0,
+      "fcf": 7920000000.0,
+      "fcfYield": 5.8662321309532635,
+      "pageQuoteTime": "Nov 19, 2026, 4:00 PM EST"
+    },
+    {
+      "ticker": "RIO",
+      "cap": 126750000000.0,
+      "pe": 10.11,
+      "pb": 1.96,
+      "roe": 19.31,
+      "ocf": 19080000000.0,
+      "capex": 13550000000.0,
+      "fcf": 5530000000.0,
+      "fcfYield": 4.3629191321499015,
+      "pageQuoteTime": "Nov 20, 2026, 10:59 AM EST"
+    },
+    {
+      "ticker": "HSBC",
+      "cap": 280190000000.0,
+      "pe": 10.78,
+      "pb": 1.47,
+      "roe": 14.22,
+      "pageQuoteTime": "Nov 20, 2026, 10:59 AM EST"
+    },
+    {
+      "ticker": "BCS",
+      "cap": 69930000000.0,
+      "pe": 8.01,
+      "pb": 0.7,
+      "roe": 10.45,
+      "pageQuoteTime": "Nov 20, 2026, 10:57 AM EST"
+    }
+  ],
+  "sixUS": {
+    "cap": 19961291600000.0,
+    "fcf": 346250000000.0,
+    "ocf": 980780000000.0,
+    "capex": 634530000000.0,
+    "fcfYield": 1.7346071934543554,
+    "capexToOcf": 64.69646607801954
+  },
+  "matureSample": [
+    [
+      "US",
+      25.75,
+      18.6
+    ],
+    [
+      "Canada",
+      20.69,
+      15.95
+    ],
+    [
+      "Australia",
+      20.15,
+      18.22
+    ],
+    [
+      "Japan",
+      18.06,
+      14.73
+    ],
+    [
+      "Netherlands",
+      17.64,
+      14.44
+    ],
+    [
+      "Germany",
+      17.46,
+      14.66
+    ],
+    [
+      "France",
+      16.67,
+      13.31
+    ],
+    [
+      "Spain",
+      15.01,
+      11.84
+    ],
+    [
+      "Italy",
+      14.72,
+      11.51
+    ]
+  ],
+  "crossMarket": {
+    "N": 9,
+    "medianPe": 17.64,
+    "medianFpe": 14.66,
+    "ftsePePercentile": 11.11111111111111,
+    "ftseFpePercentile": 22.22222222222222,
+    "ndxPePercentile": 100.0,
+    "ftsePeDiscount": -0.15702947845804993,
+    "ndxVsFtsePe": 1.2030934767989239,
+    "ndxVsFtseFpe": 0.7744360902255636
+  }
+}
