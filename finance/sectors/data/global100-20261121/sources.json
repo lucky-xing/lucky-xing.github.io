@@ -1,0 +1,24 @@
+{
+  "researchDate": "2026-11-21",
+  "retrievedDate": "2026-11-20",
+  "sources": {
+    "ftse": "https://siblisresearch.com/data/ftse-100-cape-pe-yield/",
+    "ndx": "https://siblisresearch.com/data/nasdaq-100-pe-ratio/",
+    "countries": "https://siblisresearch.com/data/pe-ratios-by-country/",
+    "oef": "https://www.ishares.com/us/products/239723/ishares-sp-100-etf",
+    "iqq": "https://www.ishares.com/us/products/351653/ishares-nasdaq-100-etf",
+    "isf": "https://www.ishares.com/uk/individual/en/products/251795/fund",
+    "qqqm": "https://www.invesco.com/us/en/financial-products/etfs/invesco-nasdaq-100-etf.html",
+    "qndx": "https://www.ssga.com/us/en/individual/etfs/state-street-spdr-portfolio-nasdaq-100-etf-qndx",
+    "qqq": "https://www.invesco.com/us/en/financial-products/etfs.html",
+    "equal": "https://www.cxfund.com.cn/products/qdii/519981/index.html",
+    "fees519981": "https://fundf10.eastmoney.com/jjfl_519981.html",
+    "ccbfund": "https://static.cninfo.com.cn/finalpage/2025-02-07/1222477607.PDF",
+    "efund": "https://static.cninfo.com.cn/finalpage/2026-08-11/1225467500.PDF",
+    "premium": "https://n.tinyright.com/",
+    "forward": "https://charts.allofthesewords.com/nasdaq100-fwdpe.html",
+    "nasdaq": "https://indexes.nasdaq.com/docs/FS_NDX.pdf",
+    "sp": "https://www.spglobal.com/spdji/en/indices/equity/sp-100/"
+  },
+  "notes": "HTML/CSV/PDF/Excel are public research evidence; calculations use annual snapshots only. Market dates differ and are disclosed per section."
+}
