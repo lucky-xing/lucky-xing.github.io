@@ -1,0 +1,327 @@
+[
+  {
+    "symbol": "sh600519",
+    "source": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sh600519,day,2026-08-01,2026-11-26,80,qfq",
+    "latest": [
+      "2026-11-26",
+      "1470.000",
+      "1469.000",
+      "1473.000",
+      "1456.000",
+      "32408.000"
+    ],
+    "rows": 78
+  },
+  {
+    "symbol": "sh603019",
+    "source": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sh603019,day,2026-08-01,2026-11-26,80,qfq",
+    "latest": [
+      "2026-11-26",
+      "71.580",
+      "69.140",
+      "71.580",
+      "68.800",
+      "196404.000"
+    ],
+    "rows": 78
+  },
+  {
+    "symbol": "sz001309",
+    "source": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sz001309,day,2026-08-01,2026-11-26,80,qfq",
+    "latest": [
+      "2026-11-26",
+      "160.070",
+      "157.660",
+      "162.700",
+      "154.500",
+      "145871.000"
+    ],
+    "rows": 78
+  },
+  {
+    "symbol": "sz002463",
+    "source": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sz002463,day,2026-08-01,2026-11-26,80,qfq",
+    "latest": [
+      "2026-11-26",
+      "81.820",
+      "81.090",
+      "84.480",
+      "79.600",
+      "675707.000"
+    ],
+    "rows": 78
+  },
+  {
+    "symbol": "sz002636",
+    "source": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sz002636,day,2026-08-01,2026-11-26,80,qfq",
+    "latest": [
+      "2026-11-26",
+      "46.500",
+      "46.780",
+      "48.500",
+      "45.220",
+      "396551.000"
+    ],
+    "rows": 78
+  },
+  {
+    "symbol": "sz000823",
+    "source": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sz000823,day,2026-08-01,2026-11-26,80,qfq",
+    "latest": [
+      "2026-11-26",
+      "19.110",
+      "20.770",
+      "21.200",
+      "18.370",
+      "1840212.000"
+    ],
+    "rows": 78
+  },
+  {
+    "symbol": "sh600276",
+    "source": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sh600276,day,2026-08-01,2026-11-26,80,qfq",
+    "latest": [
+      "2026-11-26",
+      "47.700",
+      "47.350",
+      "47.870",
+      "47.070",
+      "323831.000"
+    ],
+    "rows": 78
+  },
+  {
+    "symbol": "sh601398",
+    "source": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sh601398,day,2026-08-01,2026-11-26,80,qfq",
+    "latest": [
+      "2026-11-26",
+      "9.100",
+      "9.230",
+      "9.270",
+      "9.050",
+      "3899190.000"
+    ],
+    "rows": 78
+  },
+  {
+    "symbol": "sh600938",
+    "source": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sh600938,day,2026-08-01,2026-11-26,80,qfq",
+    "latest": [
+      "2026-11-26",
+      "30.100",
+      "30.870",
+      "31.110",
+      "30.060",
+      "571760.000"
+    ],
+    "rows": 78
+  },
+  {
+    "symbol": "sh601857",
+    "source": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sh601857,day,2026-08-01,2026-11-26,80,qfq",
+    "latest": [
+      "2026-11-26",
+      "12.320",
+      "12.760",
+      "12.790",
+      "12.210",
+      "1667702.000"
+    ],
+    "rows": 78
+  },
+  {
+    "symbol": "sz000858",
+    "source": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sz000858,day,2026-08-01,2026-11-26,80,qfq",
+    "latest": [
+      "2026-11-26",
+      "71.610",
+      "71.200",
+      "72.270",
+      "71.000",
+      "143271.000"
+    ],
+    "rows": 78
+  },
+  {
+    "symbol": "sh600487",
+    "source": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sh600487,day,2026-08-01,2026-11-26,80,qfq",
+    "latest": [
+      "2026-11-26",
+      "34.790",
+      "34.660",
+      "35.350",
+      "33.880",
+      "948422.000"
+    ],
+    "rows": 78
+  },
+  {
+    "symbol": "sz000636",
+    "source": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sz000636,day,2026-08-01,2026-11-26,80,qfq",
+    "latest": [
+      "2026-11-26",
+      "27.020",
+      "26.880",
+      "27.620",
+      "26.370",
+      "618137.000"
+    ],
+    "rows": 78
+  },
+  {
+    "symbol": "sz002050",
+    "source": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sz002050,day,2026-08-01,2026-11-26,80,qfq",
+    "latest": [
+      "2026-11-26",
+      "32.350",
+      "31.000",
+      "32.470",
+      "30.600",
+      "554426.000"
+    ],
+    "rows": 78
+  },
+  {
+    "symbol": "sh601288",
+    "source": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sh601288,day,2026-08-01,2026-11-26,80,qfq",
+    "latest": [
+      "2026-11-26",
+      "7.870",
+      "8.020",
+      "8.030",
+      "7.850",
+      "2957693.000"
+    ],
+    "rows": 78
+  },
+  {
+    "symbol": "sh600036",
+    "source": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sh600036,day,2026-08-01,2026-11-26,80,qfq",
+    "latest": [
+      "2026-11-26",
+      "43.250",
+      "43.380",
+      "43.620",
+      "43.020",
+      "882484.000"
+    ],
+    "rows": 78
+  },
+  {
+    "symbol": "sh600887",
+    "source": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sh600887,day,2026-08-01,2026-11-26,80,qfq",
+    "latest": [
+      "2026-11-26",
+      "33.480",
+      "33.430",
+      "33.780",
+      "33.140",
+      "645922.000"
+    ],
+    "rows": 78
+  },
+  {
+    "symbol": "sz002384",
+    "source": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sz002384,day,2026-08-01,2026-11-26,80,qfq",
+    "latest": [
+      "2026-11-26",
+      "71.990",
+      "72.520",
+      "73.940",
+      "70.500",
+      "1224876.000"
+    ],
+    "rows": 78
+  },
+  {
+    "symbol": "sh601869",
+    "source": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sh601869,day,2026-08-01,2026-11-26,80,qfq",
+    "latest": [
+      "2026-11-26",
+      "201.000",
+      "201.310",
+      "206.830",
+      "196.580",
+      "84795.000"
+    ],
+    "rows": 78
+  },
+  {
+    "symbol": "sz000776",
+    "source": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sz000776,day,2026-08-01,2026-11-26,80,qfq",
+    "latest": [
+      "2026-11-26",
+      "18.200",
+      "18.050",
+      "18.430",
+      "18.000",
+      "377290.000"
+    ],
+    "rows": 78
+  },
+  {
+    "symbol": "sh600030",
+    "source": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sh600030,day,2026-08-01,2026-11-26,80,qfq",
+    "latest": [
+      "2026-11-26",
+      "24.900",
+      "24.720",
+      "24.950",
+      "24.660",
+      "576121.000"
+    ],
+    "rows": 78
+  },
+  {
+    "symbol": "sh601995",
+    "source": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sh601995,day,2026-08-01,2026-11-26,80,qfq",
+    "latest": [
+      "2026-11-26",
+      "25.780",
+      "25.010",
+      "25.780",
+      "24.920",
+      "362851.000"
+    ],
+    "rows": 72
+  },
+  {
+    "symbol": "sh000001",
+    "source": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sh000001,day,2026-08-01,2026-11-26,80,qfq",
+    "latest": [
+      "2026-11-26",
+      "3490.140",
+      "3476.880",
+      "3497.810",
+      "3455.040",
+      "454062959.000"
+    ],
+    "rows": 78
+  },
+  {
+    "symbol": "sz399001",
+    "source": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sz399001,day,2026-08-01,2026-11-26,80,qfq",
+    "latest": [
+      "2026-11-26",
+      "10184.940",
+      "10084.040",
+      "10235.500",
+      "9979.060",
+      "544733686.000"
+    ],
+    "rows": 78
+  },
+  {
+    "symbol": "sz399006",
+    "source": "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sz399006,day,2026-08-01,2026-11-26,80,qfq",
+    "latest": [
+      "2026-11-26",
+      "2213.120",
+      "2189.820",
+      "2227.410",
+      "2155.010",
+      "157118489.000"
+    ],
+    "rows": 78
+  }
+]
