@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><meta content="AdamW、Lion 与 Muon 的演进、公式、实验证据与适用边界。" name="description"/><title>从 AdamW 换到 Lion 或 Muon，能省下什么？ · Lighting Future</title><link href="../../../../style.css" rel="stylesheet"/><link href="../../../../assets/paper-report.css?v=5acafff8b1bd" rel="stylesheet"/><script>window.MathJax={tex:{inlineMath:[['\\(','\\)']],displayMath:[['\\[','\\]']],processEscapes:true},svg:{fontCache:'local'},options:{skipHtmlTags:['script','noscript','style','textarea','pre','code']}};</script><script defer="" src="../../../../assets/vendor/mathjax/tex-svg-full.js"></script></head><body class="category-page paper-report theme-ai"><a class="skip" href="#main">跳到正文</a><header class="wrap"><a class="brand" href="https://lucky-xing.github.io/index.html"><span class="mark">LF</span>Lighting Future</a><nav aria-label="主导航"><a href="https://lucky-xing.github.io/index.html">首页</a><a aria-current="page" href="https://lucky-xing.github.io/ai.html">AI</a><a href="https://lucky-xing.github.io/finance.html">投资理财</a><a href="https://lucky-xing.github.io/communication.html">通信</a><a href="https://lucky-xing.github.io/learning.html">学习</a><a href="https://lucky-xing.github.io/world.html">看世界</a></nav></header><main class="report" id="main"><div class="breadcrumb"><a href="https://lucky-xing.github.io/ai.html">AI</a></div><p class="kicker">PAPER RESEARCH / 2026-11-24</p><h1 id="adamw-lion-muon">从 AdamW 换到 Lion 或 Muon，能省下什么？</h1><p>日期：2026-11-24　｜　AI　｜　论文精读与方法分析</p><h2 id="_1">换个优化器，训练会有什么变化？</h2>
+<p>想省显存，还是想用更少算力达到同样的训练损失？这两个目标，对应的选型可能不同。</p>
+<p><strong>AdamW</strong> 按历史梯度调整各坐标的步长，并独立衰减权重。<strong>Lion</strong> 用符号决定更新方向，只存一份动量。<strong>Muon</strong> 按矩阵结构调整更新，在一些语言模型预训练实验中降低了计算量，微调时收益则不稳定。</p>
+<figure class="paper-figure report-cover"><a href="../../../../assets/papers/adamw-lion-muon/cover.png" target="_blank"><img alt="AdamW、Lion、Muon 的更新方式对比" height="1000" src="../../../../assets/papers/adamw-lion-muon/cover.png" width="1800"/></a><figcaption>优化器更新方式对比 · 自制原理示意，具体假设见正文图注。</figcaption></figure><nav aria-label="文章目录" class="toc"><strong>阅读导航</strong><a href="#_1">换个优化器，训练会有什么变化？</a><a href="#1">1. 问题建模与共同的演变起点</a><a href="#2-adamw">2. AdamW：将权重衰减移出自适应梯度</a><a href="#3-lion">3. Lion：符号更新与双时间尺度动量</a><a href="#4-muon">4. Muon：矩阵更新的奇异方向处理</a><a href="#5">5. 三者的本质区别及数值例子</a><a href="#6">6. 成本、调参与失效条件</a><a href="#7">7. 调研归纳与后续研究方向</a><a href="#8">8. 参考文献与版本</a></nav>
+<h2 id="1">1. 问题建模与共同的演变起点</h2>
+<p>训练目标为 <span class="math-inline">\(\min_\theta F(\theta)=\mathbb E_{z\sim\mathcal D}[\ell(\theta;z)]\)</span>。参数 <span class="math-inline">\(\theta\in\mathbb R^P\)</span>，小批量梯度为 <span class="math-inline">\(g_t\)</span>，其方向受采样噪声影响。优化器把当前梯度、历史状态和超参数变为更新 <span class="math-inline">\(u_t\)</span>。本文统一采用</p>
+<div class="equation">\[\theta_{t+1}=(1-\eta_t\lambda)\theta_t-\eta_t u_t.\]</div>
+<p><span class="math-inline">\(\eta_t\)</span> 为学习率，<span class="math-inline">\(\lambda\)</span> 为解耦衰减系数。对不使用衰减的参数组令 <span class="math-inline">\(\lambda=0\)</span>。同一个学习率数值只有在更新尺度接近时才具有可比性。</p>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>主要问题</th>
+<th>使用的信息</th>
+<th>后续限制</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SGD</td>
+<td>用小批量梯度下降</td>
+<td>当前梯度</td>
+<td>噪声、病态曲率和步长选择</td>
+</tr>
+<tr>
+<td>Momentum</td>
+<td>平滑时间方向，积累持续梯度</td>
+<td>一份指数动量</td>
+<td>各坐标尺度仍可不同</td>
+</tr>
+<tr>
+<td>AdaGrad / RMSProp</td>
+<td>按坐标调整步长</td>
+<td>平方梯度累计或滑动平均</td>
+<td>对角统计未表示跨坐标关系</td>
+</tr>
+<tr>
+<td>Adam</td>
+<td>合并动量与自适应缩放</td>
+<td>一阶和二阶原点矩</td>
+<td>两份状态，正则项会进入预处理</td>
+</tr>
+<tr>
+<td>AdamW</td>
+<td>解耦参数收缩和损失更新</td>
+<td>Adam 状态及独立衰减</td>
+<td>仍为逐坐标预处理</td>
+</tr>
+<tr>
+<td>Lion</td>
+<td>降低状态与幅度处理成本</td>
+<td>一份动量，两个混合系数</td>
+<td>符号操作丢弃幅度，需调步长</td>
+</tr>
+<tr>
+<td>Muon</td>
+<td>利用权重的矩阵结构</td>
+<td>矩阵动量及近似极分解</td>
+<td>额外矩阵运算、参数分组与尺度约定</td>
+</tr>
+</tbody>
+</table>
+<p>Momentum 可写为 <span class="math-inline">\(m_t=\beta m_{t-1}+(1-\beta)g_t\)</span>。Adam 在此基础上估计 <span class="math-inline">\(g_t^2\)</span> 的移动平均。这里的二阶矩是平方梯度统计，和 Hessian 的二阶导数属于不同对象。Muon 也不显式计算 Hessian。上述分类按实现使用的信息组织。<a href="https://arxiv.org/pdf/1412.6980">Adam 原文</a></p>
+<h2 id="2-adamw">2. AdamW：将权重衰减移出自适应梯度</h2>
+<p>Ilya Loshchilov 与 Frank Hutter 的论文署名机构为弗赖堡大学，研究从优化及超参数选择出发，检验 Adam 的泛化差距有多少与正则化实现有关。论文发表于 ICLR 2019，本文使用 arXiv:1711.05101v3。核心贡献是解耦权重衰减。<a href="https://arxiv.org/pdf/1711.05101v3">原始论文</a></p>
+<h3 id="21-adam-adamw">2.1 Adam 与 AdamW 的区别在权重衰减的位置</h3>
+<p>Adam 用梯度的一阶、二阶移动平均决定每个参数的更新。AdamW 沿用这套自适应更新，并给权重增加一条独立的收缩路径。衰减系数设为零时，在其他设置相同的条件下，两者的更新相同。容易混淆的是 <strong>Adam 加 L2 正则</strong>：它把正则项的梯度与任务梯度相加，再把和送进 Adam。</p>
+<p>设 <span class="math-inline">\(g_t\)</span> 是当前任务损失的梯度，<span class="math-inline">\(u_t\)</span> 是根据 Adam 的两份历史状态算出的自适应更新量。三种写法的差别如下：</p>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>用什么更新一阶、二阶状态</th>
+<th>参数如何更新</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Adam（无正则）</td>
+<td><span class="math-inline">\(g_t\)</span></td>
+<td>减去 <span class="math-inline">\(\eta_t u_t\)</span></td>
+</tr>
+<tr>
+<td>Adam 加 L2 正则</td>
+<td><span class="math-inline">\(g_t+\lambda\theta_t\)</span></td>
+<td>减去 <span class="math-inline">\(\eta_t u_t\)</span>。这里的 <span class="math-inline">\(u_t\)</span> 已包含正则梯度的影响</td>
+</tr>
+<tr>
+<td>AdamW</td>
+<td><span class="math-inline">\(g_t\)</span></td>
+<td>将原权重乘以 <span class="math-inline">\(1-\eta_t\lambda\)</span>，再减去 <span class="math-inline">\(\eta_t u_t\)</span></td>
+</tr>
+</tbody>
+</table>
+<p><strong>两步手算。</strong> 假设参数初值为 2，前两步任务梯度都为零、历史状态从零开始，学习率为 0.1，衰减系数为 0.1。无正则的 Adam 两步都停在 2。AdamW 每步将权重乘以 0.99，轨迹为 <strong>2 → 1.98 → 1.9602</strong>，一阶、二阶状态始终为零。Adam 加 L2 的首步输入梯度为 0.2，偏差修正后的一阶动量为 0.2、二阶状态为 0.04，忽略很小的 <span class="math-inline">\(\epsilon\)</span> 时归一化更新量为 1，首步走到 <strong>1.9</strong>。第二步的输入梯度为 0.19，上一轮的 0.2 仍参与两份历史状态的计算。这个例子说明，同样写 0.1，L2 系数和 AdamW 衰减系数的实际作用不同。</p>
+<p>对普通 SGD，L2 正则产生的更新可以直接改写成乘法衰减：</p>
+<div class="equation">\[\theta_{t+1}=\theta_t-\eta_t(g_t+\lambda\theta_t)=(1-\eta_t\lambda)\theta_t-\eta_tg_t.\]</div>
+<p>对 Adam，正则梯度参与一阶平均，也进入平方梯度的二阶平均，因此会同时改变更新的分子、分母和后续历史状态。AdamW 的收缩则直接作用于权重。上述区分对应原论文的 Algorithm 2。<a href="https://arxiv.org/pdf/1711.05101v3">AdamW 原论文</a></p>
+<h3 id="22">2.2 完整更新链</h3>
+<p>以下按原文 Algorithm 2 整理，采用常见的学习率乘衰减系数约定。</p>
+<div class="equation">\[m_t=\beta_1m_{t-1}+(1-\beta_1)g_t,\qquad v_t=\beta_2v_{t-1}+(1-\beta_2)g_t^2.\]</div>
+<div class="equation">\[\widehat m_t=\frac{m_t}{1-\beta_1^t},\qquad \widehat v_t=\frac{v_t}{1-\beta_2^t},\qquad u_t=\frac{\widehat m_t}{\sqrt{\widehat v_t}+\epsilon}.\]</div>
+<p>梯度经过时间平滑后，用逐坐标 RMS 统计缩放。<strong>偏差修正补偿的是历史状态从零开始带来的初期偏小。</strong> 例如第一步梯度为 2，一阶系数为 0.9，二阶系数为 0.999。从零初始化时，一阶状态只收到 <span class="math-inline">\(0.1\times2=0.2\)</span>，二阶状态只收到 <span class="math-inline">\(0.001\times2^2=0.004\)</span>。分别除以 0.1 和 0.001，就得到修正后的一阶估计 2、二阶估计 4。步数增加后，分母逐渐接近 1，修正作用随之变小。Adam 和 AdamW 都做这项修正。AdamW 相比 Adam 的改动是<strong>把权重衰减单独施加到参数上</strong>。<span class="math-inline">\(\epsilon\)</span> 控制分母接近零时的数值行为。所有平方、开方、除法都逐元素执行。原文调度中的衰减记法和库函数参数可能不同，迁移时需核对实际每步收缩因子。</p>
+<figure class="paper-figure"><a href="../../../../assets/papers/adamw-lion-muon/principle-adamw.png" target="_blank"><img alt="自制优化器原理示意图" src="../../../../assets/papers/adamw-lion-muon/principle-adamw.png"/></a><figcaption>原理图 A：AdamW 的历史定标与独立衰减。输入是人为指定的偏差修正后的一阶动量和历史 RMS，忽略 epsilon，图中箭头只示意方向。 自制解释性示意，非论文实验结果；对应的可编辑公式见相邻正文。</figcaption></figure>
+<h3 id="23">2.3 证据与优缺点</h3>
+<p>原文使用 CIFAR-10、ImageNet-32×32 等图像分类配置，比较 Adam、AdamW 和动量 SGD，并扫描学习率和衰减。报告中的泛化改善属于这些数据和模型的对照结果。其理论分析解释了两种正则方式的不同，并不推出所有任务上 AdamW 均优于其他方法。</p>
+<p>优势包括逐坐标尺度适应、清晰的乘法衰减和较简单的参数类型覆盖。代价包括两份持久状态、参数级读写，以及对角统计对矩阵方向关联的表达限制。独立施加衰减改善了调参解释性，训练结果仍取决于学习率、衰减、调度、批量和参数组。</p>
+<h2 id="3-lion">3. Lion：符号更新与双时间尺度动量</h2>
+<p>Xiangning Chen 等的论文来自 Google 及 UCLA 相关团队。算法通过程序搜索、跨规模筛选和简化得到。研究发现过程包含低成本代理任务、逐级扩大任务的 funnel selection，以及排除只在代理任务有效的程序。优化器的有效性需要随后真实训练实验验证。本文采用 arXiv:2302.06675v4。<a href="https://arxiv.org/html/2302.06675v4">原始论文</a></p>
+<h3 id="31-beta">3.1 两个 beta 为何只需要一份状态</h3>
+<p>按论文 Algorithm 2，先读旧动量，再生成更新，最后写回长期状态。</p>
+<div class="equation">\[c_t=\beta_1m_{t-1}+(1-\beta_1)g_t,\qquad u_t=\operatorname{sign}(c_t).\]</div>
+<div class="equation">\[\theta_{t+1}=(1-\eta_t\lambda)\theta_t-\eta_tu_t,\qquad m_t=\beta_2m_{t-1}+(1-\beta_2)g_t.\]</div>
+<p>视觉实验常用 <span class="math-inline">\(\beta_1=0.9,\beta_2=0.99\)</span>。当前方向混合相对重视新梯度，保存的状态保留更长历史。语言实验使用另一组 beta，需按任务核对。取符号后，非零坐标在同一参数组内具有相同更新幅度，0 分量对应 0。幅度信息虽被移出当前方向，仍影响之后动量的符号翻转。</p>
+<figure class="paper-figure"><a href="../../../../assets/papers/adamw-lion-muon/principle-lion.png" target="_blank"><img alt="自制优化器原理示意图" src="../../../../assets/papers/adamw-lion-muon/principle-lion.png"/></a><figcaption>原理图 B：Lion 的双时间尺度与符号变换。数值示例取混合方向 c=(0.2,2)，取符号后为 (1,1)，不代表一条完整训练轨迹。 自制解释性示意，非论文实验结果；对应的可编辑公式见相邻正文。</figcaption></figure>
+<h3 id="32">3.2 学习率和衰减应联动核对</h3>
+<p>若有 <span class="math-inline">\(P_a\)</span> 个非零更新坐标，忽略衰减项有 <span class="math-inline">\(\|u_t\|_2=\sqrt{P_a}\)</span>。这解释了为何直接复用 AdamW 学习率可能改变整体更新规模。作者建议通常将学习率缩小 3–10 倍，并同比例提高衰减参数作为起点。因为每步收缩因子由 <span class="math-inline">\(\eta_t\lambda\)</span> 决定，调整应覆盖整个学习率调度。这个范围属于作者经验，不能代替任务验证。</p>
+<h3 id="33">3.3 实验对照与消融</h3>
+<p>下表选取原文表 2、表 7 的同模型对照。ViT 使用 ImageNet 从头训练 300 epochs，batch 4096。带增强指 RandAug 与 Mixup，指标为 ImageNet Top-1，单位为百分比。</p>
+<table>
+<thead>
+<tr>
+<th>配置</th>
+<th style="text-align: right;">AdamW</th>
+<th style="text-align: right;">Lion</th>
+<th style="text-align: right;">Lion−AdamW，百分点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ViT-B/16，无增强</td>
+<td style="text-align: right;">75.48</td>
+<td style="text-align: right;">77.44</td>
+<td style="text-align: right;">+1.96</td>
+</tr>
+<tr>
+<td>ViT-B/16，有增强</td>
+<td style="text-align: right;">80.12</td>
+<td style="text-align: right;">80.77</td>
+<td style="text-align: right;">+0.65</td>
+</tr>
+<tr>
+<td>ViT-S/16，有增强</td>
+<td style="text-align: right;">78.89</td>
+<td style="text-align: right;">79.46</td>
+<td style="text-align: right;">+0.57</td>
+</tr>
+</tbody>
+</table>
+<p>以上差值由本报告相减得到。有增强配置同时提高了两者分数，优化器之间的差距缩小。表 7 进一步将 Lion 与只使用同一 beta 的符号动量对比。</p>
+<table>
+<thead>
+<tr>
+<th>ViT-B/16，有增强</th>
+<th style="text-align: right;">AdamW</th>
+<th style="text-align: right;">单 beta=0.9</th>
+<th style="text-align: right;">单 beta=0.99</th>
+<th style="text-align: right;">Lion</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Top-1，%</td>
+<td style="text-align: right;">80.12</td>
+<td style="text-align: right;">79.54</td>
+<td style="text-align: right;">79.90</td>
+<td style="text-align: right;">80.77</td>
+</tr>
+</tbody>
+</table>
+<p>原文对优化器扫描了学习率及衰减。这个消融支持双时间尺度设计在所测配置中的作用。批量消融中，Lion 在 batch 64 也可训练，优势随批量变化，在 32K 时作者报告 77.9% 对 75.4%。这应与大批量导致步数下降的条件一起解读。<a href="https://arxiv.org/html/2302.06675v4#S4">论文 §4.1、§4.6、§5</a></p>
+<p><strong>优势与局限。</strong> <strong>Lion 节省一份持久参数级状态</strong>，更新只需混合与符号操作。近零坐标也可能有完整步长，晚期收敛依赖学习率衰减。丢弃幅度会限制某些任务，论文在部分语言任务上报告收益较小或统计上不显著。该研究并未将一份状态等同于总显存减半。</p>
+<h2 id="4-muon">4. Muon：矩阵更新的奇异方向处理</h2>
+<p>Muon 最初由 Keller Jordan 等的开放研究与训练实践提出。Jingyuan Liu、Jianlin Su 等 Moonshot AI 与 UCLA 署名团队的《Muon is Scalable for LLM Training》研究其扩展到大模型的条件。算法来源与扩展论文应分别标注。本文公式采用扩展论文 v1，并以作者代码检查实现差异。<a href="https://github.com/KellerJordan/Muon">原作者实现</a> · <a href="https://arxiv.org/html/2502.16982v1">扩展论文</a></p>
+<h3 id="41">4.1 从矩阵动量到极分解方向</h3>
+<p>对 <span class="math-inline">\(W\in\mathbb R^{a\times b}\)</span>，论文式 (1) 使用 <span class="math-inline">\(M_t=\mu M_{t-1}+G_t\)</span>。若 <span class="math-inline">\(M_t=U\Sigma V^{\mathsf T}\)</span>，理想变换为</p>
+<div class="equation">\[O_t=UV^{\mathsf T}.\]</div>
+<p>满行秩时也可写成 <span class="math-inline">\((M_tM_t^{\mathsf T})^{-1/2}M_t\)</span>。秩不足时需用相应伪逆或在非零奇异子空间上解释，逆平方根的普通逆表达存在条件。对矩形矩阵，行或列可以正交，不能同时要求两者均为单位阵。</p>
+<p>理想化的几何解释是求解谱范数约束下的线性问题</p>
+<div class="equation">\[\arg\min_{\|\Delta\|_2\le1}\langle M_t,\Delta\rangle=-UV^{\mathsf T}.\]</div>
+<p>这里 <span class="math-inline">\(\langle A,B\rangle=\operatorname{tr}(A^{\mathsf T}B)\)</span>，谱范数约束的是最大奇异值。该式解释方向变换，完整随机非凸训练的收敛表现还取决于动量、步长与模型。</p>
+<figure class="paper-figure"><a href="../../../../assets/papers/adamw-lion-muon/principle-muon.png" target="_blank"><img alt="自制优化器原理示意图" src="../../../../assets/papers/adamw-lion-muon/principle-muon.png"/></a><figcaption>原理图 C：Muon 的矩阵极分解，与逐元素取符号对照。这里显示理想方向，实际有限步近似与实现尺度另见下文。 自制解释性示意，非论文实验结果；对应的可编辑公式见相邻正文。</figcaption></figure>
+<h3 id="42-newtonschulz">4.2 Newton–Schulz 如何实现</h3>
+<p>论文式 (2) 先作 Frobenius 范数归一化 <span class="math-inline">\(X_0=M_t/(\|M_t\|_F+\epsilon)\)</span>，再迭代</p>
+<div class="equation">\[A_k=X_kX_k^{\mathsf T},\qquad X_{k+1}=a_0X_k+(b_0A_k+c_0A_k^2)X_k.\]</div>
+<p>采用 <span class="math-inline">\(a_0=3.4445,b_0=-4.7750,c_0=2.0315\)</span>。原作者代码的五步版本用 BF16 矩阵乘法，必要时转置，让形成的方阵在较小维度上。代码明确说明有限步多项式并不精确生成所有奇异值为 1 的矩阵。生产对比应记录迭代次数、精度、转置方向和矩阵分块。</p>
+<p>现行原作者实现先用插值维护动量，再可选 Nesterov 混合，默认隐藏矩阵走 Muon，embedding、输出头、增益与偏置交给辅助 AdamW。数学介绍采用的无归一化动量与代码 EMA 约定也需一起考虑。全局标量对理想极分解的方向影响有限，实际有限步近似和数值精度仍需核对。<a href="https://raw.githubusercontent.com/KellerJordan/Muon/master/muon.py">实现源码</a></p>
+<h3 id="43">4.3 为何大规模扩展需要额外尺度修正</h3>
+<p>满秩情况下 <span class="math-inline">\(r=\min(a,b)\)</span>，<span class="math-inline">\(O\)</span> 的 Frobenius 范数为 <span class="math-inline">\(\sqrt r\)</span>，所以</p>
+<div class="equation">\[\operatorname{RMS}(O)=\sqrt{\frac{r}{ab}}=\frac1{\sqrt{\max(a,b)}}.\]</div>
+<p>例如 <span class="math-inline">\(4096\times4096\)</span> 矩阵的理想更新 RMS 是 <span class="math-inline">\(1/64\)</span>，<span class="math-inline">\(4096\times16384\)</span> 则为 <span class="math-inline">\(1/128\)</span>。形状改变会改变有效步长。扩展论文式 (4) 使用</p>
+<div class="equation">\[W_{t+1}=(1-\eta_t\lambda)W_t-\eta_t\,0.2\sqrt{\max(a,b)}\,O_t.\]</div>
+<p>0.2 来自作者对 AdamW 更新 RMS 的经验匹配。原作者仓库另有 <span class="math-inline">\(\sqrt{\max(1,a/b)}\)</span> 的尺度约定，复现时不能只看优化器名称。增加衰减则控制长训练中的权重尺度增长。论文在 800M 模型、100B tokens 的过训练配置中比较无衰减与有衰减，后者长期验证损失更低。</p>
+<figure class="paper-figure"><a href="../../../../assets/papers/adamw-lion-muon/muon-figure2-weight-decay.png" target="_blank"><img alt="Muon 原文图 2：权重衰减对照" src="../../../../assets/papers/adamw-lion-muon/muon-figure2-weight-decay.png"/></a><figcaption>图 1：Liu 等《Muon is Scalable for LLM Training》arXiv v1，原文图 2（第 4 页），仅截取图及原图注，保留全部坐标、图例和插图，未修改图内内容。来源为参考文献 5，原文许可 CC BY-NC-ND 4.0；本地非商业调研预览。横轴为训练迭代，纵轴为验证损失，越低越好。绿色为 AdamW，红色为无衰减 Muon，蓝色为加入衰减的 Muon。局部放大显示早期与后期排序发生变化：作者报告无衰减在 24,000 步领先约 0.023，但在 66,000 步有衰减领先约 0.017。短程最优设置不能直接迁移到长程训练。</figcaption></figure>
+<h3 id="44">4.4 大规模实验证据与反例</h3>
+<p>Scaling-law 实验使用五档 Llama 类稠密模型，非 embedding 参数从 399M 到 1.5B，训练 tokens 为 8.92B 到 38.91B，上下文 8K。AdamW 先做网格搜索，Muon 在尺度匹配后复用其超参数。作者在这个拟合范围内报告<strong>达到相应损失约需 AdamW 52% 的训练 FLOPs</strong>。<a href="https://arxiv.org/html/2502.16982v1#S3.SS2">原文表 2–3</a></p>
+<figure class="paper-figure"><a href="../../../../assets/papers/adamw-lion-muon/muon-figure3-scaling.png" target="_blank"><img alt="Muon 原文图 3：扩展规律" src="../../../../assets/papers/adamw-lion-muon/muon-figure3-scaling.png"/></a><figcaption>图 2：同一论文 v1 原文图 3（第 7 页），仅截取结果图及原图注，保留坐标和图例，来源及许可同图 1。图 3 横轴为训练计算量 PFLOP/s-days，纵轴为 8K 序列语言模型损失；蓝色 Muon 拟合曲线在红色 AdamW 下方。52% 是该训练配置及拟合范围内的计算量比值，不能直接读成任意硬件上训练时间减少 48%。对应原文表 2 的模型规模与训练 tokens 已在上文列明；图中实线为各规模训练轨迹，虚线为扩展规律拟合。</figcaption></figure>
+<p>另一个控制程度更直接的结果是表 4 的 Moonlight-A 与 Moonlight。二者采用相同训练设置、1.2T token 中间点和相同架构，主要改变优化器。表中分数按原文保留，HumanEval 为 Pass@1，其余按原文 benchmark 设置。</p>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th style="text-align: right;">Moonlight-A（AdamW）</th>
+<th style="text-align: right;">Moonlight（Muon）</th>
+<th style="text-align: right;">差值，百分点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MMLU</td>
+<td style="text-align: right;">60.2</td>
+<td style="text-align: right;">60.4</td>
+<td style="text-align: right;">+0.2</td>
+</tr>
+<tr>
+<td>HumanEval</td>
+<td style="text-align: right;">29.3</td>
+<td style="text-align: right;">37.2</td>
+<td style="text-align: right;">+7.9</td>
+</tr>
+<tr>
+<td>MATH</td>
+<td style="text-align: right;">16.1</td>
+<td style="text-align: right;">19.8</td>
+<td style="text-align: right;">+3.7</td>
+</tr>
+<tr>
+<td>BBH</td>
+<td style="text-align: right;">45.3</td>
+<td style="text-align: right;">43.2</td>
+<td style="text-align: right;">−2.1</td>
+</tr>
+</tbody>
+</table>
+<p>BBH 的下降应与其他指标的改善一起报告。该模型排除 embedding 后总参数 15.29B、激活参数 2.24B。完整 Moonlight 后续训练到 5.7T tokens，不应把那个最终模型与本表中间点混为一组对照。</p>
+<p>SFT 反例来自表 7。对 Qwen2.5-7B 使用 tulu-3-sft-mixture，8K 打包序列，余弦学习率 <span class="math-inline">\(2\times10^{-5}\to2\times10^{-6}\)</span>。原文将基线标为 Adam-SFT，故保留其命名。</p>
+<table>
+<thead>
+<tr>
+<th>SFT 指标</th>
+<th style="text-align: right;">Adam-SFT</th>
+<th style="text-align: right;">Muon-SFT</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MMLU</td>
+<td style="text-align: right;">71.4</td>
+<td style="text-align: right;">70.8</td>
+</tr>
+<tr>
+<td>HumanEval</td>
+<td style="text-align: right;">79.3</td>
+<td style="text-align: right;">77.4</td>
+</tr>
+<tr>
+<td>MBPP</td>
+<td style="text-align: right;">71.9</td>
+<td style="text-align: right;">71.6</td>
+</tr>
+<tr>
+<td>GSM8K</td>
+<td style="text-align: right;">89.8</td>
+<td style="text-align: right;">85.8</td>
+</tr>
+</tbody>
+</table>
+<p><strong>这个对照中 Muon 未提高所列分数</strong>。预训练与微调优化器匹配、学习率和已有权重的谱结构可能影响切换效果，因果机制仍需进一步消融。<a href="https://arxiv.org/html/2502.16982v1#S3">原文 §3.3–3.5</a></p>
+<figure class="paper-figure"><a href="../../../../assets/papers/adamw-lion-muon/principle-comparison.png" target="_blank"><img alt="自制优化器原理示意图" src="../../../../assets/papers/adamw-lion-muon/principle-comparison.png"/></a><figcaption>原理图 D：统一更新链中的三种信息处理方式。状态份数指常规实现的梯度历史状态，不是整机显存。 自制解释性示意，非论文实验结果；对应的可编辑公式见相邻正文。</figcaption></figure>
+<h2 id="5">5. 三者的本质区别及数值例子</h2>
+<figure class="paper-figure"><a aria-label="打开原尺寸对比图" href="../../../../assets/papers/adamw-lion-muon/optimizer-single-geometry.png" target="_blank"><img alt="三种优化器在同一尺度下的更新几何" height="1000" src="../../../../assets/papers/adamw-lion-muon/optimizer-single-geometry.png" style="width:100%;height:auto" width="1800"/></a><figcaption>原理图 E：同一输入矩阵在指定中间状态下的更新几何。灰箭头为输入列，彩箭头为输出列，曲线为单位圆经过输出矩阵后的形状，不是损失等高线、优化轨迹或性能排序。具体数值：各方法的中间方向人为设为 M=[[1,2],[0,1]]；AdamW 的修正一阶动量取 M，假定修正后历史 RMS=[[2,4],[1,2]]，忽略 epsilon，得到 [[0.5,0.5],[0,0.5]]；Lion 的混合动量取 M，取符号得到 [[1,1],[0,1]]；Muon 对 M 的理想极分解为 [[0.707,0.707],[-0.707,0.707]]（四舍五入）。这不是相同梯度历史的训练对照。Muon 为满秩方阵的理想结果，实际有限步近似及 RMS 缩放会改变数值；三者均可另加解耦衰减，参数实际沿负更新方向移动。不能据此比较收敛快慢。自制手算示意，非论文实验。</figcaption></figure>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>AdamW</th>
+<th>Lion</th>
+<th>Muon</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>更新粒度</td>
+<td>标量坐标</td>
+<td>标量坐标</td>
+<td>权重矩阵</td>
+</tr>
+<tr>
+<td>梯度历史</td>
+<td>一阶及平方梯度 EMA</td>
+<td>一份 EMA，两套混合系数</td>
+<td>矩阵动量</td>
+</tr>
+<tr>
+<td>幅度处理</td>
+<td>除以逐坐标历史 RMS</td>
+<td>取混合动量符号</td>
+<td>近似均衡奇异方向幅度</td>
+</tr>
+<tr>
+<td>参数重排影响</td>
+<td>相同标量序列逐元素处理</td>
+<td>相同标量序列逐元素处理</td>
+<td>矩阵组织、reshape 和分块决定几何</td>
+</tr>
+<tr>
+<td>持久状态（FP32）</td>
+<td>约 <span class="math-inline">\(8P\)</span> 字节</td>
+<td>约 <span class="math-inline">\(4P\)</span> 字节</td>
+<td>Muon 参数约 <span class="math-inline">\(4P_M\)</span>，另有辅助 AdamW 状态</td>
+</tr>
+<tr>
+<td>更新计算</td>
+<td>元素混合、平方、开方、除法</td>
+<td>元素混合与符号</td>
+<td>动量加多轮矩阵乘法</td>
+</tr>
+<tr>
+<td>适用证据</td>
+<td>多类模型中的常用自适应基线</td>
+<td>视觉、扩散及部分语言任务</td>
+<td>隐藏矩阵，较强证据来自语言预训练</td>
+</tr>
+</tbody>
+</table>
+<p>对某一步的 <span class="math-inline">\(c=(0.01,100)\)</span>，Lion 给出 <span class="math-inline">\((1,1)\)</span>。AdamW 若历史 RMS 分别为 <span class="math-inline">\((0.1,100)\)</span> 且动量取相同 <span class="math-inline">\(c\)</span>，则方向约为 <span class="math-inline">\((0.1,1)\)</span>。这是假定历史状态的手算例子，说明 AdamW 的结果依赖历史分母。</p>
+<p>对矩阵动量 <span class="math-inline">\(M=\operatorname{diag}(100,1)\)</span>，理想 Muon 为 <span class="math-inline">\(I\)</span>。Lion 对这个例子也会给出 <span class="math-inline">\(I\)</span>，但一般稠密矩阵就不同。令</p>
+<div class="equation">\[M=\begin{bmatrix}1&amp;2\\0&amp;1\end{bmatrix},\quad \operatorname{sign}(M)=\begin{bmatrix}1&amp;1\\0&amp;1\end{bmatrix},\quad \operatorname{polar}(M)=\frac1{\sqrt2}\begin{bmatrix}1&amp;1\\-1&amp;1\end{bmatrix}.\]</div>
+<p>Muon 的理想方向在原来为零的位置也出现非零元素，因为它处理的是整体矩阵映射。上述例子由极分解计算，为机制示意，不代表训练实验结果。AdamW 的对角预处理也会随着参数基底变化，Muon 理想变换对正交基变换具有相应等变性质，但模型层、非线性和参数分组限制了将其推广为完整模型的旋转不变结论。</p>
+<h2 id="6">6. 成本、调参与失效条件</h2>
+<p><strong>内存。</strong> 若总共 1B 个参数，FP32 的两份 AdamW 状态约为 8 GB，Lion 约为 4 GB，均为十进制容量。还需参数、梯度、激活、主权重、缓存与通信缓冲。Muon 的总持久状态为 <span class="math-inline">\(4P_M+8P_A\)</span> 字节，其中 <span class="math-inline">\(P_A\)</span> 为辅助 AdamW 参数，临时矩阵空间另算。这个估算可用于核对分配记录，不能直接换算成整机显存节省比例。</p>
+<p><strong>计算。</strong> 对 <span class="math-inline">\(a\le b\)</span>，形成 <span class="math-inline">\(XX^{\mathsf T}\)</span> 及其乘积的单步主要成本约含 <span class="math-inline">\(O(a^2b+a^3)\)</span>，乘以迭代次数。Muon 可将部分计算交给矩阵乘法硬件。分片存储下若必须恢复整矩阵或改变通信模式，通信成本也会变化。Lion 简化的是更新内核，端到端训练还可能由前后向或通信主导。</p>
+<p><strong>调参。</strong> AdamW 的 beta、epsilon、衰减和 warmup 应按模型验证。Lion 应同步缩放起始、峰值和末端学习率，检查衰减乘积。Muon 应先核对矩阵分组、更新 RMS、精度和 Nesterov，再选学习率。LoRA 的 <span class="math-inline">\(BA\)</span> 分解中分别改变 <span class="math-inline">\(A\)</span>、<span class="math-inline">\(B\)</span> 会受到参数化尺度对称性影响，现有预训练证据不足以直接决定低秩微调配置。</p>
+<table>
+<thead>
+<tr>
+<th>可能失败的情形</th>
+<th>应记录的现象</th>
+<th>针对性对照</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Lion 小梯度频繁翻符号</td>
+<td>坐标符号翻转率、后期验证损失</td>
+<td>更低末端学习率、调整 beta，匹配预算</td>
+</tr>
+<tr>
+<td>Muon 更改矩阵拆分</td>
+<td>各层更新 RMS 和奇异谱变化</td>
+<td>合并与拆分的 QKV/头/专家独立对照</td>
+</tr>
+<tr>
+<td>Muon 从其他优化器切换</td>
+<td>切换前后损失、更新范数和遗忘</td>
+<td>同一预训练检查点，各自调学习率</td>
+</tr>
+<tr>
+<td>AdamW 低精度状态</td>
+<td>分母分布、溢出和异常更新</td>
+<td>更高精度状态及 epsilon 消融</td>
+</tr>
+<tr>
+<td>任一方法只赢步数</td>
+<td>步时间、峰值内存、总 tokens</td>
+<td>以达到目标验证损失的实际耗时复核</td>
+</tr>
+</tbody>
+</table>
+<h2 id="7">7. 调研归纳与后续研究方向</h2>
+<p><strong>演变逻辑。</strong> 权重衰减解耦可与符号更新或矩阵更新组合。Lion 的双时间尺度和 Muon 的矩阵正交化也不构成严格继承链。当前三项方法分别改变正则化方式、逐坐标信息保留和矩阵方向处理。采用统一更新 RMS 和同等调参预算，才能判断哪一项改变产生收益。</p>
+<p><strong>证据强弱。</strong> AdamW 的贡献有明确的代数不等价性。Lion 有同模型任务对照、增强条件及双 beta 消融。Muon 的预训练扩展研究有较大规模训练和同架构对照，同时 SFT 切换结果显示泛化边界。矩阵谱熵上升属于机制相关观察，仍需控制架构、正则化与轨迹后评估因果解释。</p>
+<p><strong>研究方向。</strong> 一是按参数类型配置更新器并追踪辅助优化器的开销。二是降低矩阵近似的计算与通信成本，检验迭代精度与训练质量的关系。三是研究预训练到 SFT、LoRA 等阶段的优化器切换。四是在不同批量与精度下联合研究学习率、衰减与更新尺度。上述方向从所读论文的消融及局限归纳，具体效果需要实验验证。</p>
+<p>复现实验可选择同一小型 Transformer 及 ViT，各固定模型、数据顺序、训练 tokens、精度和调度族，给三种方法相同的超参数搜索预算。至少报告多随机种子的均值、离散程度、验证损失、下游质量、总 FLOPs、实际耗时与峰值显存。Muon 基线需写清哪些参数采用辅助 AdamW。对切换实验保留同一个预训练检查点，并比较重置与保留可迁移状态的约定。</p>
+<h2 id="8">8. 参考文献与版本</h2>
+<ol>
+<li>Kingma D. P., Ba J. <em>Adam: A Method for Stochastic Optimization</em>. ICLR 2015。<a href="https://arxiv.org/pdf/1412.6980">公开全文</a></li>
+<li>Loshchilov I., Hutter F. <em>Decoupled Weight Decay Regularization</em>. ICLR 2019，本文采用 arXiv:1711.05101v3。<a href="https://arxiv.org/pdf/1711.05101v3">论文</a> · <a href="https://github.com/loshchil/AdamW-and-SGDW">作者代码</a></li>
+<li>Chen X., Liang C., Huang D., Real E., Wang K., Liu Y., Pham H., Dong X., Luong T., Hsieh C.-J., Lu Y., Le Q. V. <em>Symbolic Discovery of Optimization Algorithms</em>. 2023，arXiv:2302.06675v4。<a href="https://arxiv.org/html/2302.06675v4">全文</a> · <a href="https://github.com/google/automl/tree/master/lion">作者实现</a></li>
+<li>Jordan K. 等，<em>Muon: An Optimizer for Hidden Layers in Neural Networks</em>，开放研究与实现。<a href="https://kellerjordan.github.io/posts/muon/">方法说明</a> · <a href="https://github.com/KellerJordan/Muon">实现</a></li>
+<li>Liu J., Su J., Yao X. 等，<em>Muon is Scalable for LLM Training</em>. 2025，arXiv:2502.16982v1。<a href="https://arxiv.org/html/2502.16982v1">全文</a> · <a href="https://github.com/MoonshotAI/Moonlight">Moonlight 项目</a></li>
+</ol></main><footer class="wrap"><a class="brand" href="https://lucky-xing.github.io/index.html">Lighting Future</a><span>保持好奇。持续记录。</span><a href="https://github.com/lucky-xing/">GitHub ↗</a></footer><script defer="" src="../../../../theme-motion.js"></script></body></html>
